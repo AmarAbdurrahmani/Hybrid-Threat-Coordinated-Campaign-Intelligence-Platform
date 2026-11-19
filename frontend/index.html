@@ -63,6 +63,8 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
   .leaflet-tooltip-bottom:before{top:0;margin-top:-10px;left:50%;margin-left:-5px;border-bottom-color:#2b3a4d}
   .leaflet-div-icon{background:transparent;border:none}
   /* --- map theme --- */
+  /* OpenStreetMap tiles are light; darken only the tile layer so markers/lines/tooltips keep their colours */
+  .osm-dark-tiles{filter:invert(1) hue-rotate(180deg) brightness(.78) contrast(.92) saturate(.35)}
   .tip-hostile{border-color:#f43f5e88;color:#fecdd3}.tip-hostile.leaflet-tooltip-right:before{border-right-color:#f43f5e88}.tip-hostile.leaflet-tooltip-left:before{border-left-color:#f43f5e88}
   .tip-target{border-color:#e2e8f055;font-weight:600}
   .hostile-node{filter:drop-shadow(0 0 5px #f43f5e) drop-shadow(0 0 12px #f43f5e99)}
@@ -1075,7 +1077,7 @@ if (typeof module !== "undefined") module.exports = Engine;
       L.marker([la, lo], { interactive: false, icon: L.divIcon({ className: 'map-label', html: n, iconSize: null, iconAnchor: [-6, 6] }) }).addTo(LREF);
     });
     REGIONS.strategic.concat(REGIONS.theatre).forEach(([n, la, lo]) => L.marker([la, lo], { interactive: false, icon: L.divIcon({ className: 'map-region', html: n, iconSize: null, iconAnchor: [40, 8] }) }).addTo(LREF));
-    mapNotice('Map tiles are blocked inside this hosted viewer, so a reference grid is shown. Pan, zoom and fly-to all work. Open the HTML file directly in a browser for the CartoDB Dark Matter basemap.');
+    mapNotice('Map tiles are blocked inside this hosted viewer, so a reference grid is shown. Pan, zoom and fly-to all work. Open the HTML file directly in a browser for the OpenStreetMap basemap.');
   }
   function initLeaflet() {
     if (LMAP) return true;
@@ -1084,7 +1086,7 @@ if (typeof module !== "undefined") module.exports = Engine;
     LMAP = L.map(el, { zoomSnap: 0.25, minZoom: 3, maxZoom: 13, worldCopyJump: false, attributionControl: true, zoomControl: true });
     LMAP.attributionControl.setPrefix('Leaflet');
     LMAP.fitBounds(VIEW_BOUNDS[state.mapView], { padding: [10, 10] });
-    const tiles = L.tileLayer('https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png', { subdomains: 'abcd', maxZoom: 19, attribution: '&copy; OpenStreetMap contributors &copy; CARTO' }).addTo(LMAP);
+    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, className: 'osm-dark-tiles', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors' }).addTo(LMAP);
     tiles.on('tileload', () => { tileOk++; if (LREF) { LMAP.removeLayer(LREF); LREF = null; mapNotice(null); } });
     tiles.on('tileerror', () => { tileErr++; if (!tileOk && tileErr >= 2) addReferenceLayer(); });
     setTimeout(() => { if (!tileOk) addReferenceLayer(); }, 3500);
