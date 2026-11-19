@@ -69,3 +69,15 @@ def test_simulated_swarm_reaches_level1():
     assert r["thread"]["level"] == 1
     bg = [i for i in r["items"] if i["c"]["user"].startswith("sim_citizen")]
     assert all(i["tier"] == "organic" for i in bg)
+
+
+def test_energy_cyber_panic_scenario_reaches_level1():
+    for lang in ("en", "sq"):
+        cs = simulate_swarm(["t1", "t2"], accounts=12, background=6, seed=5, lang=lang, scenario="energy")
+        co = build_coactivity(cs)
+        r = analyze_thread([c for c in cs if c["thread_id"] == "t2"], embedder=Embedder(), coactivity=co)
+        assert r["thread"]["level"] == 1, lang
+        swarm = [i for i in r["items"] if not i["c"]["user"].startswith("sim_citizen")]
+        assert any(t["key"] == "infrastructure_panic" for i in swarm for t in i["tropes"]), lang
+        bg = [i for i in r["items"] if i["c"]["user"].startswith("sim_citizen")]
+        assert all(i["tier"] == "organic" for i in bg), lang

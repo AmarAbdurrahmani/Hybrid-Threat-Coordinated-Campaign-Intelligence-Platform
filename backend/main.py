@@ -107,7 +107,8 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="Hybrid Threat & Coordinated Campaign Intelligence Platform API", version="1.0", lifespan=lifespan)
-app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_methods=["*"], allow_headers=["*"])
+app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_origin_regex=settings.cors_origin_regex or None,
+                   allow_methods=["*"], allow_headers=["*"])
 
 
 def require_key(x_api_key: str | None = Header(default=None)):
@@ -154,6 +155,7 @@ class SimulateIn(BaseModel):
     background: int = Field(6, ge=0, le=50, description="Organic background comments per thread")
     include_infra: bool = True
     include_accounts: bool = True
+    scenario: Literal["kfor", "energy"] = Field("kfor", description="kfor = NATO/KFOR disinformation; energy = Critical Energy Infrastructure Cyber-Panic")
 
 
 class SourceIn(BaseModel):
@@ -222,16 +224,16 @@ async def ingest_portal(b: PortalIn):
 @app.post("/api/simulate-attack", dependencies=[Depends(require_key)])
 async def simulate_attack(b: SimulateIn):
     n = int(time.time())
-    title = "Kosovo–Serbia dialogue resumes in Brussels as NATO confirms KFOR posture"
+    title = ingest.SCENARIOS[b.scenario]["title"]
     tids = [b.thread_id] if b.thread_id else []
-    tids += [f"sim:demo-{n}-{k}" for k in range(b.spread_threads - len(tids))]
+    tids += [f"sim:{'demo' if b.scenario == 'kfor' else b.scenario}-{n}-{k}" for k in range(b.spread_threads - len(tids))]
     threads = []
     for k, tid in enumerate(tids):
         if not pipeline.store.get_thread(tid):
             threads.append({"id": tid, "platform": "simulated", "title": f"[EXERCISE] {title}" + (f" (mirror {k})" if k else ""), "simulated": True,
                             "published": time.time() * 1000 - (len(tids) - 1 - k) * 25 * 60000 - 3 * 60000})
     comments = ingest.simulate_swarm(tids, accounts=b.accounts, window_s=b.window_s, lang=b.lang, include_infra=b.include_infra,
-                                     include_accounts=b.include_accounts, background=b.background)
+                                     include_accounts=b.include_accounts, background=b.background, scenario=b.scenario)
     res = await pipeline.ingest(threads, comments)
     return {**res, "thread_ids": tids, "primary": tids[-1]}
 

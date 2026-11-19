@@ -313,11 +313,55 @@ _ORGANIC = [
     "Brussels again... let's hope for something concrete.", "The video sound is bad, can you upload it again?", "Finally some news on the energy deal.",
 ]
 
+# Scenario 2: Critical Energy Infrastructure Cyber-Panic. A swarm exploits a (fictional)
+# grid disturbance to push blackout / poisoned-water / "hacked grid" panic, wrapped in
+# sell-out and statehood-denial framing. Each template is written to hit the
+# infrastructure_panic lexicon (plus calques / doublets) so detection behaves like scenario 1.
+_ENERGY_TALKING_POINTS = {
+    "en": [
+        "The power in the whole north will be cut {tonight}, get ready! They are hiding the truth.",
+        "Hackers took the grid, electricity will go out for days. It is a question of the time.",
+        "The water in Pristina is poisoned, do not drink it. They are {selling} us out for their own interests.",
+        "The {grid_op} servers are hacked and the internet will go out {tonight}. Buy fuel and get ready!",
+        "At the end of the ends, we are not a state if we cannot even keep the lights on.",
+        "It is being worked about a secret plan: the electricity is being cut on purpose. The West sold us out.",
+    ],
+    "sq": [
+        "Rryma në veri do të ndërpritet sonte, përgatituni! Po na e fshehin të vërtetën.",
+        "Hakerët e morën rrjetin, energjia do të ndërpritet për ditë të tëra. Kjo është pyetje e kohës.",
+        "Uji në Prishtinë është helmuar, mos e pini! Na shet për interesat e veta.",
+        "Interneti do të prishet sonte, blini karburant dhe përgatituni!",
+        "Në fund të fundeve ne s'jemi shtet, as dritat s'i mbajmë ndezur.",
+        "Punohet për një plan të fshehtë: rryma po ndërpritet qëllimisht. Ky sistem âsht nji kurth, është një lojë.",
+    ],
+}
+_ENERGY_ORGANIC = [
+    "Does the grid operator have an official statement on the outage?", "Power came back in my neighbourhood an hour ago.",
+    "Please share only official sources, not rumours.", "Is there a schedule for the maintenance work?", "Thanks for the update, stay safe everyone.",
+    "Our street had a short outage this morning, all fine now.", "Which areas were affected exactly?", "Good that the CERT is looking into it.",
+    "Hospitals have generators, no need to panic.", "Will the article be updated when they publish the report?", "The heating is working normally here.",
+    "We need investment in the network, this happens every winter.", "Can someone post the customer service number?", "Calm here in Peja, lights are on.",
+    "I hope they explain what happened in detail.", "Same problem last year with the transformer near the river.",
+]
+SCENARIOS = {
+    "kfor": {"label": "Kosovo–Serbia dialogue / NATO-KFOR disinformation",
+             "title": "Kosovo–Serbia dialogue resumes in Brussels as NATO confirms KFOR posture",
+             "talking_points": _TALKING_POINTS, "organic": _ORGANIC, "syn": _SYN},
+    "energy": {"label": "Critical Energy Infrastructure Cyber-Panic",
+               "title": "Grid operator reports disturbance in northern Kosovo; cyber-incident under investigation",
+               "talking_points": _ENERGY_TALKING_POINTS, "organic": _ENERGY_ORGANIC,
+               "syn": {"selling": ["selling", "trading"], "tonight": ["tonight", "by midnight"], "grid_op": ["grid operator", "power company"]}},
+}
+
 
 def simulate_swarm(thread_ids: list[str], *, accounts: int = 12, window_s: int = 240, lang: str = "en", include_infra: bool = True,
-                   include_accounts: bool = True, background: int = 6, start_ms: float | None = None, seed: int | None = None) -> list[dict]:
+                   include_accounts: bool = True, background: int = 6, start_ms: float | None = None, seed: int | None = None,
+                   scenario: str = "kfor") -> list[dict]:
     """A coordinated swarm hitting each thread in `thread_ids` with the SAME account pool,
-    so the cross-thread co-activity graph links them. Optional organic background chatter."""
+    so the cross-thread co-activity graph links them. Optional organic background chatter.
+    `scenario` picks the narrative set (see SCENARIOS)."""
+    sc = SCENARIOS.get(scenario) or SCENARIOS["kfor"]
+    talking_points, organic_pool, syn = sc["talking_points"], sc["organic"], sc["syn"]
     rnd = random.Random(seed)
     now = start_ms or time.time() * 1000
     pool = [f"sim_{rnd.choice(['drita', 'arben', 'besa', 'ilir', 'valon', 'genta', 'endrit', 'mimoza', 'kushtrim', 'albana', 'fatos', 'rina', 'korab', 'dren'])}{rnd.randint(10, 99)}_{i:02d}"
@@ -326,7 +370,7 @@ def simulate_swarm(thread_ids: list[str], *, accounts: int = 12, window_s: int =
     created0 = datetime.now(timezone.utc) - timedelta(days=rnd.randint(20, 35))
     infra_keys = list(SIM_INFRA)
     out = []
-    organic = rnd.sample(_ORGANIC, len(_ORGANIC))
+    organic = rnd.sample(organic_pool, len(organic_pool))
     for ti, tid in enumerate(thread_ids):
         t0 = now - (len(thread_ids) - 1 - ti) * 25 * 60000  # earlier threads first, 25 min apart
         for k in range(background):
@@ -335,8 +379,8 @@ def simulate_swarm(thread_ids: list[str], *, accounts: int = 12, window_s: int =
                         "account": {"created": (datetime.now(timezone.utc) - timedelta(days=rnd.randint(900, 4000))).date().isoformat(),
                                     "followers": rnd.randint(60, 900), "tagged_photos": rnd.randint(5, 120), "friends": [f"o{rnd.randint(0, 9999)}" for _ in range(10)]} if include_accounts else None})
         for i, u in enumerate(pool):
-            tpl = rnd.choice(_TALKING_POINTS[lang])
-            text = tpl.format(**{k: rnd.choice(v) for k, v in _SYN.items()})
+            tpl = rnd.choice(talking_points[lang])
+            text = tpl.format(**{k: rnd.choice(v) for k, v in syn.items()})
             c = {"id": f"sim:{tid}:{u}:{int(t0)}", "thread_id": tid, "platform": "simulated", "simulated": True, "user": u,
                  "ts": t0 + rnd.uniform(0, window_s) * 1000, "text": text}
             if include_accounts:

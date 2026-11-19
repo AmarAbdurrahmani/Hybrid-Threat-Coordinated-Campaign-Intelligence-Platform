@@ -91,6 +91,20 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
   ::-webkit-scrollbar { width: 8px; height: 8px; } ::-webkit-scrollbar-thumb { background: #1e2a38; border-radius: 8px; }
   .node { cursor: pointer; transition: r .15s; }
   .fade-in { animation: fade .25s ease-out; } @keyframes fade { from { opacity: 0; transform: translateY(4px); } }
+  /* --- SitRep PDF export (window.print): print only #printArea, black on white --- */
+  @media print {
+    @page { size: A4; margin: 14mm 14mm 16mm; }
+    html, body { background: #fff !important; color: #000 !important; }
+    body { background-image: none !important; }
+    body > *:not(#printArea) { display: none !important; }
+    #printArea { display: block !important; font-family: Inter, system-ui, sans-serif; color: #000; }
+    #printArea .pa-banner { text-align: center; font: 600 8pt/1.6 'JetBrains Mono', ui-monospace, monospace; letter-spacing: .18em; border: 1px solid #000; padding: 1mm 0; }
+    #printArea .pa-foot { margin-top: 6mm; }
+    #printArea .pa-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6mm; margin: 5mm 0 3mm; padding-bottom: 2mm; border-bottom: 1.5px solid #000; }
+    #printArea .pa-title { font-size: 14pt; font-weight: 700; }
+    #printArea .pa-meta { font: 8pt 'JetBrains Mono', ui-monospace, monospace; color: #333; text-align: right; }
+    #printArea pre { margin: 0; white-space: pre-wrap; word-break: break-word; font: 8.6pt/1.45 'JetBrains Mono', ui-monospace, monospace; color: #000; orphans: 3; widows: 3; }
+  }
 </style>
 </head>
 <body class="text-slate-200 font-sans antialiased grid-bg min-h-screen">
@@ -116,6 +130,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
     <div class="flex flex-wrap gap-2 shrink-0">
       <button id="btnReset" class="text-xs px-3 py-1.5 rounded-lg border border-ink-600 hover:bg-ink-800">Reset demo</button>
       <button id="btnCopy" class="text-xs px-3 py-1.5 rounded-lg border border-ink-600 hover:bg-ink-800">Copy JSON</button>
+      <button id="btnPdf" class="text-xs px-3 py-1.5 rounded-lg border border-ink-600 hover:bg-ink-800" title="Opens the print dialog — choose “Save as PDF”">Export SitRep PDF</button>
       <button id="btnLive" class="text-xs px-3 py-1.5 rounded-lg border border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/10 inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot"></span>Live Test</button>
       <button id="btnSitrep" class="text-xs font-semibold px-3.5 py-1.5 rounded-lg bg-emerald-500 text-ink-950 hover:bg-emerald-400">Generate Operational Briefing / SitRep</button>
     </div>
@@ -127,6 +142,10 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
     <select id="liveThreads" class="flex-1 min-w-0 text-xs bg-ink-950 border border-ink-600 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500"></select>
     <div class="flex flex-wrap gap-2 shrink-0">
       <input id="liveKey" type="password" placeholder="API key" class="hidden w-28 text-xs bg-ink-950 border border-ink-600 rounded-lg px-2.5 py-1.5">
+      <select id="liveScenario" title="Attack simulation scenario" class="text-xs bg-ink-950 border border-ink-600 rounded-lg px-2 py-1.5 focus:outline-none focus:border-rose-500">
+        <option value="kfor">Scenario: NATO / KFOR disinformation</option>
+        <option value="energy">Scenario: Energy infrastructure cyber-panic</option>
+      </select>
       <button id="liveSim" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-rose-500/90 text-white hover:bg-rose-500">Simulate attack</button>
       <button id="liveDemo" class="text-xs px-3 py-1.5 rounded-lg border border-ink-600 hover:bg-ink-800">Demo data</button>
     </div>
@@ -286,11 +305,19 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
     <div class="flex flex-wrap gap-2 mt-3 items-center">
       <span class="text-[11px] text-slate-500 flex-1 min-w-[200px]">Plain-text SitRep, ready for email or a briefing pack. Review before circulation.</span>
       <button id="sitrepCopy" class="text-xs px-3 py-1.5 rounded-lg border border-ink-600 hover:bg-ink-800">Copy text</button>
+      <button id="sitrepPdf" class="text-xs px-3 py-1.5 rounded-lg border border-ink-600 hover:bg-ink-800">Export PDF</button>
       <button id="sitrepDl" class="text-xs font-semibold px-3.5 py-1.5 rounded-lg bg-emerald-500 text-ink-950 hover:bg-emerald-400">Download .txt</button>
     </div>
   </div>
 </div>
 <div id="toast" class="fixed bottom-4 left-1/2 -translate-x-1/2 z-50 hidden text-xs px-4 py-2.5 rounded-xl bg-ink-800 border border-ink-600 shadow-xl"></div>
+<!-- PRINT-ONLY SITREP (filled by "Export SitRep PDF"; the only thing visible in @media print) -->
+<div id="printArea" class="hidden" aria-hidden="true">
+  <div class="pa-banner">UNCLASSIFIED // EXERCISE — SIMULATED DATA // PROTOTYPE</div>
+  <div class="pa-head"><div class="pa-title">Operational Briefing / SitRep</div><div class="pa-meta" id="printMeta"></div></div>
+  <pre id="printText"></pre>
+  <div class="pa-banner pa-foot">UNCLASSIFIED // EXERCISE — SIMULATED DATA // PROTOTYPE</div>
+</div>
 
 <script>
 // ---------------------------------------------------------------------------
@@ -1510,13 +1537,30 @@ if (typeof module !== "undefined") module.exports = Engine;
     return { text: L.join('\n'), id };
   }
   const sitrepModal = $('#sitrep'); let lastSitrep = null;
-  $('#btnSitrep').addEventListener('click', async () => {
+  async function getSitrep() {
     if (state.live) {
-      try { const txt = await (await apiFetch(`/api/threads/${encodeURIComponent(state.live.thread.id)}/sitrep`)).text(); lastSitrep = { text: txt, id: 'SITREP-' + state.live.thread.id.replace(/[^\w-]+/g, '-') }; }
-      catch (e) { lastSitrep = buildSitrep(); }
-    } else lastSitrep = buildSitrep();
+      try { const r = await apiFetch(`/api/threads/${encodeURIComponent(state.live.thread.id)}/sitrep`); if (!r.ok) throw new Error('HTTP ' + r.status); return { text: await r.text(), id: 'SITREP-' + state.live.thread.id.replace(/[^\w-]+/g, '-') }; }
+      catch (e) { return buildSitrep(); }
+    }
+    return buildSitrep();
+  }
+  $('#btnSitrep').addEventListener('click', async () => {
+    lastSitrep = await getSitrep();
     $('#sitrepText').textContent = lastSitrep.text; sitrepModal.classList.remove('hidden');
   });
+  // PDF export: fill the print-only container and open the browser print dialog ("Save as PDF").
+  async function exportSitrepPdf(rep) {
+    rep = rep || await getSitrep(); lastSitrep = rep;
+    $('#printText').textContent = rep.text;
+    $('#printMeta').textContent = `${rep.id} · generated ${new Date().toISOString().replace('T', ' ').slice(0, 16)}Z`;
+    const prevTitle = document.title; document.title = rep.id; // browsers use the title as the default PDF filename
+    const restore = () => { document.title = prevTitle; window.removeEventListener('afterprint', restore); };
+    window.addEventListener('afterprint', restore);
+    try { window.print(); } catch (e) { toast('Printing is blocked in this viewer — open the page directly in a browser'); }
+    setTimeout(restore, 1000); // fallback for browsers without afterprint (print() blocks until the dialog closes elsewhere)
+  }
+  $('#btnPdf').addEventListener('click', () => exportSitrepPdf());
+  $('#sitrepPdf').addEventListener('click', () => exportSitrepPdf(lastSitrep));
   sitrepModal.querySelectorAll('[data-sclose]').forEach((el) => el.addEventListener('click', () => sitrepModal.classList.add('hidden')));
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') sitrepModal.classList.add('hidden'); });
   $('#sitrepCopy').addEventListener('click', async () => { try { await navigator.clipboard.writeText(lastSitrep.text); toast('SitRep copied to clipboard'); } catch (e) { toast('Clipboard blocked in this viewer — select the text and copy manually'); } });
@@ -1533,10 +1577,25 @@ if (typeof module !== "undefined") module.exports = Engine;
   });
 
   // ---------------- LIVE BACKEND MODE ----------------
-  // Active only when this page is served by the FastAPI backend (same origin).
+  // Default API = the Render deployment (so the Vercel-hosted dashboard goes live automatically).
+  // Same-origin when this page is served by the backend itself (Render URL or local uvicorn).
+  // Override: ?api=https://other-host  ·  ?api=same (same-origin)  ·  ?api= (clear override).
+  const RENDER_API = 'https://hybrid-threat-coordinated-campaign.onrender.com';
+  const API_BASE = (() => {
+    let o = null;
+    try {
+      const q = new URLSearchParams(location.search).get('api');
+      if (q === '') localStorage.removeItem('htccip_api'); else if (q) localStorage.setItem('htccip_api', q);
+      o = localStorage.getItem('htccip_api');
+    } catch (e) {}
+    if (o) return o === 'same' ? '' : o.replace(/\/+$/, '');
+    if (location.origin === RENDER_API || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return '';
+    return RENDER_API;
+  })();
+  const API_HOST = API_BASE ? API_BASE.replace(/^https?:\/\//, '') : location.host;
   let ws = null, liveTimer = null, apiKey = '';
   try { apiKey = sessionStorage.getItem('htccip_key') || ''; } catch (e) {}
-  const apiFetch = (path, opt = {}) => fetch(path, { ...opt, headers: { 'Content-Type': 'application/json', ...(apiKey ? { 'X-API-Key': apiKey } : {}), ...(opt.headers || {}) } });
+  const apiFetch = (path, opt = {}) => fetch(API_BASE + path, { ...opt, headers: { 'Content-Type': 'application/json', ...(apiKey ? { 'X-API-Key': apiKey } : {}), ...(opt.headers || {}) } });
   function fromContract(a) {
     const items = a.items.map((i) => ({ ...i, t: i.t == null ? NaN : i.t }));
     const firstT = items.filter((i) => !isNaN(i.t)).reduce((m, i) => Math.min(m, i.t), Infinity);
@@ -1566,7 +1625,8 @@ if (typeof module !== "undefined") module.exports = Engine;
     return list;
   }
   function connectWS() {
-    try { ws = new WebSocket((location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host + '/ws/live' + (apiKey ? '?key=' + encodeURIComponent(apiKey) : '')); } catch (e) { return; }
+    const wsBase = API_BASE ? API_BASE.replace(/^http/, 'ws') : (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host;
+    try { ws = new WebSocket(wsBase + '/ws/live' + (apiKey ? '?key=' + encodeURIComponent(apiKey) : '')); } catch (e) { return; }
     ws.onopen = () => setLive(true, 'LIVE · backend connected');
     ws.onclose = () => { setLive(false, 'Backend disconnected — retrying'); setTimeout(connectWS, 3000); };
     ws.onmessage = (ev) => {
@@ -1579,9 +1639,10 @@ if (typeof module !== "undefined") module.exports = Engine;
   }
   async function initLive() {
     if (!/^https?:$/.test(location.protocol)) return;
-    let h; try { const r = await fetch('/api/health', { cache: 'no-store' }); if (!r.ok) return; h = await r.json(); if (!h || h.contract !== '1') return; } catch (e) { return; }
+    // Render's free tier sleeps when idle; the first request can take ~30-60 s while it wakes.
+    let h; try { const r = await fetch(API_BASE + '/api/health', { cache: 'no-store' }); if (!r.ok) return; h = await r.json(); if (!h || h.contract !== '1') return; } catch (e) { return; }
     $('#livePanel').classList.remove('hidden');
-    setLive(true, `LIVE · ${h.embedder} · alerts ${h.alerts}${h.youtube ? ' · YouTube' : ''}${h.telegram ? ' · Telegram' : ''}`);
+    setLive(true, `LIVE · ${API_HOST} · ${h.embedder} · alerts ${h.alerts}${h.youtube ? ' · YouTube' : ''}${h.telegram ? ' · Telegram' : ''}`);
     $('#liveKey').classList.remove('hidden'); $('#liveKey').value = apiKey;
     $('#liveKey').addEventListener('change', (e) => { apiKey = e.target.value.trim(); try { sessionStorage.setItem('htccip_key', apiKey); } catch (er) {} });
     $('#liveThreads').addEventListener('change', (e) => e.target.value && loadLiveThread(e.target.value).catch((er) => toast('Load failed: ' + er.message)));
@@ -1589,10 +1650,11 @@ if (typeof module !== "undefined") module.exports = Engine;
     $('#liveSim').addEventListener('click', async () => {
       $('#liveSim').disabled = true; $('#liveSim').textContent = 'Injecting…';
       try {
-        const r = await apiFetch('/api/simulate-attack', { method: 'POST', body: JSON.stringify({ spread_threads: 2, lang: 'en', accounts: 12, background: 6 }) });
-        if (!r.ok) throw new Error(r.status === 401 ? 'API key required' : 'HTTP ' + r.status);
+        const scSel = $('#liveScenario'); const scenario = scSel.value || 'kfor'; const scLabel = scSel.options[scSel.selectedIndex].text.replace(/^Scenario:\s*/, '');
+        const r = await apiFetch('/api/simulate-attack', { method: 'POST', body: JSON.stringify({ spread_threads: 2, lang: 'en', accounts: 12, background: 6, scenario }) });
+        if (!r.ok) throw new Error(r.status === 401 ? 'API key required' : r.status === 422 ? 'scenario not supported by this backend version' : 'HTTP ' + r.status);
         const res = await r.json(); await refreshThreadList(res.primary); await loadLiveThread(res.primary);
-        toast(`Exercise swarm injected into ${res.thread_ids.length} threads (${res.new} comments)`);
+        toast(`${scLabel}: exercise swarm injected into ${res.thread_ids.length} threads (${res.new} comments)`);
       } catch (e) { toast('Simulation failed: ' + e.message); }
       $('#liveSim').disabled = false; $('#liveSim').textContent = 'Simulate attack';
     });

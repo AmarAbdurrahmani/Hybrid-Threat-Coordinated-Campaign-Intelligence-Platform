@@ -26,6 +26,10 @@ class Settings:
     # --- security ---
     api_key: str = os.getenv("API_KEY", "")  # required for write endpoints when set
     cors_origins: list[str] = field(default_factory=lambda: _list("CORS_ORIGINS") or ["http://localhost:8000", "http://127.0.0.1:8000", "http://localhost:5173"])
+    # Lets the Vercel-hosted dashboard (production + preview URLs) call this API cross-origin.
+    # No cookies are used and writes still need X-API-Key. Set CORS_ORIGIN_REGEX="" to disable,
+    # or pin it to your own project, e.g. https://my-dashboard(-[\w-]+)?\.vercel\.app
+    cors_origin_regex: str = os.getenv("CORS_ORIGIN_REGEX", r"https://[\w-]+\.vercel\.app")
     pseudonym_secret: str = os.getenv("PSEUDONYM_SECRET", "change-me-before-the-demo")
     keep_display_names: bool = _bool("KEEP_DISPLAY_NAMES", False)
 
