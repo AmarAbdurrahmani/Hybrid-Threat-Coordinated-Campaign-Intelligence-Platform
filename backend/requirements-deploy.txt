@@ -1,0 +1,11 @@
+# Lean set for Render's free instance (512 MB RAM): no torch / sentence-transformers.
+# The engine falls back to TF-IDF char n-grams (EMBED_BACKEND=tfidf).
+fastapi>=0.115
+uvicorn[standard]>=0.30
+pydantic>=2.7
+python-dotenv>=1.0
+numpy>=1.26
+networkx>=3.2
+scikit-learn>=1.4
+telethon>=1.36
+anthropic>=0.40

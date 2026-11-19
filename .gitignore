@@ -1,0 +1,20 @@
+# secrets & local state
+.env
+*.env.local
+*.session
+*.session-journal
+*.db
+*.sqlite3
+# python
+__pycache__/
+*.pyc
+.venv/
+venv/
+.pytest_cache/
+# models / data dumps
+*.mmdb
+models/
+# os / editors
+.DS_Store
+.vscode/
+.idea/

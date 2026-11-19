@@ -1,0 +1,1036 @@
+{
+ "article": {
+  "title": "Kosovo–Serbia dialogue resumes in Brussels as NATO confirms KFOR posture",
+  "portal": "security-desk.example (sim)",
+  "published": "2026-11-18T09:00:00"
+ },
+ "comments": [
+  {
+   "id": "c01",
+   "user": "arben_prishtina",
+   "ts": "2026-11-18T09:06:00",
+   "truth": "organic",
+   "dialect": "Geg",
+   "text": "Dialogue again, promises again. I want to see whether anything actually gets implemented this time, or whether we're back to square one.",
+   "source_text": "Prap dialog, prap premtime. Po du me pa a ka me u zbatu diçka kësaj here apo prap kthehemi n'pikën zero.",
+   "account": {
+    "created": "2014-03-11",
+    "followers": 412,
+    "tagged_photos": 86,
+    "friends": [
+     "acct_o1_0",
+     "acct_o1_1",
+     "acct_o1_2",
+     "acct_o1_3",
+     "acct_o1_4",
+     "acct_o1_5",
+     "acct_o1_6",
+     "acct_o1_7",
+     "acct_o1_8",
+     "acct_o1_9"
+    ]
+   },
+   "infra": {
+    "node": "RES-Pristina",
+    "type": "residential",
+    "asn": "AS65540 (sim KS broadband)",
+    "ip": "masked (residential)",
+    "city": "Pristina",
+    "cc": "XK",
+    "lat": 42.66,
+    "lon": 21.17
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c02",
+   "user": "elira_m",
+   "ts": "2026-11-18T09:22:24",
+   "truth": "organic",
+   "dialect": "Tosk",
+   "text": "I think without EU mediation there would be no progress at all. Let's see what Brussels says tomorrow.",
+   "source_text": "Mendoj se pa ndërmjetësimin e BE-së nuk do të kishte asnjë progres. Le të shohim çfarë thotë Brukseli nesër.",
+   "account": {
+    "created": "2017-09-02",
+    "followers": 233,
+    "tagged_photos": 41,
+    "friends": [
+     "acct_o2_0",
+     "acct_o2_1",
+     "acct_o2_2",
+     "acct_o2_3",
+     "acct_o2_4",
+     "acct_o2_5",
+     "acct_o2_6",
+     "acct_o2_7",
+     "acct_o2_8",
+     "acct_o2_9"
+    ]
+   },
+   "infra": {
+    "node": "RES-Tirana",
+    "type": "residential",
+    "asn": "AS65541 (sim AL broadband)",
+    "ip": "masked (residential)",
+    "city": "Tirana",
+    "cc": "AL",
+    "lat": 41.33,
+    "lon": 19.82
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c03",
+   "user": "dardan.berisha",
+   "ts": "2026-11-18T09:38:06",
+   "truth": "organic",
+   "dialect": "Geg",
+   "text": "KFOR was there when nobody else was there to protect us. It just bothers me how this whole thing keeps dragging on.",
+   "source_text": "KFOR-i ka qenë aty kur s'kishte kush tjetër me na mbrojt. Veç po m'mërzit qysh po zvarritet krejt kjo punë.",
+   "account": {
+    "created": "2012-06-19",
+    "followers": 897,
+    "tagged_photos": 152,
+    "friends": [
+     "acct_o3_0",
+     "acct_o3_1",
+     "acct_o3_2",
+     "acct_o3_3",
+     "acct_o3_4",
+     "acct_o3_5",
+     "acct_o3_6",
+     "acct_o3_7",
+     "acct_o3_8",
+     "acct_o3_9",
+     "acct_common_news"
+    ]
+   },
+   "infra": {
+    "node": "RES-Pristina",
+    "type": "residential",
+    "asn": "AS65540 (sim KS broadband)",
+    "ip": "masked (residential)",
+    "city": "Pristina",
+    "cc": "XK",
+    "lat": 42.66,
+    "lon": 21.17
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c04",
+   "user": "gentian_sh",
+   "ts": "2026-11-18T09:51:18",
+   "truth": "organic",
+   "dialect": "Tosk",
+   "text": "I'm not against NATO, but the government should be more transparent about what it signs. Little information, lots of noise.",
+   "source_text": "Unë nuk jam kundër NATO-s, por qeveria duhet të jetë më transparente për çfarë nënshkruan. Pak informacion, shumë zhurmë.",
+   "account": {
+    "created": "2019-01-27",
+    "followers": 128,
+    "tagged_photos": 23,
+    "friends": [
+     "acct_o4_0",
+     "acct_o4_1",
+     "acct_o4_2",
+     "acct_o4_3",
+     "acct_o4_4",
+     "acct_o4_5",
+     "acct_o4_6",
+     "acct_o4_7",
+     "acct_o4_8",
+     "acct_o4_9"
+    ]
+   },
+   "infra": {
+    "node": "RES-Tirana",
+    "type": "residential",
+    "asn": "AS65541 (sim AL broadband)",
+    "ip": "masked (residential)",
+    "city": "Tirana",
+    "cc": "AL",
+    "lat": 41.33,
+    "lon": 19.82
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c05",
+   "user": "vjosa.gj",
+   "ts": "2026-11-18T10:04:00",
+   "truth": "organic",
+   "dialect": "Geg",
+   "text": "Does anyone have a link to the full statement? On the portal I only saw part of it.",
+   "source_text": "A ka kush link për deklaratën e plotë? Në portal e pashë veç një pjesë.",
+   "account": {
+    "created": "2016-11-08",
+    "followers": 305,
+    "tagged_photos": 64,
+    "friends": [
+     "acct_o5_0",
+     "acct_o5_1",
+     "acct_o5_2",
+     "acct_o5_3",
+     "acct_o5_4",
+     "acct_o5_5",
+     "acct_o5_6",
+     "acct_o5_7",
+     "acct_o5_8",
+     "acct_o5_9"
+    ]
+   },
+   "infra": {
+    "node": "RES-Gjakova",
+    "type": "residential",
+    "asn": "AS65540 (sim KS broadband)",
+    "ip": "masked (residential)",
+    "city": "Gjakova",
+    "cc": "XK",
+    "lat": 42.38,
+    "lon": 20.43
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c06",
+   "user": "petrit_korca",
+   "ts": "2026-11-18T10:19:36",
+   "truth": "organic",
+   "dialect": "Tosk",
+   "text": "People in Tirana are following this closely too. I hope the missing persons are not forgotten; that is the most important issue.",
+   "source_text": "Edhe në Tiranë po ndiqet me vëmendje. Shpresoj që të mos harrohen të pagjeturit, kjo është çështja më e rëndësishme.",
+   "account": {
+    "created": "2013-04-30",
+    "followers": 1204,
+    "tagged_photos": 210,
+    "friends": [
+     "acct_o6_0",
+     "acct_o6_1",
+     "acct_o6_2",
+     "acct_o6_3",
+     "acct_o6_4",
+     "acct_o6_5",
+     "acct_o6_6",
+     "acct_o6_7",
+     "acct_o6_8",
+     "acct_o6_9",
+     "acct_common_news"
+    ]
+   },
+   "infra": {
+    "node": "RES-Korça",
+    "type": "residential",
+    "asn": "AS65541 (sim AL broadband)",
+    "ip": "masked (residential)",
+    "city": "Korça",
+    "cc": "AL",
+    "lat": 40.62,
+    "lon": 20.78
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c07",
+   "user": "teuta.ferizaj",
+   "ts": "2026-11-18T10:33:12",
+   "truth": "organic",
+   "dialect": "Geg",
+   "text": "I worked with KFOR for three years in Ferizaj, decent people. Whoever says otherwise doesn't know what it was like before '99.",
+   "source_text": "Kam punu tri vjet me KFOR-in n'Ferizaj, njerëz korrekt. Kush thotë ndryshe s'e din qysh ka qenë para '99.",
+   "account": {
+    "created": "2011-08-15",
+    "followers": 540,
+    "tagged_photos": 97,
+    "friends": [
+     "acct_o7_0",
+     "acct_o7_1",
+     "acct_o7_2",
+     "acct_o7_3",
+     "acct_o7_4",
+     "acct_o7_5",
+     "acct_o7_6",
+     "acct_o7_7",
+     "acct_o7_8",
+     "acct_o7_9"
+    ]
+   },
+   "infra": {
+    "node": "RES-Ferizaj",
+    "type": "residential",
+    "asn": "AS65540 (sim KS broadband)",
+    "ip": "masked (residential)",
+    "city": "Ferizaj",
+    "cc": "XK",
+    "lat": 42.37,
+    "lon": 21.16
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c08",
+   "user": "erion.dev",
+   "ts": "2026-11-18T10:48:30",
+   "truth": "organic",
+   "dialect": "Tosk",
+   "text": "Good analysis from the journalist. I'd like more detail on the energy agreement for the north.",
+   "source_text": "Analiza e mirë nga gazetari. Do të doja më shumë të dhëna për marrëveshjen e energjisë në veri.",
+   "account": {
+    "created": "2020-02-14",
+    "followers": 89,
+    "tagged_photos": 12,
+    "friends": [
+     "acct_o8_0",
+     "acct_o8_1",
+     "acct_o8_2",
+     "acct_o8_3",
+     "acct_o8_4",
+     "acct_o8_5",
+     "acct_o8_6",
+     "acct_o8_7",
+     "acct_o8_8",
+     "acct_o8_9"
+    ]
+   },
+   "infra": {
+    "node": "RES-Tirana",
+    "type": "residential",
+    "asn": "AS65541 (sim AL broadband)",
+    "ip": "masked (residential)",
+    "city": "Tirana",
+    "cc": "AL",
+    "lat": 41.33,
+    "lon": 19.82
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c09",
+   "user": "blerta_mitrovica",
+   "ts": "2026-11-18T11:06:00",
+   "truth": "organic",
+   "dialect": "Geg",
+   "text": "In Mitrovica we live with this every day. Politicians talk, we wait. They could ask us for once.",
+   "source_text": "Ne n'Mitrovicë po jetojmë me këtë çdo ditë. Politikanët flasin, ne presim. Le t'na pyesin edhe neve njëherë.",
+   "account": {
+    "created": "2015-05-21",
+    "followers": 377,
+    "tagged_photos": 58,
+    "friends": [
+     "acct_o9_0",
+     "acct_o9_1",
+     "acct_o9_2",
+     "acct_o9_3",
+     "acct_o9_4",
+     "acct_o9_5",
+     "acct_o9_6",
+     "acct_o9_7",
+     "acct_o9_8",
+     "acct_o9_9",
+     "acct_common_news"
+    ]
+   },
+   "infra": {
+    "node": "RES-Mitrovica",
+    "type": "residential",
+    "asn": "AS65540 (sim KS broadband)",
+    "ip": "masked (residential)",
+    "city": "Mitrovica",
+    "cc": "XK",
+    "lat": 42.89,
+    "lon": 20.87
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c10",
+   "user": "ardit.vlora",
+   "ts": "2026-11-18T11:21:42",
+   "truth": "organic",
+   "dialect": "Tosk",
+   "text": "At the end of the day, the agreement depends on implementation. Paper accepts anything.",
+   "source_text": "Në fund të fundit, marrëveshja varet nga zbatimi. Letra pranon gjithçka.",
+   "account": {
+    "created": "2018-10-03",
+    "followers": 164,
+    "tagged_photos": 30,
+    "friends": [
+     "acct_o10_0",
+     "acct_o10_1",
+     "acct_o10_2",
+     "acct_o10_3",
+     "acct_o10_4",
+     "acct_o10_5",
+     "acct_o10_6",
+     "acct_o10_7",
+     "acct_o10_8",
+     "acct_o10_9"
+    ]
+   },
+   "infra": {
+    "node": "RES-Vlora",
+    "type": "residential",
+    "asn": "AS65541 (sim AL broadband)",
+    "ip": "masked (residential)",
+    "city": "Vlora",
+    "cc": "AL",
+    "lat": 40.47,
+    "lon": 19.49
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c11",
+   "user": "lumi.peja",
+   "ts": "2026-11-18T11:38:12",
+   "truth": "organic",
+   "dialect": "Geg",
+   "text": "Whatever happens, we have to keep the peace. Our children deserve better than this.",
+   "source_text": "Qysh do qoftë, duhet me ruajt paqen. Fëmijët tanë meritojnë ma mirë se kjo.",
+   "account": {
+    "created": "2022-07-09",
+    "followers": 96,
+    "tagged_photos": 19,
+    "friends": [
+     "acct_o11_0",
+     "acct_o11_1",
+     "acct_o11_2",
+     "acct_o11_3",
+     "acct_o11_4",
+     "acct_o11_5",
+     "acct_o11_6",
+     "acct_o11_7",
+     "acct_o11_8",
+     "acct_o11_9"
+    ]
+   },
+   "infra": {
+    "node": "RES-Peja",
+    "type": "residential",
+    "asn": "AS65540 (sim KS broadband)",
+    "ip": "masked (residential)",
+    "city": "Peja",
+    "cc": "XK",
+    "lat": 42.66,
+    "lon": 20.29
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c12",
+   "user": "sara_tirana",
+   "ts": "2026-11-18T11:56:24",
+   "truth": "organic",
+   "dialect": "Tosk",
+   "text": "Important news, thanks for the article. I hope there are concrete results this time.",
+   "source_text": "Lajm i rëndësishëm, faleminderit për artikullin. Shpresoj të ketë rezultate konkrete këtë herë.",
+   "account": {
+    "created": "2016-02-25",
+    "followers": 451,
+    "tagged_photos": 77,
+    "friends": [
+     "acct_o12_0",
+     "acct_o12_1",
+     "acct_o12_2",
+     "acct_o12_3",
+     "acct_o12_4",
+     "acct_o12_5",
+     "acct_o12_6",
+     "acct_o12_7",
+     "acct_o12_8",
+     "acct_o12_9",
+     "acct_common_news"
+    ]
+   },
+   "infra": {
+    "node": "RES-Tirana",
+    "type": "residential",
+    "asn": "AS65541 (sim AL broadband)",
+    "ip": "masked (residential)",
+    "city": "Tirana",
+    "cc": "AL",
+    "lat": 41.33,
+    "lon": 19.82
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c13",
+   "user": "drita.k2211",
+   "ts": "2026-11-18T09:03:00",
+   "truth": "coordinated",
+   "text": "NATO is not our friend, NATO is selling us out for its own interests. It is a question of the time.",
+   "source_text": "NATO-ja nuk është miku ynë, NATO-ja na shet për interesat e veta. Kjo është pyetje e kohës.",
+   "account": {
+    "created": "2026-10-21",
+    "followers": 2,
+    "tagged_photos": 0,
+    "friends": [
+     "acct_f01",
+     "acct_f02",
+     "acct_f03",
+     "acct_f04",
+     "acct_f05",
+     "acct_f06",
+     "acct_f07",
+     "acct_f08",
+     "acct_f09",
+     "acct_f10",
+     "acct_f11",
+     "acct_f12",
+     "acct_u1"
+    ]
+   },
+   "infra": {
+    "node": "INF-01",
+    "type": "vpn",
+    "asn": "AS64496",
+    "ip": "203.0.113.11",
+    "city": "Frankfurt",
+    "cc": "DE",
+    "lat": 50.11,
+    "lon": 8.68
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c14",
+   "user": "arta_vlora88",
+   "ts": "2026-11-18T09:03:18",
+   "truth": "coordinated",
+   "text": "NATO is not our buddy, it is trading us for their own interests. At the end of the ends, who protects us?",
+   "source_text": "NATO nuk është shoku ynë, na tregton për interesat e tyre. Në fund të fundeve, kush na mbron?",
+   "account": {
+    "created": "2026-10-22",
+    "followers": 0,
+    "tagged_photos": 0,
+    "friends": [
+     "acct_f01",
+     "acct_f02",
+     "acct_f03",
+     "acct_f04",
+     "acct_f05",
+     "acct_f06",
+     "acct_f07",
+     "acct_f08",
+     "acct_f09",
+     "acct_f10",
+     "acct_f11",
+     "acct_f12",
+     "acct_u2"
+    ]
+   },
+   "infra": {
+    "node": "INF-01",
+    "type": "vpn",
+    "asn": "AS64496",
+    "ip": "203.0.113.18",
+    "city": "Frankfurt",
+    "cc": "DE",
+    "lat": 50.11,
+    "lon": 8.68
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c15",
+   "user": "liridon.pz",
+   "ts": "2026-11-18T09:03:30",
+   "truth": "coordinated",
+   "text": "Foreign bases are a real occupation, KFOR is secretly leaving. We have to get them out now, not tomorrow, now!",
+   "source_text": "Bazat e huaja janë okupim i vërtetë, KFOR-i po largohet fshehurazi. Duhet me i largu tash, jo nesër, tani!",
+   "account": {
+    "created": "2026-10-24",
+    "followers": 1,
+    "tagged_photos": 0,
+    "friends": [
+     "acct_f01",
+     "acct_f02",
+     "acct_f03",
+     "acct_f04",
+     "acct_f05",
+     "acct_f06",
+     "acct_f07",
+     "acct_f08",
+     "acct_f09",
+     "acct_f10",
+     "acct_f11",
+     "acct_f12",
+     "acct_u3"
+    ]
+   },
+   "infra": {
+    "node": "INF-03",
+    "type": "proxy",
+    "asn": "AS64502",
+    "ip": "192.0.2.25",
+    "city": "Pristina region",
+    "cc": "XK",
+    "lat": 42.55,
+    "lon": 21.32
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c16",
+   "user": "besa_tirana01",
+   "ts": "2026-11-18T09:03:54",
+   "truth": "coordinated",
+   "text": "The West betrayed us always, let us keep in sight what happened. This dialogue is a trap, it is a game of theirs.",
+   "source_text": "Perëndimi na tradhtoi gjithmonë, të kemi në shikim çfarë ndodhi. Ky dialog âsht nji kurth, është një lojë e tyre.",
+   "account": {
+    "created": "2026-10-24",
+    "followers": 3,
+    "tagged_photos": 0,
+    "friends": [
+     "acct_f01",
+     "acct_f02",
+     "acct_f03",
+     "acct_f04",
+     "acct_f05",
+     "acct_f06",
+     "acct_f07",
+     "acct_f08",
+     "acct_f09",
+     "acct_f10",
+     "acct_f11",
+     "acct_f12",
+     "acct_u4"
+    ]
+   },
+   "infra": {
+    "node": "INF-02",
+    "type": "datacenter",
+    "asn": "AS64499",
+    "ip": "198.51.100.11",
+    "city": "Amsterdam",
+    "cc": "NL",
+    "lat": 52.37,
+    "lon": 4.9
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c17",
+   "user": "ilir.shqiptar_",
+   "ts": "2026-11-18T09:04:24",
+   "truth": "coordinated",
+   "text": "NATO is not our friend, NATO sold us out for its own interests. This is clear to everyone.",
+   "source_text": "NATO-ja nuk âsht mik i yni, NATO-ja na shiti për interesat e veta. Kjo është e qartë për të gjithë.",
+   "account": {
+    "created": "2026-10-26",
+    "followers": 0,
+    "tagged_photos": 0,
+    "friends": [
+     "acct_f01",
+     "acct_f02",
+     "acct_f03",
+     "acct_f04",
+     "acct_f05",
+     "acct_f06",
+     "acct_f07",
+     "acct_f08",
+     "acct_f09",
+     "acct_f10",
+     "acct_f11",
+     "acct_f12",
+     "acct_u5"
+    ]
+   },
+   "infra": {
+    "node": "INF-01",
+    "type": "vpn",
+    "asn": "AS64496",
+    "ip": "203.0.113.18",
+    "city": "Frankfurt",
+    "cc": "DE",
+    "lat": 50.11,
+    "lon": 8.68
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c18",
+   "user": "valon.ks77",
+   "ts": "2026-11-18T09:04:48",
+   "truth": "coordinated",
+   "text": "Catholics and Muslims will never be together, the West divides us on purpose. What does the dialogue want? What connection does religion have with this!",
+   "source_text": "Katolikët dhe muslimanët nuk do të jenë kurrë bashkë, Perëndimi na përçan me qëllim. Çka do dialogu? Çfarë ka lidhje feja me këtë!",
+   "account": {
+    "created": "2026-10-27",
+    "followers": 4,
+    "tagged_photos": 0,
+    "friends": [
+     "acct_f01",
+     "acct_f02",
+     "acct_f03",
+     "acct_f04",
+     "acct_f05",
+     "acct_f06",
+     "acct_f07",
+     "acct_f08",
+     "acct_f09",
+     "acct_f10",
+     "acct_f11",
+     "acct_f12",
+     "acct_u6"
+    ]
+   },
+   "infra": {
+    "node": "INF-02",
+    "type": "datacenter",
+    "asn": "AS64499",
+    "ip": "198.51.100.25",
+    "city": "Amsterdam",
+    "cc": "NL",
+    "lat": 52.37,
+    "lon": 4.9
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c19",
+   "user": "genta_dardania",
+   "ts": "2026-11-18T09:05:12",
+   "truth": "coordinated",
+   "text": "It is being worked about a secret plan: NATO is selling us out, Brussels is deceiving us. Nothing will change, nothing!",
+   "source_text": "Punohet për një plan të fshehtë: NATO-ja na shet, Brukseli na mashtron. Kurrgjo s'do të ndryshojë, asgjë!",
+   "account": {
+    "created": "2026-10-28",
+    "followers": 1,
+    "tagged_photos": 0,
+    "friends": [
+     "acct_f01",
+     "acct_f02",
+     "acct_f03",
+     "acct_f04",
+     "acct_f05",
+     "acct_f06",
+     "acct_f07",
+     "acct_f08",
+     "acct_f09",
+     "acct_f10",
+     "acct_f11",
+     "acct_f12",
+     "acct_u7"
+    ]
+   },
+   "infra": {
+    "node": "INF-03",
+    "type": "proxy",
+    "asn": "AS64502",
+    "ip": "192.0.2.11",
+    "city": "Pristina region",
+    "cc": "XK",
+    "lat": 42.55,
+    "lon": 21.32
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c20",
+   "user": "endrit.patriot",
+   "ts": "2026-11-18T09:05:36",
+   "truth": "coordinated",
+   "text": "Skanderbeg was a myth created by foreigners, just like this dialogue. At the end of the ends, we are not a state.",
+   "source_text": "Skënderbeu ishte mit i krijuar nga të huajt, ashtu si edhe ky dialog. Në fund të fundeve ne s'jemi shtet.",
+   "account": {
+    "created": "2026-10-29",
+    "followers": 2,
+    "tagged_photos": 0,
+    "friends": [
+     "acct_f01",
+     "acct_f02",
+     "acct_f03",
+     "acct_f04",
+     "acct_f05",
+     "acct_f06",
+     "acct_f07",
+     "acct_f08",
+     "acct_f09",
+     "acct_f10",
+     "acct_f11",
+     "acct_f12",
+     "acct_u8"
+    ]
+   },
+   "infra": {
+    "node": "INF-02",
+    "type": "datacenter",
+    "asn": "AS64499",
+    "ip": "198.51.100.18",
+    "city": "Amsterdam",
+    "cc": "NL",
+    "lat": 52.37,
+    "lon": 4.9
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c21",
+   "user": "mimoza.k_",
+   "ts": "2026-11-18T09:06:06",
+   "truth": "coordinated",
+   "text": "Foreign bases = occupation. KFOR no longer protects you. NATO is not our buddy, it is trading us for its own interests.",
+   "source_text": "Bazat e huaja = okupim. KFOR-i nuk ju mbron më. NATO nuk është shoku ynë, na tregton për interesat e veta.",
+   "account": {
+    "created": "2026-10-30",
+    "followers": 0,
+    "tagged_photos": 0,
+    "friends": [
+     "acct_f01",
+     "acct_f02",
+     "acct_f03",
+     "acct_f04",
+     "acct_f05",
+     "acct_f06",
+     "acct_f07",
+     "acct_f08",
+     "acct_f09",
+     "acct_f10",
+     "acct_f11",
+     "acct_f12",
+     "acct_u9"
+    ]
+   },
+   "infra": {
+    "node": "INF-01",
+    "type": "vpn",
+    "asn": "AS64496",
+    "ip": "203.0.113.25",
+    "city": "Frankfurt",
+    "cc": "DE",
+    "lat": 50.11,
+    "lon": 8.68
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c22",
+   "user": "kushtrim_99x",
+   "ts": "2026-11-18T09:06:30",
+   "truth": "coordinated",
+   "text": "Why are you silent? The West sold us out, betrayed us again. It comes up to the point that the power in the north will be cut tonight, get ready!",
+   "source_text": "Pse heshtni? Perëndimi na shiti, na tradhtoi përsëri. Vjen deri te ajo që rryma në veri do të ndërpritet sonte, përgatituni!",
+   "account": {
+    "created": "2026-10-31",
+    "followers": 1,
+    "tagged_photos": 0,
+    "friends": [
+     "acct_f01",
+     "acct_f02",
+     "acct_f03",
+     "acct_f04",
+     "acct_f05",
+     "acct_f06",
+     "acct_f07",
+     "acct_f08",
+     "acct_f09",
+     "acct_f10",
+     "acct_f11",
+     "acct_f12",
+     "acct_u10"
+    ]
+   },
+   "infra": {
+    "node": "INF-02",
+    "type": "datacenter",
+    "asn": "AS64499",
+    "ip": "198.51.100.11",
+    "city": "Amsterdam",
+    "cc": "NL",
+    "lat": 52.37,
+    "lon": 4.9
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c23",
+   "user": "albana.d22",
+   "ts": "2026-11-18T09:06:54",
+   "truth": "coordinated",
+   "text": "It is a question of the time, NATO is selling us out and one day they will leave. Then you will understand one thing.",
+   "source_text": "Kjo është pyetje e kohës, NATO-ja na shet dhe nji ditë do ikin. Atëherë një gjë do ta kuptoni.",
+   "account": {
+    "created": "2026-11-01",
+    "followers": 3,
+    "tagged_photos": 0,
+    "friends": [
+     "acct_f01",
+     "acct_f02",
+     "acct_f03",
+     "acct_f04",
+     "acct_f05",
+     "acct_f06",
+     "acct_f07",
+     "acct_f08",
+     "acct_f09",
+     "acct_f10",
+     "acct_f11",
+     "acct_f12",
+     "acct_u11"
+    ]
+   },
+   "infra": {
+    "node": "INF-03",
+    "type": "proxy",
+    "asn": "AS64502",
+    "ip": "192.0.2.18",
+    "city": "Pristina region",
+    "cc": "XK",
+    "lat": 42.55,
+    "lon": 21.32
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c24",
+   "user": "fatos.real",
+   "ts": "2026-11-18T09:47:12",
+   "truth": "coordinated",
+   "text": "True Muslims don't want NATO, this is a fact. Don't make yourself smart, let us keep in sight the history.",
+   "source_text": "Muslimanët e vërtetë nuk e duan NATO-n, kjo është fakt. Mos u bëj i zgjuar, të kemi në shikim historinë.",
+   "account": {
+    "created": "2026-11-01",
+    "followers": 0,
+    "tagged_photos": 0,
+    "friends": [
+     "acct_f01",
+     "acct_f02",
+     "acct_f03",
+     "acct_f04",
+     "acct_f05",
+     "acct_f06",
+     "acct_f07",
+     "acct_f08",
+     "acct_f09",
+     "acct_f10",
+     "acct_f11",
+     "acct_f12",
+     "acct_u12"
+    ]
+   },
+   "infra": {
+    "node": "INF-03",
+    "type": "proxy",
+    "asn": "AS64502",
+    "ip": "192.0.2.25",
+    "city": "Pristina region",
+    "cc": "XK",
+    "lat": 42.55,
+    "lon": 21.32
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  },
+  {
+   "id": "c25",
+   "user": "rina_prizreni",
+   "ts": "2026-11-18T10:52:36",
+   "truth": "coordinated",
+   "text": "NATO is not our friend, it is selling us out for its own interests. A question of the time before you understand.",
+   "source_text": "NATO-ja nuk është miku ynë, na shet për interesat e veta. Pyetje e kohës para se ta kuptoni.",
+   "account": {
+    "created": "2026-11-02",
+    "followers": 2,
+    "tagged_photos": 0,
+    "friends": [
+     "acct_f01",
+     "acct_f02",
+     "acct_f03",
+     "acct_f04",
+     "acct_f05",
+     "acct_f06",
+     "acct_f07",
+     "acct_f08",
+     "acct_f09",
+     "acct_f10",
+     "acct_f11",
+     "acct_f12",
+     "acct_u13"
+    ]
+   },
+   "infra": {
+    "node": "INF-01",
+    "type": "vpn",
+    "asn": "AS64496",
+    "ip": "203.0.113.11",
+    "city": "Frankfurt",
+    "cc": "DE",
+    "lat": 50.11,
+    "lon": 8.68
+   },
+   "thread_id": "seed",
+   "platform": "portal"
+  }
+ ],
+ "infra_meta": {
+  "INF-01": {
+   "label": "Commercial VPN exit cluster",
+   "type": "vpn",
+   "provider": "Brightline VPN (fictional)",
+   "asn": "AS64496",
+   "prefix": "203.0.113.0/24",
+   "city": "Frankfurt",
+   "cc": "DE",
+   "lat": 50.11,
+   "lon": 8.68,
+   "hosting": "Shared VPN exit IPs; consumer subscription, no KYC",
+   "notes": "5 accounts rotate across 3 exit IPs in the same /24. Same browser fingerprint family observed on all sessions (sim).",
+   "nexus": "Not established",
+   "confidence": "Low"
+  },
+  "INF-02": {
+   "label": "Bulk VPS hosting",
+   "type": "datacenter",
+   "provider": "Polder Compute B.V. (fictional)",
+   "asn": "AS64499",
+   "prefix": "198.51.100.0/24",
+   "city": "Amsterdam",
+   "cc": "NL",
+   "lat": 52.37,
+   "lon": 4.9,
+   "hosting": "Low-cost VPS; crypto payment accepted; headless-browser automation suspected",
+   "notes": "Posting cadence of 20–40 s between accounts suggests a single scheduler driving several sessions (sim).",
+   "nexus": "Not established",
+   "confidence": "Low"
+  },
+  "INF-03": {
+   "label": "In-region residential proxy pool",
+   "type": "proxy",
+   "provider": "Mobile-carrier range resold via proxy SDK (fictional)",
+   "asn": "AS64502",
+   "prefix": "192.0.2.0/24",
+   "city": "Pristina region",
+   "cc": "XK",
+   "lat": 42.55,
+   "lon": 21.32,
+   "hosting": "Residential proxy exits that make foreign operators look local",
+   "notes": "Exits geolocate inside Kosovo, but session timing and the shared friend graph match INF-01/02. Typical of 'local-looking' cover traffic (sim).",
+   "nexus": "Not established",
+   "confidence": "Moderate (infrastructure reuse)"
+  }
+ }
+}

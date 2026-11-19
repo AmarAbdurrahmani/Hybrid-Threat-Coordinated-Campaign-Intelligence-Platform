@@ -1,0 +1,22 @@
+# --- core API ---
+fastapi>=0.115
+uvicorn[standard]>=0.30        # includes websockets
+pydantic>=2.7
+python-dotenv>=1.0
+
+# --- engine ---
+numpy>=1.26
+networkx>=3.2                  # louvain_communities needs >= 2.8
+scikit-learn>=1.4              # TF-IDF fallback when no embedding model is available
+sentence-transformers>=3.0     # paraphrase-multilingual-MiniLM-L12-v2 (pulls in torch)
+# CPU-only torch is much smaller:  pip install torch --index-url https://download.pytorch.org/whl/cpu
+
+# --- ingestion / enrichment ---
+telethon>=1.36                 # Telegram public channels (user session)
+maxminddb>=2.6                 # optional: GeoLite2 ASN/City for YOUR portal's IPs
+
+# --- optional LLM-assisted calque review ---
+anthropic>=0.40
+
+# --- dev ---
+pytest>=8

@@ -1,0 +1,32 @@
+# Render Blueprint: New → Blueprint → pick this repo. One web service serves API + dashboard.
+services:
+  - type: web
+    name: htccip
+    runtime: python
+    plan: free                      # 512 MB / 0.1 CPU, sleeps after 15 min idle, disk is wiped on restart
+    buildCommand: pip install -r backend/requirements-deploy.txt
+    startCommand: cd backend && uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /api/health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.12.8
+      - key: EMBED_BACKEND
+        value: tfidf                # switch to auto only on a 2 GB+ instance with requirements.txt
+      - key: API_KEY
+        generateValue: true         # copy it from the Render dashboard into the dashboard's API-key box
+      - key: PSEUDONYM_SECRET
+        generateValue: true
+      - key: ALERT_DRY_RUN
+        value: "true"
+      - key: DASHBOARD_PATH
+        value: ../frontend/index.html
+      - key: DB_PATH
+        value: /tmp/htccip.db
+      - key: YOUTUBE_API_KEY
+        sync: false                 # Render asks for these when you create the Blueprint
+      - key: YOUTUBE_VIDEO_IDS
+        sync: false
+      - key: ALERT_BOT_TOKEN
+        sync: false
+      - key: ALERT_CHAT_ID
+        sync: false
