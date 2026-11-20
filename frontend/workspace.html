@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <title>Synapse Intel | Analyst Workspace</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined&family=Space+Grotesk:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+  <link rel="stylesheet" href="./workspace.css">
+  <script defer src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+  <script defer src="./workspace-data.js"></script>
+  <script defer src="./workspace.js"></script>
+</head>
+<body>
+  <a class="skip-link" href="#view">Skip to workspace</a>
+  <div class="shell">
+    <aside class="sidebar" aria-label="Workspace navigation">
+      <a class="brand" href="#monitor" aria-label="Synapse Intel monitor">
+        <span class="brand-mark material-symbols-outlined" aria-hidden="true">radar</span>
+        <span><strong>SYNAPSE INTEL</strong><small>THREAT OBSERVATORY</small></span>
+      </a>
+      <nav>
+        <a href="#monitor" data-nav="monitor"><span class="material-symbols-outlined" aria-hidden="true">radar</span>Monitor</a>
+        <a href="#cases" data-nav="cases"><span class="material-symbols-outlined" aria-hidden="true">folder_managed</span>Cases</a>
+        <a href="#sources" data-nav="sources"><span class="material-symbols-outlined" aria-hidden="true">hub</span>Sources</a>
+        <a href="#alerts" data-nav="alerts"><span class="material-symbols-outlined" aria-hidden="true">notifications_active</span>Alerts</a>
+      </nav>
+      <div class="sidebar-bottom">
+        <a href="#exercise" data-nav="exercise"><span class="material-symbols-outlined" aria-hidden="true">science</span>Exercise tools</a>
+        <a href="./classic.html"><span class="material-symbols-outlined" aria-hidden="true">dashboard</span>Command center</a>
+      </div>
+    </aside>
+    <div class="workspace">
+      <header class="topbar">
+        <div class="connection" id="connection" role="status"><span></span>Checking connection</div>
+        <label class="global-search"><span class="material-symbols-outlined" aria-hidden="true">search</span>
+          <input id="quick-search" type="search" placeholder="Find a thread or source…" aria-label="Find a thread or source">
+          <kbd aria-hidden="true">Ctrl K</kbd>
+        </label>
+        <div class="header-actions">
+          <div class="segmented" aria-label="Workspace mode">
+            <button type="button" data-mode="live">Live</button>
+            <button type="button" data-mode="exercise">Exercise</button>
+          </div>
+          <button type="button" class="button compact" data-action="connect"><span class="material-symbols-outlined" aria-hidden="true">key</span><span>Connect</span></button>
+        </div>
+      </header>
+      <main id="view" tabindex="-1" aria-busy="true"></main>
+    </div>
+  </div>
+  <div id="notice" class="notice" role="status" aria-live="polite" hidden></div>
+  <dialog id="modal" aria-labelledby="modal-title"></dialog>
+  <noscript><p class="no-script">JavaScript is required. <a href="./classic.html">Open the command center</a>.</p></noscript>
+</body>
+</html>

@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+
+<html class="dark" lang="en"><head><meta charset="utf-8"/><meta content="width=device-width, initial-scale=1.0" name="viewport"/><meta content="web_dashboard" name="shell-type"/><link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet"/><link href="https://fonts.googleapis.com" rel="preconnect"/><link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/><link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;600;700&amp;family=Space+Mono:ital,wght@0,400;0,700;1,400&amp;display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet"/><style>@layer base{html,body{margin:0;padding:0;}body{overscroll-behavior:none;}main>:first-child{margin-top:0!important;}main>:last-child{margin-bottom:0!important;}}::-webkit-scrollbar{display:none;}</style><script src="https://cdn.tailwindcss.com"></script><script id="tailwind-config">tailwind.config={darkMode:"class",theme:{extend:{colors:{"tertiary-fixed":"#ffdad7","inverse-on-surface":"#2d3137","surface-container":"#1c2026","background":"#10141a","primary-container":"#2dd4bf","outline":"#859490","primary":"#57f1db","inverse-surface":"#dfe2eb","secondary":"#ffb95f","on-tertiary-container":"#9e0016","on-error":"#690005","on-primary-fixed":"#00201c","on-tertiary":"#68000a","on-secondary-fixed":"#2a1700","on-background":"#dfe2eb","secondary-container":"#ee9800","on-error-container":"#ffdad6","on-primary-container":"#00574d","primary-fixed":"#62fae3","surface-variant":"#31353c","surface-container-lowest":"#0a0e14","surface-tint":"#3cddc7","on-tertiary-fixed-variant":"#930013","surface-dim":"#10141a","error-container":"#93000a","primary-fixed-dim":"#3cddc7","surface-bright":"#353940","tertiary":"#ffceca","secondary-fixed":"#ffddb8","on-primary-fixed-variant":"#005047","surface-container-low":"#181c22","on-surface":"#dfe2eb","surface":"#10141a","on-secondary-fixed-variant":"#653e00","on-secondary":"#472a00","tertiary-fixed-dim":"#ffb3ad","on-surface-variant":"#bacac5","tertiary-container":"#ffa7a0","on-primary":"#003731","on-secondary-container":"#5b3800","error":"#ffb4ab","on-tertiary-fixed":"#410004","surface-container-high":"#262a31","secondary-fixed-dim":"#ffb95f","surface-container-highest":"#31353c","inverse-primary":"#006b5f","outline-variant":"#3c4a46"},borderRadius:{"DEFAULT":"0.25rem","lg":"0.5rem","xl":"0.75rem","full":"9999px"},spacing:{"space-sm":"0.5rem","margin-desktop":"1.5rem","space-xs":"0.25rem","margin":"1rem","gutter-desktop":"1rem","gutter":"0.75rem","space-lg":"1.25rem","space-md":"0.75rem","space-xl":"2rem"},fontFamily:{"label-md":["Space Mono"],"label-sm":["Space Mono"],"headline-lg-mobile":["Space Grotesk"],"headline-sm":["Space Grotesk"],"body-md":["Space Mono"],"headline-md":["Space Grotesk"],"body-sm":["Space Mono"],"label-lg":["Space Mono"],"body-lg":["Space Mono"],"headline-lg":["Space Grotesk"],"headline-xl-mobile":["Space Grotesk"],"headline-xl":["Space Grotesk"]},fontSize:{"label-md":["11px",{lineHeight:"14px",fontWeight:"700"}],"label-sm":["10px",{lineHeight:"12px",fontWeight:"400"}],"headline-lg-mobile":["22px",{lineHeight:"28px",fontWeight:"700"}],"headline-sm":["16px",{lineHeight:"22px",fontWeight:"600"}],"body-md":["13px",{lineHeight:"20px",fontWeight:"400"}],"headline-md":["20px",{lineHeight:"26px",fontWeight:"600"}],"body-sm":["11px",{lineHeight:"16px",fontWeight:"400"}],"label-lg":["12px",{lineHeight:"16px",fontWeight:"700"}],"body-lg":["15px",{lineHeight:"24px",fontWeight:"400"}],"headline-lg":["28px",{lineHeight:"34px",fontWeight:"700"}],"headline-xl-mobile":["30px",{lineHeight:"36px",fontWeight:"700"}],"headline-xl":["40px",{lineHeight:"48px",fontWeight:"700"}]}}}}</script><link href="./stitch-bridge.css" rel="stylesheet"/><script defer="" src="./workspace-data.js"></script><script defer="" src="./stitch-bridge.js"></script><title>Thread Investigation &amp; Evidence Workspace | Synapse Intel</title></head><body class="bg-surface-container-lowest font-body-md text-on-surface antialiased selection:bg-primary-container selection:text-on-primary-container" data-stitch-page="investigation"><!-- Imported from Google Stitch workspace 140841000522370670: stitch_stitch_threat_intelligence_workspace/thread_investigation_evidence_workspace/code.html. --><aside class="fixed left-0 top-0 h-full w-72 bg-surface-container-lowest z-50 flex flex-col justify-between select-none border-r border-outline-variant/30"><div class="flex flex-col flex-1"><div class="h-16 px-space-md flex items-center justify-between border-b border-outline-variant/30 bg-surface-container-lowest"><div class="flex items-center gap-space-sm overflow-hidden"><img alt="Profile" class="w-8 h-8 rounded-full object-cover shrink-0 ring-1 ring-primary/40" src="https://lh3.googleusercontent.com/aida/ALJJyrAtAVk-NoyWggA8g6t3hEJ0IPjkbO5JR8JVJaPpkl6VesoxlBUlZkt3MfcgxNg_2Z6uyHvDvIumqNTWDVe5k1b2bwe3jq4TuOzGSevL4fFpf5iPZf-5ltHvPbS4e0r9AU1UqWglm86C9qeRBBM3v9DQ4mltIH7woLG6gQcDGXykwRYnTPib5aZQWh8vCxf9OrdeR2iq6fQhsGcxCj_KwBnxDjz18nmZbCvHbbDRpw"/><div class="flex flex-col truncate"><span class="font-headline-sm text-headline-sm text-primary uppercase tracking-wider truncate">SYNAPSE INTEL</span><span class="font-label-sm text-label-sm text-on-surface-variant tracking-widest">C-WAR OBSERVER // 01</span></div></div><div class="w-2 h-2 rounded-full bg-primary animate-pulse shrink-0"></div></div><div class="px-space-md py-space-sm bg-surface-container-low/40 border-b border-outline-variant/20 flex items-center justify-between"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">DOMAIN DISSECTION</span><span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-surface-container-high text-primary font-bold">SIGINT-09</span></div><nav class="flex flex-col gap-1 p-space-sm flex-1" data-active-classes="bg-surface-container-high text-primary border-l-2 border-primary font-bold"><a aria-current="page" class="flex items-center justify-between px-space-sm py-2 rounded transition-all duration-150 group bg-surface-container-high text-primary border-l-2 border-primary font-bold" data-path="monitor" href="./index.html"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-headline-sm group-hover:text-primary transition-colors">radar</span><span class="font-body-md text-body-md uppercase tracking-wide">Monitor</span></div><span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-primary/10 border border-primary/30 text-primary font-bold">14 active</span></a><a class="flex items-center justify-between px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-150 group" data-path="cases" href="./campaign.html"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-headline-sm group-hover:text-primary transition-colors">folder_managed</span><span class="font-body-md text-body-md uppercase tracking-wide">Cases</span></div><span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-secondary/10 border border-secondary/30 text-secondary font-bold">3 pending</span></a><a class="flex items-center justify-between px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-150 group" data-path="sources" href="./workspace.html#sources"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-headline-sm group-hover:text-primary transition-colors">hub</span><span class="font-body-md text-body-md uppercase tracking-wide">Sources</span></div><span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-error/10 border border-error/30 text-error font-bold">1 degraded</span></a><a class="flex items-center justify-between px-space-sm py-2 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all duration-150 group" data-path="alerts" href="./workspace.html#alerts"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-headline-sm group-hover:text-primary transition-colors">crisis_alert</span><span class="font-body-md text-body-md uppercase tracking-wide">Alerts</span></div><span class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-error-container text-on-surface font-bold">5 unack</span></a></nav></div><div class="p-space-sm border-t border-outline-variant/30 bg-surface-container-lowest flex flex-col gap-1"><div class="px-space-xs py-1 flex items-center justify-between"><span class="font-label-sm text-label-sm text-on-surface-variant uppercase tracking-wider">Subsystems</span><span class="font-label-sm text-label-sm text-outline">v4.1.2</span></div><a class="flex items-center gap-space-sm px-space-sm py-1.5 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-secondary transition-all" data-path="exercise-simulator" href="./workspace.html#exercise"><span class="material-symbols-outlined text-label-lg text-secondary">science</span><span class="font-body-sm text-body-sm truncate">Exercise Simulator</span></a><a class="flex items-center justify-between px-space-sm py-1.5 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-primary transition-all" data-path="schema-api-status" href="./workspace.html"><div class="flex items-center gap-space-sm"><span class="material-symbols-outlined text-label-lg text-primary">sync_alt</span><span class="font-body-sm text-body-sm truncate">FastAPI / SQLite</span></div><span class="font-label-sm text-label-sm text-primary uppercase">SYNCED</span></a><a class="flex items-center gap-space-sm px-space-sm py-1.5 rounded text-on-surface-variant hover:bg-surface-container-high hover:text-on-surface transition-all" data-path="system-diagnostics" href="./classic.html"><span class="material-symbols-outlined text-label-lg text-outline">memory</span><span class="font-body-sm text-body-sm truncate">Diagnostics</span></a></div></aside><div class="pl-72 flex flex-col min-h-screen"><header class="fixed top-0 left-72 right-0 h-16 bg-surface-container-lowest/90 backdrop-blur-md border-b border-outline-variant/30 z-40 px-space-md flex items-center justify-between gap-space-md"><div class="flex items-center gap-space-md overflow-hidden"><div class="flex items-center gap-2 font-label-md text-label-md uppercase tracking-wider"><span class="text-on-surface-variant hover:text-primary cursor-pointer transition-colors">OBSERVATORY</span><span class="text-outline">/</span><span class="text-primary font-bold">THREAT-CONVERGENCE</span></div><div class="h-4 w-px bg-outline-variant/40 hidden sm:block"></div><div class="hidden lg:flex items-center gap-2 px-2.5 py-1 rounded bg-surface-container-high border border-outline-variant/30"><span class="relative flex h-2 w-2"><span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-primary opacity-75"></span><span class="relative inline-flex rounded-full h-2 w-2 bg-primary"></span></span><span class="font-label-sm text-label-sm text-on-surface uppercase tracking-wider font-bold">ONLINE · INGEST ACTIVE (48 msg/s)</span></div></div><div class="flex items-center gap-space-md shrink-0"><div class="relative hidden xl:block w-72"><div class="absolute inset-y-0 left-0 pl-2.5 flex items-center pointer-events-none"><span class="material-symbols-outlined text-label-lg text-outline">search</span></div><input class="w-full bg-surface-container-low border border-outline-variant/40 rounded-none pl-8 pr-12 py-1.5 font-label-sm text-label-sm text-on-surface placeholder:text-outline focus:outline-none focus:border-primary transition-colors" placeholder="THREAD HASH, CHAN, CASE ID..." type="text"/><div class="absolute inset-y-0 right-0 pr-2 flex items-center pointer-events-none"><kbd class="font-label-sm text-label-sm px-1.5 py-0.5 rounded bg-surface-container-highest text-on-surface-variant border border-outline-variant/30">Ctrl+K</kbd></div></div><div class="inline-flex items-center p-0.5 bg-surface-container-high border border-outline-variant/40 rounded"><button class="px-3 py-1 font-label-sm text-label-sm uppercase font-bold bg-primary text-on-primary transition-all" data-stitch-action="live-mode" type="button">LIVE</button><button class="px-3 py-1 font-label-sm text-label-sm uppercase font-bold text-on-surface-variant hover:text-secondary transition-all" data-stitch-action="exercise-mode" type="button">EXERCISE</button></div><div class="h-5 w-px bg-outline-variant/30"></div><div class="flex items-center gap-space-sm pl-1"><div class="flex flex-col text-right hidden md:block"><span class="font-headline-sm text-headline-sm text-on-surface leading-tight">Analyst J. Vance</span><span class="font-label-sm text-label-sm text-primary uppercase">G-SOC LEVEL 3</span></div><img alt="Profile" class="w-8 h-8 rounded-full object-cover border border-outline-variant/40" src="https://lh3.googleusercontent.com/aida/ALJJyrAtAVk-NoyWggA8g6t3hEJ0IPjkbO5JR8JVJaPpkl6VesoxlBUlZkt3MfcgxNg_2Z6uyHvDvIumqNTWDVe5k1b2bwe3jq4TuOzGSevL4fFpf5iPZf-5ltHvPbS4e0r9AU1UqWglm86C9qeRBBM3v9DQ4mltIH7woLG6gQcDGXykwRYnTPib5aZQWh8vCxf9OrdeR2iq6fQhsGcxCj_KwBnxDjz18nmZbCvHbbDRpw"/></div></div></header><main class="relative pt-16 bg-surface-container-lowest flex-1 w-full"><div class="flex flex-col w-full">
+<!-- Top Operational Breadcrumb & Context Banner -->
+<div class="w-full bg-surface-container-low px-gutter-desktop py-space-sm flex flex-wrap items-center justify-between gap-space-sm" data-stitch-region="thread-toolbar">
+<div class="flex items-center gap-space-md">
+<a class="inline-flex items-center gap-1.5 px-space-sm py-1 bg-surface-container-high hover:bg-surface-bright text-on-surface-variant hover:text-primary transition-colors font-label-md text-label-md uppercase tracking-wider" href="./index.html">
+<span class="material-symbols-outlined text-label-md">arrow_back</span>
+        Back to Monitor Queue
+      </a>
+<div class="h-4 w-px bg-outline-variant/30 hidden sm:block"></div>
+<div class="flex items-center gap-2">
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-error/15 text-error font-label-sm text-label-sm uppercase tracking-wider font-bold">
+<span class="w-1.5 h-1.5 rounded-full bg-error animate-ping"></span>
+          LEVEL 1 - CRITICAL COORDINATION
+        </span>
+<span class="inline-flex items-center gap-1.5 px-2 py-0.5 bg-surface-container-high text-primary font-label-sm text-label-sm">
+<span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
+          Live Ingesting (Sync: 4s ago)
+        </span>
+</div>
+</div>
+<div class="flex items-center gap-space-xs flex-wrap">
+<button class="px-2.5 py-1.5 bg-surface-container-high hover:bg-surface-variant text-on-surface hover:text-primary transition-all font-label-sm text-label-sm uppercase flex items-center gap-1.5" data-stitch-action="new-case" type="button">
+<span class="material-symbols-outlined text-label-md">add_circle</span>
+        Create New Case
+      </button>
+<button class="px-2.5 py-1.5 bg-surface-container-high hover:bg-surface-variant text-secondary font-label-sm text-label-sm uppercase flex items-center gap-1.5" data-stitch-action="assign-case" type="button">
+<span class="material-symbols-outlined text-label-md">link</span>
+        Link: CASE-2025-081
+      </button>
+<button class="px-2.5 py-1.5 bg-surface-container-high hover:bg-surface-variant text-on-surface font-label-sm text-label-sm uppercase flex items-center gap-1.5" data-stitch-action="thread-report" type="button">
+<span class="material-symbols-outlined text-label-md">summarize</span>
+        Preview SitRep
+      </button>
+<!-- Exercise Tools Dropdown Trigger -->
+<div class="relative group">
+<button class="px-2.5 py-1.5 bg-secondary/15 hover:bg-secondary/25 text-secondary font-label-sm text-label-sm uppercase flex items-center gap-1" data-stitch-action="exercise-tools" type="button">
+<span class="material-symbols-outlined text-label-md">science</span>
+          Exercise Tools
+          <span class="material-symbols-outlined text-label-sm">arrow_drop_down</span>
+</button>
+<div class="absolute right-0 top-full mt-1 w-56 bg-surface-container-high shadow-2xl py-1 hidden group-hover:block z-50">
+<a class="px-space-sm py-2 text-on-surface hover:bg-surface-bright flex items-center gap-2 font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-label-md text-secondary">content_paste_go</span>
+            Paste-a-Batch Test
+          </a>
+<a class="px-space-sm py-2 text-on-surface hover:bg-surface-bright flex items-center gap-2 font-label-sm text-label-sm" href="#">
+<span class="material-symbols-outlined text-label-md text-primary">play_arrow</span>
+            Run Simulation Scenario
+          </a>
+<div class="h-px bg-outline-variant/30 my-1"></div>
+<div class="px-space-sm py-1 font-label-sm text-label-sm text-outline">
+            MODE: EXERCISE_ACTIVE (SANDBOX)
+          </div>
+</div>
+</div>
+</div>
+</div>
+<!-- Thread Primary Title Bar -->
+<div class="w-full bg-surface-container-lowest px-gutter-desktop py-space-md" data-stitch-region="thread-header">
+<div class="flex flex-col lg:flex-row lg:items-center justify-between gap-space-md">
+<div class="space-y-1">
+<div class="flex items-center gap-2 font-label-sm text-label-sm text-outline">
+<span class="uppercase">SIGNAL INGEST</span>
+<span>//</span>
+<span class="text-primary font-bold">TELEGRAM @nordic_frontier_news</span>
+<span>//</span>
+<span>HASH: th_948f21e0</span>
+<span>//</span>
+<span>2025-05-18 09:14:00 UTC</span>
+</div>
+<h1 class="font-headline-lg text-headline-lg text-on-surface tracking-tight">
+          Nordic Grid Sabotage Rumor Spreading in Regional Defense Hubs
+        </h1>
+</div>
+<div class="flex items-center gap-space-sm shrink-0">
+<a aria-disabled="true" class="px-3 py-1.5 bg-surface-container hover:bg-surface-container-high text-primary hover:text-primary-fixed transition-colors font-label-sm text-label-sm uppercase flex items-center gap-1.5" data-stitch-preview-link="" href="#" rel="noopener noreferrer" target="_blank">
+<span class="material-symbols-outlined text-label-md">open_in_new</span>
+          Open Telegram Post ↗
+        </a>
+<div class="px-3 py-1.5 bg-error-container text-on-surface font-label-sm text-label-sm uppercase font-bold tracking-wider">
+          CRITICAL THREAT THRESHOLD
+        </div>
+</div>
+</div>
+</div>
+<!-- Lead Telemetry Metrics Grid -->
+<div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-gutter px-gutter-desktop py-space-md bg-surface-container-lowest" data-stitch-region="thread-metrics">
+<!-- Card 1 -->
+<div class="bg-surface-container-low p-space-md flex flex-col justify-between relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-wider">Total Ingested Comments</span>
+<span class="material-symbols-outlined text-on-surface-variant text-label-lg group-hover:text-primary transition-colors">forum</span>
+</div>
+<div class="mt-space-sm flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-on-surface tracking-tight">1,420</span>
+<span class="font-label-sm text-label-sm text-primary uppercase font-bold">+48/min</span>
+</div>
+<div class="mt-space-xs flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span>Across 192 user accounts</span>
+<span class="text-primary font-bold">100% PARSED</span>
+</div>
+<div class="w-full bg-surface-container-high h-1 mt-3">
+<div class="bg-primary h-1" style="width: 100%"></div>
+</div>
+</div>
+<!-- Card 2 -->
+<div class="bg-surface-container-low p-space-md flex flex-col justify-between relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-wider">Flagged Coordinated Share</span>
+<span class="material-symbols-outlined text-error text-label-lg">crisis_alert</span>
+</div>
+<div class="mt-space-sm flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-error tracking-tight">68.4%</span>
+<span class="font-label-sm text-label-sm text-error uppercase font-bold">971 / 1,420</span>
+</div>
+<div class="mt-space-xs flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span>Anomalous copypasta/sync</span>
+<span class="text-error font-bold">HIGH RISK</span>
+</div>
+<div class="w-full bg-surface-container-high h-1 mt-3">
+<div class="bg-error h-1" style="width: 68.4%"></div>
+</div>
+</div>
+<!-- Card 3 -->
+<div class="bg-surface-container-low p-space-md flex flex-col justify-between relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-wider">Dominant Bot Cluster</span>
+<span class="material-symbols-outlined text-secondary text-label-lg">hub</span>
+</div>
+<div class="mt-space-sm flex items-baseline gap-2">
+<span class="font-headline-lg text-headline-lg text-secondary tracking-tight">Cluster Alpha</span>
+</div>
+<div class="mt-space-xs flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span class="text-on-surface font-bold">412 nodes</span>
+<span class="text-secondary font-bold">89% Density Clique</span>
+</div>
+<div class="w-full bg-surface-container-high h-1 mt-3">
+<div class="bg-secondary h-1" style="width: 89%"></div>
+</div>
+</div>
+<!-- Card 4 -->
+<div class="bg-surface-container-low p-space-md flex flex-col justify-between relative overflow-hidden group">
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm uppercase text-on-surface-variant tracking-wider">Peak 5-Min Burst Velocity</span>
+<span class="material-symbols-outlined text-primary text-label-lg">speed</span>
+</div>
+<div class="mt-space-sm flex items-baseline gap-2">
+<span class="font-headline-xl text-headline-xl text-primary tracking-tight">318</span>
+<span class="font-label-sm text-label-sm text-outline uppercase">msg / 5m</span>
+</div>
+<div class="mt-space-xs flex items-center justify-between text-on-surface-variant font-label-sm text-label-sm">
+<span>Logged at 11:15:00 UTC</span>
+<span class="text-primary font-bold">SYNC ANOMALY</span>
+</div>
+<div class="w-full bg-surface-container-high h-1 mt-3">
+<div class="bg-primary h-1" style="width: 94%"></div>
+</div>
+</div>
+</div>
+<!-- Interactive Five-Minute Comment-Burst Timeline Visualizer -->
+<div class="px-gutter-desktop py-space-sm bg-surface-container-lowest" data-stitch-region="thread-chart">
+<div class="bg-surface-container-low p-space-md">
+<div class="flex flex-col md:flex-row md:items-center justify-between gap-space-sm pb-space-sm">
+<div class="flex items-center gap-space-sm">
+<span class="material-symbols-outlined text-primary text-headline-sm">monitoring</span>
+<div>
+<div class="font-headline-sm text-headline-sm text-on-surface">5-Minute Comment Burst Velocity (Last 6 Hours)</div>
+<div class="font-label-sm text-label-sm text-outline">Bucket resolution: 300s // Synchronized injection spikes indicated by vertical pulse markers</div>
+</div>
+</div>
+<!-- Legend and Filters -->
+<div class="flex items-center gap-space-md">
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 bg-surface-container-highest inline-block"></span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Total Ingest (Organic+Coordinated)</span>
+</div>
+<div class="flex items-center gap-2">
+<span class="w-3 h-3 bg-error inline-block"></span>
+<span class="font-label-sm text-label-sm text-error font-bold">Coordinated Burst Spike</span>
+</div>
+<div class="inline-flex bg-surface-container-high p-0.5 text-label-sm font-label-sm">
+<button class="px-2 py-0.5 bg-primary text-on-primary font-bold">6H</button>
+<button class="px-2 py-0.5 text-on-surface-variant hover:text-on-surface">12H</button>
+<button class="px-2 py-0.5 text-on-surface-variant hover:text-on-surface">ALL</button>
+</div>
+</div>
+</div>
+<!-- High-Fidelity SVG Dual-Series Chart -->
+<div class="w-full relative mt-2 bg-surface-container-lowest p-space-sm">
+<svg class="w-full h-48 select-none overflow-visible" preserveaspectratio="none" viewbox="0 0 1000 220">
+<defs>
+<lineargradient id="flaggedGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#ffb4ab" stop-opacity="0.4"></stop>
+<stop offset="100%" stop-color="#93000a" stop-opacity="0.0"></stop>
+</lineargradient>
+<lineargradient id="totalGradient" x1="0" x2="0" y1="0" y2="1">
+<stop offset="0%" stop-color="#57f1db" stop-opacity="0.2"></stop>
+<stop offset="100%" stop-color="#10141a" stop-opacity="0.0"></stop>
+</lineargradient>
+<pattern height="40" id="gridPattern" patternunits="userSpaceOnUse" width="50">
+<path d="M 50 0 L 0 0 0 50" fill="none" stroke="#262a31" stroke-width="0.8"></path>
+</pattern>
+</defs>
+<!-- Grid Background -->
+<rect fill="url(#gridPattern)" height="180" width="1000"></rect>
+<!-- Y-axis reference lines and labels -->
+<line stroke="#31353c" stroke-dasharray="2,2" stroke-width="1" x1="0" x2="1000" y1="20" y2="20"></line>
+<text fill="#859490" font-family="Space Mono" font-size="9" x="8" y="26">320 msg/5m</text>
+<line stroke="#31353c" stroke-dasharray="2,2" stroke-width="1" x1="0" x2="1000" y1="80" y2="80"></line>
+<text fill="#859490" font-family="Space Mono" font-size="9" x="8" y="86">180 msg/5m</text>
+<line stroke="#31353c" stroke-dasharray="2,2" stroke-width="1" x1="0" x2="1000" y1="140" y2="140"></line>
+<text fill="#859490" font-family="Space Mono" font-size="9" x="8" y="146">60 msg/5m</text>
+<!-- Burst 1 Indicator Line (11:15 UTC) -->
+<line stroke="#ffb4ab" stroke-dasharray="3,3" stroke-width="1.5" x1="420" x2="420" y1="0" y2="180"></line>
+<rect fill="#93000a" height="18" rx="0" width="110" x="365" y="8"></rect>
+<text fill="#dfe2eb" font-family="Space Mono" font-size="8.5" font-weight="700" x="372" y="21">BURST #1: 318 msg/5m</text>
+<!-- Burst 2 Indicator Line (13:40 UTC) -->
+<line stroke="#ffb4ab" stroke-dasharray="3,3" stroke-width="1.5" x1="780" x2="780" y1="0" y2="180"></line>
+<rect fill="#93000a" height="18" rx="0" width="110" x="725" y="28"></rect>
+<text fill="#dfe2eb" font-family="Space Mono" font-size="8.5" font-weight="700" x="732" y="41">BURST #2: 242 msg/5m</text>
+<!-- Series 1: Total Volume Ingest Area & Line -->
+<path d="M 0 170
+                   L 70 166 L 140 162 L 210 155 L 280 148 L 350 110
+                   L 420 18 L 470 65 L 530 135 L 600 142 L 670 120
+                   L 740 70 L 780 34 L 840 92 L 910 145 L 970 150 L 1000 152
+                   L 1000 180 L 0 180 Z" fill="url(#totalGradient)"></path>
+<path d="M 0 170
+                   L 70 166 L 140 162 L 210 155 L 280 148 L 350 110
+                   L 420 18 L 470 65 L 530 135 L 600 142 L 670 120
+                   L 740 70 L 780 34 L 840 92 L 910 145 L 970 150 L 1000 152" fill="none" stroke="#57f1db" stroke-width="2"></path>
+<!-- Series 2: Coordinated Flagged Volume Area & Line (Red/Hot) -->
+<path d="M 0 178
+                   L 70 177 L 140 176 L 210 175 L 280 170 L 350 130
+                   L 420 22 L 470 78 L 530 155 L 600 165 L 670 145
+                   L 740 90 L 780 44 L 840 122 L 910 165 L 970 172 L 1000 174
+                   L 1000 180 L 0 180 Z" fill="url(#flaggedGradient)"></path>
+<path d="M 0 178
+                   L 70 177 L 140 176 L 210 175 L 280 170 L 350 130
+                   L 420 22 L 470 78 L 530 155 L 600 165 L 670 145
+                   L 740 90 L 780 44 L 840 122 L 910 165 L 970 172 L 1000 174" fill="none" stroke="#ffb4ab" stroke-width="2.5"></path>
+<!-- Data Point Highlights -->
+<circle cx="420" cy="22" fill="#ffb4ab" r="4.5" stroke="#10141a" stroke-width="2"></circle>
+<circle cx="780" cy="44" fill="#ffb4ab" r="4.5" stroke="#10141a" stroke-width="2"></circle>
+<!-- X-Axis Labels -->
+<text fill="#859490" font-family="Space Mono" font-size="10" x="2" y="200">09:00 UTC</text>
+<text fill="#859490" font-family="Space Mono" font-size="10" x="195" y="200">10:00 UTC</text>
+<text fill="#859490" font-family="Space Mono" font-size="10" x="395" y="200">11:00 UTC</text>
+<text fill="#859490" font-family="Space Mono" font-size="10" x="595" y="200">12:00 UTC</text>
+<text fill="#859490" font-family="Space Mono" font-size="10" x="765" y="200">13:00 UTC</text>
+<text fill="#859490" font-family="Space Mono" font-size="10" x="940" y="200">14:00 (NOW)</text>
+</svg>
+<!-- Dynamic Hover Annotation Overlay (Brutalist readout badge) -->
+<div class="absolute top-4 right-6 bg-surface-container-high px-3 py-2 text-right hidden sm:block">
+<div class="font-label-sm text-label-sm text-outline">CURRENT SECTOR SCAN</div>
+<div class="font-headline-sm text-headline-sm text-primary">ANOMALY CONFIRMATION: 99.1%</div>
+<div class="font-label-sm text-label-sm text-on-surface-variant font-mono">11:15 UTC · Cluster Alpha injection (318 / 5m)</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Primary Workspace Content Split: Tabbed Investigation Left / Evidence Drawer Right -->
+<div class="px-gutter-desktop py-space-sm grid grid-cols-1 xl:grid-cols-12 gap-gutter bg-surface-container-lowest" data-stitch-region="thread-detail">
+<!-- LEFT PANE: Tabbed Navigation & Detailed Modules (8 Cols) -->
+<div class="xl:col-span-8 flex flex-col gap-space-md">
+<!-- Tab Header Strip -->
+<div class="flex items-center gap-1 bg-surface-container-low p-1 overflow-x-auto" data-stitch-region="thread-tabs">
+<button class="px-space-md py-2 bg-primary text-on-primary font-headline-sm text-headline-sm uppercase font-bold flex items-center gap-2" data-stitch-action="tab-overview" id="tab-overview">
+<span class="material-symbols-outlined text-label-lg">insights</span>
+          Overview
+        </button>
+<button class="px-space-md py-2 bg-surface-container-high text-on-surface-variant hover:text-on-surface font-headline-sm text-headline-sm uppercase flex items-center gap-2 transition-colors" data-stitch-action="tab-comments" id="tab-comments">
+<span class="material-symbols-outlined text-label-lg">comment</span>
+          Comments (1,420)
+        </button>
+<button class="px-space-md py-2 bg-surface-container-high text-on-surface-variant hover:text-on-surface font-headline-sm text-headline-sm uppercase flex items-center gap-2 transition-colors" data-stitch-action="tab-network" id="tab-network">
+<span class="material-symbols-outlined text-label-lg">account_tree</span>
+          Network &amp; Clusters (4)
+        </button>
+<button class="px-space-md py-2 bg-surface-container-high text-on-surface-variant hover:text-on-surface font-headline-sm text-headline-sm uppercase flex items-center gap-2 transition-colors" data-stitch-action="tab-infra" id="tab-infra">
+<span class="material-symbols-outlined text-label-lg">dns</span>
+          Infrastructure (6 Nodes)
+        </button>
+</div>
+<!-- The Four Core Analysis Signals Comparison Cards -->
+<div class="grid grid-cols-1 sm:grid-cols-2 gap-gutter" data-stitch-region="thread-signals">
+<!-- 1. Temporal Signal -->
+<div class="bg-surface-container-low p-space-md flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">CORE SIGNAL 01 // TEMPORAL</span>
+<span class="px-1.5 py-0.5 bg-error/20 text-error font-label-sm text-label-sm font-bold">CONFIRMED</span>
+</div>
+<div class="mt-2 flex items-baseline justify-between">
+<span class="font-headline-md text-headline-md text-error">94.2% Abnormal</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">p &lt; 0.0001</span>
+</div>
+<p class="mt-2 font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              Microsecond burst clustering with synchronized interval spikes. Total absence of human organic diurnal decay. 318 comments fired within a single 5-minute synchronization window.
+            </p>
+</div>
+<div class="mt-3 pt-2 bg-surface-container-lowest p-2 flex items-center justify-between text-on-surface font-label-sm text-label-sm">
+<span>Interval variance: ±0.04s</span>
+<span class="text-primary font-bold">AUTOMATED DISPATCH</span>
+</div>
+</div>
+<!-- 2. Linguistic Signal -->
+<div class="bg-surface-container-low p-space-md flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">CORE SIGNAL 02 // LINGUISTIC</span>
+<span class="px-1.5 py-0.5 bg-secondary/20 text-secondary font-label-sm text-label-sm font-bold">HIGH MATCH</span>
+</div>
+<div class="mt-2 flex items-baseline justify-between">
+<span class="font-headline-md text-headline-md text-secondary">87.6% Repetitive</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">Cosine Sim &gt; 0.89</span>
+</div>
+<p class="mt-2 font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              Copypasta patterns and shared syntactic skeleton. Identical phrasing across pseudonyms with variable character insertion bypasses (zero-width spaces and Cyrillic homoglyphs).
+            </p>
+</div>
+<div class="mt-3 pt-2 bg-surface-container-lowest p-2 flex items-center justify-between text-on-surface font-label-sm text-label-sm">
+<span>Templates Identified: 3 Master</span>
+<span class="text-secondary font-bold">SYNTACTIC CLONE</span>
+</div>
+</div>
+<!-- 3. Narrative Signal -->
+<div class="bg-surface-container-low p-space-md flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">CORE SIGNAL 03 // NARRATIVE</span>
+<span class="px-1.5 py-0.5 bg-primary/20 text-primary font-label-sm text-label-sm font-bold">ALIGNED</span>
+</div>
+<div class="mt-2 flex items-baseline justify-between">
+<span class="font-headline-md text-headline-md text-primary">78.9% Aligned</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">3 Discrete Narratives</span>
+</div>
+<p class="mt-2 font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              Triad narrative saturation: 1) "Regional military false flag", 2) "Substation blast was kinetic sabotage", 3) "Instant blackout imminent, stockpile fuel/powerbanks immediately".
+            </p>
+</div>
+<div class="mt-3 pt-2 bg-surface-container-lowest p-2 flex items-center justify-between text-on-surface font-label-sm text-label-sm">
+<span>Panic Seeding Index: 8.8/10</span>
+<span class="text-primary font-bold">TARGETED DISRUPTION</span>
+</div>
+</div>
+<!-- 4. Network Signal -->
+<div class="bg-surface-container-low p-space-md flex flex-col justify-between">
+<div>
+<div class="flex items-center justify-between">
+<span class="font-label-sm text-label-sm text-outline uppercase tracking-wider">CORE SIGNAL 04 // NETWORK</span>
+<span class="px-1.5 py-0.5 bg-error/20 text-error font-label-sm text-label-sm font-bold">CONVERGENT</span>
+</div>
+<div class="mt-2 flex items-baseline justify-between">
+<span class="font-headline-md text-headline-md text-error">91.3% Coordinated</span>
+<span class="font-label-sm text-label-sm text-on-surface-variant">4 Dense Cliques</span>
+</div>
+<p class="mt-2 font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+              Intense reciprocal amplifying interactions. Graph topology reveals isolated, non-organic clusters with high modularity and near-zero engagement with external community members.
+            </p>
+</div>
+<div class="mt-3 pt-2 bg-surface-container-lowest p-2 flex items-center justify-between text-on-surface font-label-sm text-label-sm">
+<span>Cluster Alpha: 412 Nodes</span>
+<span class="text-error font-bold">ASTROTURF CELL</span>
+</div>
+</div>
+</div>
+<!-- Recurring Narratives & Key Phrases Table -->
+<div class="bg-surface-container-low p-space-md" data-stitch-region="thread-narratives">
+<div class="flex items-center justify-between pb-space-sm">
+<div>
+<div class="font-headline-sm text-headline-sm text-on-surface uppercase">Recurring Synchronized Phrasing</div>
+<div class="font-label-sm text-label-sm text-outline">Detected algorithmic copypasta and keyword dispersion metrics</div>
+</div>
+<button class="px-2 py-1 bg-surface-container-high text-primary hover:bg-surface-variant font-label-sm text-label-sm uppercase" data-stitch-action="comment-csv">
+            Export CSV
+          </button>
+</div>
+<div class="overflow-x-auto">
+<table class="w-full text-left font-label-sm text-label-sm">
+<thead>
+<tr class="bg-surface-container-high text-outline">
+<th class="py-2 px-space-sm uppercase">Key Phrasing / Copypasta Signature</th>
+<th class="py-2 px-space-sm uppercase">Frequency</th>
+<th class="py-2 px-space-sm uppercase">First Ingest</th>
+<th class="py-2 px-space-sm uppercase">Pseudonym Pool</th>
+<th class="py-2 px-space-sm uppercase">Coord Score</th>
+<th class="py-2 px-space-sm uppercase text-right">Action</th>
+</tr>
+</thead>
+<tbody class="divide-y divide-surface-container-highest/40 font-body-sm">
+<tr class="hover:bg-surface-container transition-colors">
+<td class="py-2.5 px-space-sm text-on-surface font-mono font-bold text-error">
+                  "substation blast was planned"
+                </td>
+<td class="py-2.5 px-space-sm text-on-surface">284x</td>
+<td class="py-2.5 px-space-sm text-outline font-mono">09:18:22 UTC</td>
+<td class="py-2.5 px-space-sm text-on-surface">82 pseudonyms</td>
+<td class="py-2.5 px-space-sm">
+<span class="px-1.5 py-0.5 bg-error/20 text-error font-bold font-mono">0.96</span>
+</td>
+<td class="py-2.5 px-space-sm text-right">
+<button class="text-primary hover:underline font-mono" data-stitch-action="tab-comments">ISOLATE</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors">
+<td class="py-2.5 px-space-sm text-on-surface font-mono font-bold text-secondary">
+                  "grid collapse imminent prepare powerbanks"
+                </td>
+<td class="py-2.5 px-space-sm text-on-surface">195x</td>
+<td class="py-2.5 px-space-sm text-outline font-mono">09:25:04 UTC</td>
+<td class="py-2.5 px-space-sm text-on-surface">64 pseudonyms</td>
+<td class="py-2.5 px-space-sm">
+<span class="px-1.5 py-0.5 bg-secondary/20 text-secondary font-bold font-mono">0.91</span>
+</td>
+<td class="py-2.5 px-space-sm text-right">
+<button class="text-primary hover:underline font-mono" data-stitch-action="tab-comments">ISOLATE</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors">
+<td class="py-2.5 px-space-sm text-on-surface font-mono">
+                  "defense ministry suppressing turbine casualty numbers"
+                </td>
+<td class="py-2.5 px-space-sm text-on-surface">142x</td>
+<td class="py-2.5 px-space-sm text-outline font-mono">09:31:40 UTC</td>
+<td class="py-2.5 px-space-sm text-on-surface">47 pseudonyms</td>
+<td class="py-2.5 px-space-sm">
+<span class="px-1.5 py-0.5 bg-secondary/20 text-secondary font-bold font-mono">0.88</span>
+</td>
+<td class="py-2.5 px-space-sm text-right">
+<button class="text-primary hover:underline font-mono" data-stitch-action="tab-comments">ISOLATE</button>
+</td>
+</tr>
+<tr class="hover:bg-surface-container transition-colors">
+<td class="py-2.5 px-space-sm text-on-surface font-mono">
+                  "diesel generators failing across Gotland sector"
+                </td>
+<td class="py-2.5 px-space-sm text-on-surface">88x</td>
+<td class="py-2.5 px-space-sm text-outline font-mono">09:44:11 UTC</td>
+<td class="py-2.5 px-space-sm text-on-surface">31 pseudonyms</td>
+<td class="py-2.5 px-space-sm">
+<span class="px-1.5 py-0.5 bg-primary/20 text-primary font-bold font-mono">0.74</span>
+</td>
+<td class="py-2.5 px-space-sm text-right">
+<button class="text-primary hover:underline font-mono" data-stitch-action="tab-comments">ISOLATE</button>
+</td>
+</tr>
+</tbody>
+</table>
+</div>
+</div>
+<!-- Network Clusters & Infrastructure Preview Mini-Module -->
+<div class="grid grid-cols-1 md:grid-cols-2 gap-gutter" data-stitch-region="thread-network">
+<div class="bg-surface-container-low p-space-md">
+<div class="flex items-center justify-between mb-2">
+<span class="font-headline-sm text-headline-sm text-on-surface uppercase">Network Clusters</span>
+<span class="font-label-sm text-label-sm text-primary font-bold">4 DETECTED</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-3">
+            Cluster Alpha (412 nodes, primary amplifier), Cluster Beta (180 nodes, cross-poster bridge), Cluster Gamma (94 nodes, narrative seeders), Cluster Delta (42 nodes, fallback).
+          </p>
+<div class="p-2 bg-surface-container-lowest font-label-sm text-label-sm text-outline flex items-center justify-between">
+<span>GRAPH MODULARITY: 0.84</span>
+<button class="text-primary font-bold hover:underline" data-stitch-action="tab-network">OPEN INTERACTIVE GRAPH ↗</button>
+</div>
+</div>
+<div class="bg-surface-container-low p-space-md">
+<div class="flex items-center justify-between mb-2">
+<span class="font-headline-sm text-headline-sm text-on-surface uppercase">Observed Infrastructure</span>
+<span class="font-label-sm text-label-sm text-secondary font-bold">6 EGRESS NODES</span>
+</div>
+<p class="font-body-sm text-body-sm text-on-surface-variant mb-3">
+            Traffic routed through 6 localized commercial VPN/Proxy endpoints in Frankfurt and Stockholm. ASNs logged: AS13335, AS20473.
+          </p>
+<div class="p-2 bg-surface-container-lowest font-label-sm text-label-sm text-secondary font-mono">
+            ATTRIBUTION WITHHELD // RAW TELEMETRY ACTIVE
+          </div>
+</div>
+</div>
+<!-- Attribution Disclaimer Box (Crucial Doctrine Requirement) -->
+<div class="bg-surface-container-high p-space-md flex items-start gap-space-sm" data-stitch-region="thread-doctrine">
+<span class="material-symbols-outlined text-secondary text-headline-md shrink-0">gavel</span>
+<div class="space-y-1">
+<div class="font-headline-sm text-headline-sm text-secondary uppercase tracking-wider">
+            Doctrine Attribution Notice
+          </div>
+<p class="font-body-sm text-body-sm text-on-surface-variant leading-relaxed">
+<strong class="text-on-surface">Statistical Coordination Anomaly Only:</strong> Calculated scores reflect temporal convergence, template clustering, and network density patterns. Formal operational attribution to specific state-sponsored APT or hybrid warfare actors requires corroboration with external out-of-band SIGINT, HUMINT, or cross-agency classified dossiers.
+          </p>
+</div>
+</div>
+</div>
+<!-- RIGHT PANE: Docked Evidence Drawer & Selected Comment Inspector (4 Cols) -->
+<div class="xl:col-span-4 flex flex-col gap-space-md" data-stitch-region="thread-evidence">
+<!-- Evidence Drawer Container -->
+<div class="bg-surface-container-low p-space-md flex flex-col justify-between sticky top-20">
+<div class="space-y-space-md">
+<!-- Drawer Header -->
+<div class="flex items-center justify-between pb-space-sm bg-surface-container-high px-space-sm py-2">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-primary text-label-lg">fingerprint</span>
+<span class="font-headline-sm text-headline-sm text-on-surface uppercase">Evidence Inspector</span>
+</div>
+<span class="font-label-sm text-label-sm px-1.5 py-0.5 bg-error text-on-error font-bold">CRITICAL ITEM</span>
+</div>
+<!-- Selected Comment Details -->
+<div class="space-y-space-xs">
+<div class="flex items-center justify-between text-label-sm font-label-sm text-outline">
+<span>TARGET COMMENT</span>
+<span class="font-mono text-primary font-bold">cmt_b729f1</span>
+</div>
+<div class="bg-surface-container-lowest p-space-sm space-y-2">
+<div class="flex items-center justify-between">
+<div class="flex items-center gap-2">
+<span class="material-symbols-outlined text-outline text-label-lg">account_circle</span>
+<span class="font-label-sm text-label-sm font-bold text-on-surface font-mono">user_anon_8829</span>
+</div>
+<span class="font-label-sm text-label-sm text-error font-bold bg-error/15 px-1 py-0.5">SCORE 0.94</span>
+</div>
+<div class="grid grid-cols-2 gap-2 text-label-sm font-label-sm text-outline">
+<div>Account Age: <span class="text-on-surface font-bold">4 days</span></div>
+<div>Historical Msgs: <span class="text-on-surface font-bold">12 msgs</span></div>
+<div>Cluster: <span class="text-secondary font-bold">Alpha (Node 89)</span></div>
+<div>Burst Offset: <span class="text-error font-bold">+1.2s</span></div>
+</div>
+</div>
+</div>
+<!-- Highlighted Comment Text Display -->
+<div class="space-y-1">
+<span class="font-label-sm text-label-sm text-outline uppercase">Extracted Ingest Payload with Signal Highlights</span>
+<div class="bg-surface-container-lowest p-space-md text-on-surface font-body-sm leading-relaxed relative">
+<div class="absolute top-2 right-2 text-label-sm font-label-sm text-outline">RAW INGEST</div>
+<p class="font-mono">
+                "Breaking: Nordic transmission operator confirmed <mark class="bg-error/30 text-error font-bold px-0.5">substation blast was planned</mark> as a drill coverup. The emergency reserve is completely depleted and <mark class="bg-secondary/30 text-secondary font-bold px-0.5">grid collapse imminent prepare powerbanks</mark> before 18:00 tonight. Do not trust regional council press statements."
+              </p>
+</div>
+</div>
+<!-- Signal Justifications -->
+<div class="space-y-space-xs">
+<span class="font-label-sm text-label-sm text-outline uppercase">Heuristic Anomaly Breakdown</span>
+<div class="space-y-1.5">
+<div class="p-2 bg-surface-container text-label-sm font-label-sm flex items-start gap-2">
+<span class="material-symbols-outlined text-error text-label-md shrink-0 mt-0.5">crisis_alert</span>
+<div>
+<span class="text-error font-bold">Linguistic Match (98%):</span>
+<span class="text-on-surface-variant"> Identical syntactic vector match with Template T-04 propagated by 42 other accounts.</span>
+</div>
+</div>
+<div class="p-2 bg-surface-container text-label-sm font-label-sm flex items-start gap-2">
+<span class="material-symbols-outlined text-secondary text-label-md shrink-0 mt-0.5">timer</span>
+<div>
+<span class="text-secondary font-bold">Temporal Delta:</span>
+<span class="text-on-surface-variant"> 1.2s lag behind primary trigger node `user_alpha_seed` at 11:15:02 UTC.</span>
+</div>
+</div>
+<div class="p-2 bg-surface-container text-label-sm font-label-sm flex items-start gap-2">
+<span class="material-symbols-outlined text-primary text-label-md shrink-0 mt-0.5">device_hub</span>
+<div>
+<span class="text-primary font-bold">Infrastructure Signature:</span>
+<span class="text-on-surface-variant"> Egress routed through AS20473 Stockholm exit node shared with 88 accounts.</span>
+</div>
+</div>
+</div>
+</div>
+<!-- Matching Correlated Nodes / Similar Comments -->
+<div class="space-y-space-xs">
+<span class="font-label-sm text-label-sm text-outline uppercase">Correlated Comments (Matching Hash)</span>
+<div class="space-y-1">
+<div class="p-2 bg-surface-container-lowest hover:bg-surface-container transition-colors cursor-pointer flex items-center justify-between text-label-sm font-label-sm">
+<div class="truncate">
+<span class="font-mono text-primary font-bold">cmt_44a10e</span>
+<span class="text-on-surface-variant ml-2 truncate">"substation blast was planned..."</span>
+</div>
+<span class="text-error font-mono font-bold">0.96</span>
+</div>
+<div class="p-2 bg-surface-container-lowest hover:bg-surface-container transition-colors cursor-pointer flex items-center justify-between text-label-sm font-label-sm">
+<div class="truncate">
+<span class="font-mono text-primary font-bold">cmt_89cc21</span>
+<span class="text-on-surface-variant ml-2 truncate">"substation blast was planned drill..."</span>
+</div>
+<span class="text-error font-mono font-bold">0.94</span>
+</div>
+<div class="p-2 bg-surface-container-lowest hover:bg-surface-container transition-colors cursor-pointer flex items-center justify-between text-label-sm font-label-sm">
+<div class="truncate">
+<span class="font-mono text-primary font-bold">cmt_f019a3</span>
+<span class="text-on-surface-variant ml-2 truncate">"grid collapse imminent prepare powerbanks..."</span>
+</div>
+<span class="text-secondary font-mono font-bold">0.89</span>
+</div>
+</div>
+</div>
+<!-- Origin Message Link & Actions -->
+<div class="pt-2 flex flex-col gap-2">
+<a aria-disabled="true" class="w-full py-2 bg-surface-container-high hover:bg-surface-bright text-center text-primary font-label-sm text-label-sm uppercase font-bold flex items-center justify-center gap-1.5 transition-colors" data-stitch-preview-link="" href="#" rel="noopener noreferrer" target="_blank">
+<span class="material-symbols-outlined text-label-md">open_in_new</span>
+              View Original Message #49102 ↗
+            </a>
+<div class="grid grid-cols-2 gap-2">
+<button class="py-2 bg-error hover:bg-error/90 text-on-error font-label-sm text-label-sm uppercase font-bold text-center" data-stitch-action="assign-case">
+                Add to Evidence Log
+              </button>
+<button class="py-2 bg-surface-container-highest hover:bg-surface-bright text-on-surface font-label-sm text-label-sm uppercase text-center" data-stitch-action="tab-comments">
+                Triage Account
+              </button>
+</div>
+</div>
+</div>
+</div>
+</div>
+</div>
+<!-- Operational Footer Bar -->
+<div class="w-full bg-surface-container-high border-t border-outline-variant/30 px-gutter-desktop py-space-sm flex flex-col sm:flex-row items-center justify-between gap-space-sm text-on-surface-variant font-label-sm text-label-sm" data-stitch-region="thread-footer">
+<div class="flex items-center gap-space-md">
+<span class="flex items-center gap-1.5">
+<span class="w-2 h-2 rounded-full bg-primary"></span>
+        STREAM STATUS: WEBSOCKET CONNECTED
+      </span>
+<span>BUFFER: 0 DROPPED</span>
+<span>INGEST LATENCY: 210ms</span>
+</div>
+<div class="flex items-center gap-space-md">
+<span>SYNAPSE INTEL OBSERVER · BUILD 4.1.2-PROD</span>
+<span class="font-mono text-outline">SESSION ID: 0x948F-SOC3</span>
+</div>
+</div>
+</div>
+</main></div></body></html>

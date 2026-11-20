@@ -36,7 +36,9 @@ def api(monkeypatch, tmp_path):
 
 def test_private_reads_and_scoped_ingestion(api):
     client, _ = api
-    assert client.get("/operations.js").status_code == 200
+    for path in ("/", "/investigation.html", "/campaign.html", "/stitch-bridge.js", "/stitch-bridge.css",
+                 "/classic.html", "/workspace.html", "/workspace.js", "/workspace-data.js", "/workspace.css", "/operations.js"):
+        assert client.get(path).status_code == 200
     for path in ("threads", "graph", "alerts", "sources", "cases", "threads/ext:one/analysis", "threads/ext:one/sitrep"):
         assert client.get("/api/" + path).status_code == 401
         assert client.get("/api/" + path, headers=INGEST).status_code == 401

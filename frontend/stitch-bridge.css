@@ -1,0 +1,57 @@
+[hidden] { display: none !important; }
+[data-stitch-action] { cursor: pointer; }
+[data-stitch-action]:focus-visible, [data-stitch-page] a:focus-visible,
+[data-stitch-page] input:focus-visible, [data-stitch-page] select:focus-visible {
+  outline: 2px solid #2dd4bf;
+  outline-offset: 3px;
+}
+.stitch-notice {
+  position: fixed;
+  z-index: 100;
+  right: 1rem;
+  bottom: 1rem;
+  max-width: min(28rem, calc(100% - 2rem));
+  padding: .75rem 1rem;
+  background: #181c22;
+  border: 1px solid #2dd4bf;
+  color: #dfe2eb;
+  font: 12px/1.5 "Space Mono", monospace;
+}
+.stitch-notice[role="alert"] { border-color: #ffb4ab; }
+.stitch-dialog {
+  color: #dfe2eb;
+  background: #181c22;
+  border: 1px solid #2dd4bf;
+  width: min(40rem, calc(100vw - 2rem));
+  max-height: 86vh;
+  padding: 1.25rem;
+}
+.stitch-dialog::backdrop { background: #06080bd9; }
+.stitch-dialog input, .stitch-dialog select, .stitch-dialog textarea, .stitch-field {
+  appearance: auto;
+  color: #dfe2eb;
+  background: #0a0e14;
+  border: 1px solid #3c4a46;
+  width: 100%;
+  padding: .5rem;
+}
+.stitch-report { white-space: pre-wrap; overflow-wrap: anywhere; }
+.stitch-live-chart { display: flex; align-items: end; gap: 3px; min-height: 110px; }
+.stitch-live-chart > * { flex: 1 0 3px; }
+.stitch-bucket { min-width: 3px; background: #2dd4bf; cursor: pointer; }
+.stitch-bucket:hover, .stitch-bucket[aria-pressed="true"] { background: #ffb95f; }
+.stitch-empty-bucket { height: 2px; background: #263b3a; }
+[data-stitch-window][aria-pressed="true"] { color: #57f1db; outline: 1px solid #2dd4bf; }
+@media (max-width: 767px) {
+  body[data-stitch-page] > aside { position: static; width: 100%; height: auto; }
+  body[data-stitch-page] > aside nav { display: flex; overflow-x: auto; flex-wrap: nowrap; }
+  body[data-stitch-page] > aside nav a { white-space: nowrap; flex-shrink: 0; }
+  body[data-stitch-page] > .pl-72 { padding-left: 0; }
+  body[data-stitch-page] header { flex-wrap: wrap; height: auto; gap: .5rem; }
+  [data-stitch-region="monitor-ticker"] { flex-wrap: wrap; gap: .4rem; }
+}
+@media print {
+  body:has(.stitch-dialog[open]) > :not(.stitch-dialog) { display: none !important; }
+  .stitch-dialog[open] { position: static; color: black; background: white; border: 0; width: 100%; max-height: none; }
+  .stitch-dialog::backdrop, .stitch-dialog button { display: none; }
+}

@@ -25,8 +25,11 @@ pytest -q
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
-Open **http://localhost:8000**, enter the analyst `API_KEY` in the LIVE bar, and press Enter
-or leave the input to connect. Public demo data is available on the page. OpenAPI docs: `/docs`.
+Open **http://localhost:8000** for the Stitch analyst workspace. Choose **Live** and
+enter the analyst `API_KEY` to load monitored data, or choose **Exercise** for a
+simulated investigation. In an investigation, select a five-minute timeline bar
+to filter the comment inspector. The original dashboard and paste-a-batch analyzer
+are available under **Diagnostics**. OpenAPI docs: `/docs`.
 
 The first start downloads `paraphrase-multilingual-MiniLM-L12-v2` (about 470 MB) from
 Hugging Face. **Download it before the venue Wi-Fi does it for you.** Without it the

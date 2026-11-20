@@ -15,7 +15,7 @@ import uuid
 from datetime import datetime, timezone
 from typing import Annotated, Literal
 
-from fastapi import Depends, FastAPI, Header, HTTPException, WebSocket, WebSocketDisconnect
+from fastapi import Depends, FastAPI, Header, HTTPException, Request, WebSocket, WebSocketDisconnect
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
 from pydantic import BaseModel, Field, HttpUrl, IPvAnyAddress, StringConstraints, field_validator
@@ -566,7 +566,19 @@ async def dashboard():
     return HTMLResponse("<h1>Dashboard unavailable</h1>", status_code=404)
 
 
+@app.get("/classic.html", include_in_schema=False)
+@app.get("/workspace.html", include_in_schema=False)
+@app.get("/investigation.html", include_in_schema=False)
+@app.get("/campaign.html", include_in_schema=False)
+@app.get("/stitch-bridge.js", include_in_schema=False)
+@app.get("/stitch-bridge.css", include_in_schema=False)
 @app.get("/operations.js", include_in_schema=False)
-async def operations_script():
+@app.get("/workspace.js", include_in_schema=False)
+@app.get("/workspace-data.js", include_in_schema=False)
+@app.get("/workspace.css", include_in_schema=False)
+async def dashboard_asset(request: Request):
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), settings.dashboard_path))
-    return FileResponse(os.path.join(os.path.dirname(path), "operations.js"), media_type="text/javascript")
+    asset = os.path.join(os.path.dirname(path), os.path.basename(request.url.path))
+    if not os.path.isfile(asset):
+        raise HTTPException(404, "Dashboard asset unavailable")
+    return FileResponse(asset)
