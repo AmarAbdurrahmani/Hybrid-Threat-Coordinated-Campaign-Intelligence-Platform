@@ -29,21 +29,33 @@ export interface Analysis {
             peak: { start: number; end: number; count: number; coordinated: number } | null;
             narratives: [label: string, count: number, key: string, severity: "STRATEGIC" | "OPERATIONAL"][];
             signalAvg: Record<SignalKey, { flagged: number | null; organic: number | null }> };
-  meta: { thread: { id: string; platform?: string; title?: string; url?: string; simulated?: number }; generated: number; embedder: "sbert" | "tfidf" };
+  meta: { thread: { id: string; platform?: string; title?: string; url?: string; simulated?: number }; generated: number; embedder: "sbert" | "tfidf"; scoring_version?: string };
 }
-export interface LiveMessage { type: "hello" | "analysis"; thread_id?: string; level?: number; n?: number;
-  alert?: { thread_id: string; level: number; delivered: boolean; dry_run: boolean; exercise: boolean } | null; threads?: unknown[] }
+export interface LiveMessage { type: "hello" | "analysis" | "alert_delivery"; thread_id?: string; level?: number; n?: number; status?: string;
+  alert?: { id: number; thread_id: string; level: number; status: string; delivered: boolean; dry_run: boolean; exercise: boolean } | null;
+  threads?: unknown[] }
 
 // Minimal React hook (Vite / Next.js client component)
 // import { useEffect, useState } from "react";
 // export function useLiveThread(threadId: string, apiKey = "") {
 //   const [data, setData] = useState<Analysis | null>(null);
 //   useEffect(() => {
-//     const load = () => fetch(`/api/threads/${encodeURIComponent(threadId)}/analysis`).then(r => r.json()).then(setData);
+//     const headers = { "X-API-Key": apiKey };
+//     const load = async () => {
+//       const response = await fetch(`/api/threads/${encodeURIComponent(threadId)}/analysis`, { headers });
+//       if (response.ok && !disposed) setData(await response.json());
+//     };
+//     let disposed = false;
+//     let ws: WebSocket | undefined;
 //     load();
-//     const ws = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws/live?key=${encodeURIComponent(apiKey)}`);
-//     ws.onmessage = (ev) => { const m: LiveMessage = JSON.parse(ev.data); if (m.type === "analysis" && m.thread_id === threadId) load(); };
-//     return () => ws.close();
+//     fetch("/api/ws-ticket", { method: "POST", headers }).then(async response => {
+//       if (!response.ok || disposed) return;
+//       const { ticket } = await response.json();
+//       if (disposed) return;
+//       ws = new WebSocket(`${location.protocol === "https:" ? "wss" : "ws"}://${location.host}/ws/live?ticket=${encodeURIComponent(ticket)}`);
+//       ws.onmessage = (ev) => { const m: LiveMessage = JSON.parse(ev.data); if (m.type === "analysis" && m.thread_id === threadId) load(); };
+//     });
+//     return () => { disposed = true; ws?.close(); };
 //   }, [threadId, apiKey]);
 //   return data;
 // }

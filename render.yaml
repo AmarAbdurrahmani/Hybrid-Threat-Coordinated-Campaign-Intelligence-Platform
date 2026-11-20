@@ -13,7 +13,9 @@ services:
       - key: EMBED_BACKEND
         value: tfidf                # switch to auto only on a 2 GB+ instance with requirements.txt
       - key: API_KEY
-        generateValue: true         # copy it from the Render dashboard into the dashboard's API-key box
+        generateValue: true         # analyst key
+      - key: INGEST_API_KEY
+        generateValue: true
       - key: PSEUDONYM_SECRET
         generateValue: true
       - key: ALERT_DRY_RUN
@@ -21,6 +23,7 @@ services:
       - key: DASHBOARD_PATH
         value: ../frontend/index.html
       - key: DB_PATH
+        # Use a path on an attached persistent disk for evidence that must survive a redeploy.
         value: /tmp/htccip.db
       - key: YOUTUBE_API_KEY
         sync: false                 # Render asks for these when you create the Blueprint

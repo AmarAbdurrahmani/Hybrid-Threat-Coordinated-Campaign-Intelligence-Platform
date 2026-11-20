@@ -44,6 +44,21 @@ def pseudonym(platform: str, raw_id: str, display: str | None = None) -> str:
     return f"{prefix}_{h}"
 
 
+def pseudonymize_account(platform: str, user: str, account: dict | None) -> tuple[str, dict | None]:
+    normalized = None
+    if isinstance(account, dict):
+        normalized = {key: account[key] for key in ("created", "followers") if key in account}
+        friends = account.get("friends")
+        if isinstance(friends, list):
+            normalized["friends"] = [pseudonym(platform, friend) for friend in friends if isinstance(friend, str)]
+    return pseudonym(platform, user), normalized
+
+
+def scoped_comment_id(thread_id: str, platform: str, upstream_id: str) -> str:
+    key = json.dumps([thread_id, platform, upstream_id], ensure_ascii=False)
+    return "comment:" + hashlib.sha256(key.encode()).hexdigest()
+
+
 def iso_to_ms(s: str | None) -> float | None:
     if not s:
         return None
@@ -110,13 +125,7 @@ def yt_fetch_comments(video_id: str, since_ms: float | None = None, max_pages: i
         params = {"part": "snippet,replies", "videoId": video_id, "order": "time", "maxResults": 100, "textFormat": "plainText"}
         if token:
             params["pageToken"] = token
-        try:
-            d = _yt_get("commentThreads", params)
-        except YouTubeError as e:
-            if "commentsDisabled" in str(e):
-                log.info("comments disabled on %s", video_id)
-                return out
-            raise
+        d = _yt_get("commentThreads", params)
         stop = False
         for th in d.get("items", []):
             top = th["snippet"]["topLevelComment"]
@@ -183,6 +192,7 @@ class TelegramFetcher:
         else:
             await self.client.connect()
             if not await self.client.is_user_authorized():
+                await self.client.disconnect()
                 raise RuntimeError("Telegram session not authorised: run `python ingest.py telegram-login` once")
         return self
 
@@ -207,8 +217,10 @@ class TelegramFetcher:
                     comments.append({"id": f"tg:{handle}:{post.id}:{r.id}", "thread_id": tid, "platform": "telegram",
                                      "user": pseudonym("telegram", str(r.sender_id or "anon")), "ts": ts, "text": r.message,
                                      "url": f"https://t.me/{handle}/{post.id}?comment={r.id}"})
-            except Exception as e:  # discussion group may be private
-                log.info("replies unavailable for %s: %s", tid, e)
+            except Exception as e:
+                if type(e).__name__ not in {"MsgIdInvalidError", "ChannelPrivateError", "ChatAdminRequiredError"}:
+                    raise
+                log.info("Replies unavailable for %s (%s)", tid, type(e).__name__)
         return threads, comments
 
 

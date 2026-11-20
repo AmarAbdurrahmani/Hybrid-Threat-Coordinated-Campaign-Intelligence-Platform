@@ -147,9 +147,23 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
         <option value="energy">Scenario: Energy infrastructure cyber-panic</option>
       </select>
       <button id="liveSim" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-rose-500/90 text-white hover:bg-rose-500">Simulate attack</button>
+      <button id="liveOperations" type="button" class="text-xs px-3 py-1.5 rounded-lg border border-ink-600">Operations</button>
       <button id="liveDemo" class="text-xs px-3 py-1.5 rounded-lg border border-ink-600 hover:bg-ink-800">Demo data</button>
     </div>
   </section>
+
+  <dialog id="operations" class="bg-ink-950 text-slate-200 rounded-lg border border-ink-600 p-5 w-[min(94vw,48rem)] max-h-[85vh] backdrop:bg-black/60">
+    <form method="dialog"><button class="float-right text-sm px-2" aria-label="Close operations">Close</button></form>
+    <h2 class="font-semibold mb-3">Operations</h2>
+    <div class="flex flex-wrap items-center gap-3 mb-3 text-sm">
+      <button type="button" data-ops="cases">Campaign cases</button>
+      <button type="button" data-ops="sources">Sources</button>
+      <button type="button" data-ops="alerts">Alerts</button>
+      <label><input id="exerciseCases" type="checkbox"> Exercise cases</label>
+    </div>
+    <p id="operationsStatus" role="status" class="text-xs text-slate-400 mb-2"></p>
+    <div id="operationsBody" class="text-sm space-y-3"></div>
+  </dialog>
 
   <!-- ARTICLE -->
   <section class="panel px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
@@ -960,6 +974,7 @@ const Engine = (() => {
 if (typeof module !== "undefined") module.exports = Engine;
 
 </script>
+<script src="./operations.js"></script>
 <script>
 (() => {
   const $ = (s) => document.querySelector(s);
@@ -1593,9 +1608,19 @@ if (typeof module !== "undefined") module.exports = Engine;
     return RENDER_API;
   })();
   const API_HOST = API_BASE ? API_BASE.replace(/^https?:\/\//, '') : location.host;
-  let ws = null, liveTimer = null, apiKey = '';
-  try { apiKey = sessionStorage.getItem('htccip_key') || ''; } catch (e) {}
-  const apiFetch = (path, opt = {}) => fetch(API_BASE + path, { ...opt, headers: { 'Content-Type': 'application/json', ...(apiKey ? { 'X-API-Key': apiKey } : {}), ...(opt.headers || {}) } });
+  const API_ORIGIN = new URL(API_BASE || location.origin, location.href).origin;
+  const KEY_NAME = 'htccip_key:' + API_ORIGIN;
+  let ws = null, reconnectTimer = null, liveTimer = null, apiKey = '', connection = 0, threadRequest = 0;
+  let threadList = [], selectedUpdates = new Set();
+  try { apiKey = sessionStorage.getItem(KEY_NAME) || ''; } catch (e) {}
+  const apiFetch = (path, opt = {}) => fetch(API_BASE + path, {
+    ...opt,
+    headers: {
+      ...(opt.body !== undefined ? { 'Content-Type': 'application/json' } : {}),
+      ...(apiKey ? { 'X-API-Key': apiKey } : {}),
+      ...(opt.headers || {}),
+    },
+  });
   function fromContract(a) {
     const items = a.items.map((i) => ({ ...i, t: i.t == null ? NaN : i.t }));
     const firstT = items.filter((i) => !isNaN(i.t)).reduce((m, i) => Math.min(m, i.t), Infinity);
@@ -1606,61 +1631,160 @@ if (typeof module !== "undefined") module.exports = Engine;
       thread: { ...a.thread, published: a.thread.published ?? (isFinite(firstT) ? firstT : Date.now()) },
     };
   }
-  function setLive(ok, msg) { $('#liveDot').className = 'w-2.5 h-2.5 rounded-full ' + (ok ? 'bg-emerald-400 pulse-dot' : 'bg-rose-500'); $('#liveStatus').textContent = msg; }
+  function setLive(ok, msg) {
+    $('#liveDot').className = 'w-2.5 h-2.5 rounded-full ' + (ok ? 'bg-emerald-400 pulse-dot' : 'bg-rose-500');
+    $('#liveStatus').textContent = msg;
+  }
   async function loadLiveThread(tid) {
-    const r = await apiFetch(`/api/threads/${encodeURIComponent(tid)}/analysis`);
+    const request = ++threadRequest;
+    const r = await apiFetch('/api/threads/' + encodeURIComponent(tid) + '/analysis');
     if (!r.ok) throw new Error('HTTP ' + r.status);
     const a = await r.json();
-    state.live = { ...a.meta, threadId: tid }; state.standalone = false; state.sel = null; state.filter = 'all';
+    if (request !== threadRequest) return;
+    const changedThread = state.live?.threadId !== tid;
+    state.live = { ...a.meta, threadId: tid };
+    state.standalone = false;
+    if (changedThread) { state.sel = null; state.filter = 'all'; }
     state.res = fromContract(a); state.layout = layoutGraph(state.res);
-    if (!state.res.infra.find((g) => g.node === state.infraSel)) state.infraSel = (state.res.infra.find((g) => g.hostile) || state.res.infra[0] || {}).node || null;
+    if (!state.res.infra.find((g) => g.node === state.infraSel)) {
+      state.infraSel = (state.res.infra.find((g) => g.hostile) || state.res.infra[0] || {}).node || null;
+    }
     render();
   }
-  async function refreshThreadList(selectId) {
-    const list = await (await apiFetch('/api/threads')).json();
-    const sel = $('#liveThreads'); const cur = selectId || sel.value;
-    const lv = (l) => (l ? `L${l}` : '··');
-    sel.innerHTML = list.map((t) => `<option value="${esc(t.id)}">[${lv(t.level)}] ${esc((t.platform || '').toUpperCase())} · ${esc((t.title || t.id).slice(0, 90))} · ${t.n} comments</option>`).join('') || '<option value="">No threads yet — add a source or simulate an attack</option>';
-    if (cur && list.some((t) => t.id === cur)) sel.value = cur;
-    return list;
+  function setThreadList(list, preferred) {
+    threadList = list;
+    const sel = $('#liveThreads');
+    const current = preferred || sel.value;
+    sel.replaceChildren(...list.map((t) => new Option(
+      '[' + (t.level ? 'L' + t.level : '··') + '] ' + (t.platform || '').toUpperCase() + ' · ' +
+      (t.title || t.id).slice(0, 90) + ' · ' + t.n + ' comments', t.id
+    )));
+    if (!list.length) sel.add(new Option('No threads yet', ''));
+    if (current && list.some((t) => t.id === current)) sel.value = current;
+    return sel.value;
   }
-  function connectWS() {
-    const wsBase = API_BASE ? API_BASE.replace(/^http/, 'ws') : (location.protocol === 'https:' ? 'wss://' : 'ws://') + location.host;
-    try { ws = new WebSocket(wsBase + '/ws/live' + (apiKey ? '?key=' + encodeURIComponent(apiKey) : '')); } catch (e) { return; }
-    ws.onopen = () => setLive(true, 'LIVE · backend connected');
-    ws.onclose = () => { setLive(false, 'Backend disconnected — retrying'); setTimeout(connectWS, 3000); };
-    ws.onmessage = (ev) => {
-      let m; try { m = JSON.parse(ev.data); } catch (e) { return; }
-      if (m.type !== 'analysis') return;
-      if (m.alert) toast(`LEVEL ${m.level} SitRep ${m.alert.dry_run ? 'logged (dry run)' : m.alert.delivered ? 'sent to Telegram' : 'FAILED to send'} · ${m.thread_id}`);
-      clearTimeout(liveTimer);
-      liveTimer = setTimeout(async () => { await refreshThreadList(); if (state.live && state.live.threadId === m.thread_id) loadLiveThread(m.thread_id); }, 400);
-    };
+  async function refreshThreadList(preferred) {
+    const response = await apiFetch('/api/threads');
+    if (!response.ok) throw new Error(response.status === 401 ? 'Enter a valid analyst API key' : 'Thread list unavailable');
+    return setThreadList(await response.json(), preferred);
+  }
+  async function connectWS(attempt, authRequired) {
+    if (attempt !== connection) return;
+    if (authRequired && !apiKey) {
+      setLive(false, 'Enter analyst API key');
+      return;
+    }
+    try {
+      const response = await apiFetch('/api/ws-ticket', { method: 'POST' });
+      if (attempt !== connection) return;
+      if (response.status === 401) {
+        setLive(false, 'Enter a valid analyst API key');
+        return;
+      }
+      if (!response.ok) throw new Error('Ticket unavailable');
+      const { ticket } = await response.json();
+      if (attempt !== connection) return;
+      const wsBase = API_ORIGIN.replace(/^http/, 'ws');
+      const socket = new WebSocket(wsBase + '/ws/live?ticket=' + encodeURIComponent(ticket));
+      ws = socket;
+      socket.onclose = () => {
+        if (attempt !== connection) return;
+        setLive(false, 'Disconnected · reconnecting');
+        reconnectTimer = setTimeout(() => connectWS(attempt, authRequired), 3000);
+      };
+      socket.onmessage = (event) => {
+        if (attempt !== connection) return;
+        let m;
+        try { m = JSON.parse(event.data); } catch { return; }
+        if (m.type === 'hello') {
+          setLive(true, 'LIVE · ' + API_HOST);
+          const id = setThreadList(m.threads || []);
+          if (id && (state.live || !$('#liveThreads').dataset.demo)) loadLiveThread(id).catch((error) => toast(error.message));
+          return;
+        }
+        if (m.type === 'alert_delivery') {
+          toast('SitRep ' + m.status + ' · ' + m.thread_id);
+          return;
+        }
+        if (m.type !== 'analysis') return;
+        if (m.alert) toast('Level ' + m.level + ' SitRep ' + (m.alert.status || 'recorded') + ' · ' + m.thread_id);
+        selectedUpdates.add(m.thread_id);
+        clearTimeout(liveTimer);
+        liveTimer = setTimeout(async () => {
+          const updates = selectedUpdates;
+          selectedUpdates = new Set();
+          try {
+            await refreshThreadList();
+            if (attempt === connection && state.live && updates.has(state.live.threadId)) await loadLiveThread(state.live.threadId);
+          } catch (error) { toast(error.message); }
+        }, 400);
+      };
+    } catch {
+      if (attempt !== connection) return;
+      setLive(false, 'Backend unavailable · retrying');
+      reconnectTimer = setTimeout(() => connectWS(attempt, authRequired), 3000);
+    }
   }
   async function initLive() {
     if (!/^https?:$/.test(location.protocol)) return;
-    // Render's free tier sleeps when idle; the first request can take ~30-60 s while it wakes.
-    let h; try { const r = await fetch(API_BASE + '/api/health', { cache: 'no-store' }); if (!r.ok) return; h = await r.json(); if (!h || h.contract !== '1') return; } catch (e) { return; }
+    let health;
+    try {
+      const response = await fetch(API_BASE + '/api/health', { cache: 'no-store' });
+      if (!response.ok) return;
+      health = await response.json();
+      if (health.contract !== '1') return;
+    } catch { return; }
     $('#livePanel').classList.remove('hidden');
-    setLive(true, `LIVE · ${API_HOST} · ${h.embedder} · alerts ${h.alerts}${h.youtube ? ' · YouTube' : ''}${h.telegram ? ' · Telegram' : ''}`);
-    $('#liveKey').classList.remove('hidden'); $('#liveKey').value = apiKey;
-    $('#liveKey').addEventListener('change', (e) => { apiKey = e.target.value.trim(); try { sessionStorage.setItem('htccip_key', apiKey); } catch (er) {} });
-    $('#liveThreads').addEventListener('change', (e) => e.target.value && loadLiveThread(e.target.value).catch((er) => toast('Load failed: ' + er.message)));
-    $('#liveDemo').addEventListener('click', () => $('#btnReset').click());
-    $('#liveSim').addEventListener('click', async () => {
-      $('#liveSim').disabled = true; $('#liveSim').textContent = 'Injecting…';
+    const input = $('#liveKey');
+    input.classList.remove('hidden');
+    input.value = apiKey;
+    input.addEventListener('change', () => {
+      apiKey = input.value.trim();
       try {
-        const scSel = $('#liveScenario'); const scenario = scSel.value || 'kfor'; const scLabel = scSel.options[scSel.selectedIndex].text.replace(/^Scenario:\s*/, '');
-        const r = await apiFetch('/api/simulate-attack', { method: 'POST', body: JSON.stringify({ spread_threads: 2, lang: 'en', accounts: 12, background: 6, scenario }) });
-        if (!r.ok) throw new Error(r.status === 401 ? 'API key required' : r.status === 422 ? 'scenario not supported by this backend version' : 'HTTP ' + r.status);
-        const res = await r.json(); await refreshThreadList(res.primary); await loadLiveThread(res.primary);
-        toast(`${scLabel}: exercise swarm injected into ${res.thread_ids.length} threads (${res.new} comments)`);
-      } catch (e) { toast('Simulation failed: ' + e.message); }
-      $('#liveSim').disabled = false; $('#liveSim').textContent = 'Simulate attack';
+        if (apiKey) sessionStorage.setItem(KEY_NAME, apiKey);
+        else sessionStorage.removeItem(KEY_NAME);
+      } catch {}
+      ++connection;
+      ++threadRequest;
+      clearTimeout(reconnectTimer);
+      clearTimeout(liveTimer);
+      selectedUpdates.clear();
+      if (ws) ws.close();
+      if (state.live) $('#btnReset').click();
+      setThreadList([]);
+      connectWS(connection, health.auth_required);
     });
-    const list = await refreshThreadList();
-    if (list.length) loadLiveThread(list[0].id).catch(() => {});
-    connectWS();
+    $('#liveThreads').addEventListener('change', (event) => {
+      delete $('#liveThreads').dataset.demo;
+      if (event.target.value) loadLiveThread(event.target.value).catch((error) => toast(error.message));
+    });
+    $('#liveDemo').addEventListener('click', () => {
+      ++threadRequest;
+      $('#liveThreads').dataset.demo = 'true';
+      $('#btnReset').click();
+    });
+    if (window.setupOperations) window.setupOperations(apiFetch, () => threadList.find((thread) => thread.id === $('#liveThreads').value));
+    else $('#liveOperations').disabled = true;
+    $('#liveSim').addEventListener('click', async () => {
+      const button = $('#liveSim');
+      button.disabled = true;
+      button.textContent = 'Injecting…';
+      try {
+        const scenario = $('#liveScenario').value || 'kfor';
+        const response = await apiFetch('/api/simulate-attack', {
+          method: 'POST',
+          body: JSON.stringify({ spread_threads: 2, lang: 'en', accounts: 12, background: 6, scenario }),
+        });
+        if (!response.ok) throw new Error(response.status === 401 ? 'Analyst API key required' : 'HTTP ' + response.status);
+        const result = await response.json();
+        delete $('#liveThreads').dataset.demo;
+        await refreshThreadList(result.primary);
+        await loadLiveThread(result.primary);
+        toast('Exercise data added to ' + result.thread_ids.length + ' threads (' + result.new + ' comments)');
+      } catch (error) { toast('Simulation failed: ' + error.message); }
+      finally { button.disabled = false; button.textContent = 'Simulate attack'; }
+    });
+    connectWS(connection, health.auth_required);
   }
 
   let tt; function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(tt); tt = setTimeout(() => t.classList.add('hidden'), 3200); }

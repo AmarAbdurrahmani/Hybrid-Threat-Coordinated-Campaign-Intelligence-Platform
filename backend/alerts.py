@@ -94,34 +94,27 @@ def build_sitrep(analysis: dict, thread: dict, *, exercise: bool, compact: bool 
     return "\n".join(L)
 
 
-def send_telegram(text: str) -> bool:
-    if not (settings.alert_bot_token and settings.alert_chat_id):
-        log.warning("Telegram alert not configured (ALERT_BOT_TOKEN / ALERT_CHAT_ID)")
+def send_telegram(text: str, chat_id: str) -> bool:
+    if not (settings.alert_bot_token and chat_id):
+        log.warning("Telegram destination is not configured")
         return False
     url = f"https://api.telegram.org/bot{settings.alert_bot_token}/sendMessage"
-    ok = True
-    for i in range(0, len(text), 3900):  # Telegram limit is 4096 chars per message
-        chunk = text[i:i + 3900]
-        body = urllib.parse.urlencode({"chat_id": settings.alert_chat_id, "text": chunk, "disable_web_page_preview": "true"}).encode()
-        try:
-            with urllib.request.urlopen(urllib.request.Request(url, data=body), timeout=15) as r:
-                ok = ok and json.loads(r.read().decode()).get("ok", False)
-        except Exception as e:
-            log.error("Telegram send failed: %s", e)
-            ok = False
-    return ok
+    excerpt = text if len(text) <= 3800 else text[:3750] + "\n[Full report available in the dashboard]"
+    body = urllib.parse.urlencode({"chat_id": chat_id, "text": excerpt, "disable_web_page_preview": "true"}).encode()
+    try:
+        with urllib.request.urlopen(urllib.request.Request(url, data=body), timeout=15) as response:
+            return json.loads(response.read().decode()).get("ok", False)
+    except (OSError, ValueError) as exc:
+        log.warning("Telegram send failed (%s)", type(exc).__name__)
+        return False
 
 
 class AlertManager:
     def __init__(self, store):
         self.store = store
-        self._last_level: dict[str, int] = {}
 
     def evaluate(self, thread: dict, analysis: dict, *, force: bool = False) -> dict | None:
         tid, level = thread["id"], analysis["thread"]["level"]
-        seen = tid in self._last_level
-        prev = self._last_level.get(tid, 4)
-        self._last_level[tid] = level
         exercise = bool(thread.get("simulated")) or any(i["c"].get("simulated") for i in analysis["items"])
         if not force:
             if level != 1:
@@ -129,13 +122,29 @@ class AlertManager:
             if exercise and not settings.alert_on_simulated:
                 return None
             last = self.store.last_alert(tid)
-            if last and (prev == 1 or not seen) and time.time() - last["sent_at"] < settings.alert_cooldown_s:
+            if last and (last.get("status") == "queued" or time.time() - last["sent_at"] < settings.alert_cooldown_s):
                 return None
         text = build_sitrep(analysis, thread, exercise=exercise, compact=True)
-        delivered = False
+        alert_dry_run = settings.alert_dry_run or (exercise and not settings.alert_exercise_chat_id)
+        status = "dry_run" if alert_dry_run else "queued"
+        alert_id = self.store.queue_alert(tid, level, status, exercise, text)
+        return {"id": alert_id, "thread_id": tid, "level": level, "status": status, "delivered": False,
+                "dry_run": alert_dry_run, "exercise": exercise}
+
+    def deliver_pending(self) -> list[dict]:
         if settings.alert_dry_run:
-            log.warning("ALERT_DRY_RUN — SitRep not sent:\n%s", text)
-        else:
-            delivered = send_telegram(text)
-        self.store.log_alert(tid, level, delivered, text)
-        return {"thread_id": tid, "level": level, "delivered": delivered, "dry_run": settings.alert_dry_run, "exercise": exercise}
+            return []
+        updates = []
+        for job in self.store.pending_alerts():
+            destination = settings.alert_exercise_chat_id if job["exercise"] else settings.alert_chat_id
+            if job["exercise"] and (not destination or destination == settings.alert_chat_id):
+                self.store.record_delivery(job["id"], "failed")
+                updates.append({"id": job["id"], "thread_id": job["thread_id"], "status": "failed", "level": job["level"]})
+                continue
+            sent = send_telegram(job["text"], destination)
+            attempts = job["attempts"] + 1
+            status = "delivered" if sent else ("failed" if attempts >= 5 else "queued")
+            self.store.record_delivery(job["id"], status, time.time() + 30 * 2 ** (attempts - 1) if status == "queued" else None)
+            if status != "queued":
+                updates.append({"id": job["id"], "thread_id": job["thread_id"], "status": status, "level": job["level"]})
+        return updates

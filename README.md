@@ -2,8 +2,9 @@
 
 FastAPI + NetworkX + sentence-transformers backend for the tactical dashboard. It
 ingests real comments from YouTube and public Telegram channels, scores coordination,
-streams results to the dashboard over WebSocket, and sends a SitRep to a Telegram
-command chat when a thread reaches **LEVEL 1 (Strategic Threat)**.
+streams results to the dashboard over WebSocket, and queues a Telegram SitRep
+when a thread reaches **LEVEL 1 (Strategic Threat)**. The Operations panel manages
+campaign cases, watched sources, analyst feedback, and alert acknowledgments.
 
 ```
  YouTube Data API v3 ─┐                                   ┌─► REST  /api/threads/{id}/analysis
@@ -20,12 +21,12 @@ python -m venv .venv && source .venv/bin/activate          # Windows: .venv\Scri
 pip install torch --index-url https://download.pytorch.org/whl/cpu   # optional, keeps the install small
 pip install -r requirements.txt
 cp .env.example .env                                        # set API_KEY and PSEUDONYM_SECRET at least
-pytest -q                                                   # 10 tests, about 2 s
+pytest -q
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
-Open **http://localhost:8000**. The dashboard detects the backend and shows the LIVE bar
-(thread picker, API key, **Simulate attack**, Demo data). OpenAPI docs: `/docs`.
+Open **http://localhost:8000**, enter the analyst `API_KEY` in the LIVE bar, and press Enter
+or leave the input to connect. Public demo data is available on the page. OpenAPI docs: `/docs`.
 
 The first start downloads `paraphrase-multilingual-MiniLM-L12-v2` (about 470 MB) from
 Hugging Face. **Download it before the venue Wi-Fi does it for you.** Without it the
@@ -35,8 +36,10 @@ engine falls back to TF-IDF character n-grams (`/api/health` → `"embedder": "t
 
 `render.yaml` deploys API + dashboard as one service. On render.com: **New → Blueprint →** this repo →
 fill in the secret env vars → **Apply**. Live at `https://htccip-XXXX.onrender.com` (dashboard at `/`, docs at `/docs`).
-Free tier: sleeps after 15 min idle (about a minute to wake: open it before you present), SQLite is
-wiped on restart, and it runs the lean `requirements-deploy.txt` (TF-IDF embeddings, no torch).
+The free deployment runs the lean `requirements-deploy.txt` and uses temporary SQLite
+storage. For monitoring that must survive redeploys, set `DB_PATH` to a file on an attached
+persistent disk before ingesting data. Run one backend process for the SQLite delivery queue,
+pollers and WebSocket tickets.
 
 ## Stage demo script (3 minutes)
 
@@ -45,9 +48,11 @@ wiped on restart, and it runs the lean `requirements-deploy.txt` (TF-IDF embeddi
    the co-activity graph links them across threads, the thread hits LEVEL 1.
 3. Walk the panels: timeline spike → threat vectors → map / infrastructure → network
    (yellow = cross-thread co-activity) → inspector evidence.
-4. Show the phone: the SitRep arrives in the command chat tagged **EXERCISE**
-   (set `ALERT_DRY_RUN=false` first; test with `POST /api/alerts/test/{thread_id}`).
-5. **Generate Operational Briefing / SitRep**: the full report, generated server-side.
+4. Open **Operations → Campaign cases → Exercise cases**. Open the suggested case, review the
+   linked evidence, and download the case SitRep.
+5. **Operations → Alerts** shows delivery status and acknowledgment. Set
+   `ALERT_EXERCISE_CHAT_ID` to a separate destination and `ALERT_DRY_RUN=false` to
+   deliver exercise alerts.
 
 ## Endpoints
 
@@ -58,16 +63,29 @@ wiped on restart, and it runs the lean `requirements-deploy.txt` (TF-IDF embeddi
 | GET | `/api/threads/{id}/analysis` | Full analysis (contract v1, see `frontend/contract.ts`) |
 | GET | `/api/threads/{id}/sitrep` | Plain-text SitRep |
 | GET | `/api/graph` | Global co-activity graph (nodes/edges JSON, Louvain communities) |
-| POST* | `/api/simulate-attack` | Inject an exercise swarm (`spread_threads`, `accounts`, `window_s`, `lang`: en/sq) |
-| POST* | `/api/ingest/comments` | Push any batch (`thread_id`, `comments[{user, ts, text, account?, infra?}]`) |
-| POST* | `/api/ingest/portal` | Your own portal's comments **with server-side IP** → ASN/geo via GeoLite2 |
-| POST* | `/api/sources` | Watch a YouTube video ID or Telegram channel |
-| POST* | `/api/sources/youtube/poll` | Poll YouTube now |
-| GET | `/api/alerts` | Alert log (sent / dry-run) |
-| POST* | `/api/alerts/test/{id}` | Force a SitRep for a thread |
-| WS | `/ws/live?key=…` | Push: `{"type":"analysis","thread_id","level","alert"}` |
+| POST | `/api/simulate-attack` | Inject an exercise swarm |
+| POST | `/api/ingest/comments` | Ingest external comments with scoped IDs and optional evidence URLs |
+| POST | `/api/ingest/portal` | Ingest your portal's comments with server-side IP for GeoIP lookup |
+| GET / POST | `/api/sources` | List source health or watch a new source |
+| POST | `/api/sources/{id}/{action}` | Pause, resume, retry, or run a bounded backfill |
+| GET | `/api/alerts` | Delivery status, attempt count and acknowledgment |
+| POST | `/api/alerts/{id}/acknowledge` | Acknowledge an alert |
+| POST | `/api/alerts/test/{id}` | Force a delivery job or dry-run record |
+| GET / POST | `/api/cases` | List or open campaign cases |
+| GET | `/api/cases/suggestions` | Group threads with repeated account-pair evidence |
+| GET | `/api/cases/feedback` | Count latest decisions for reviewed cases |
+| GET / PATCH | `/api/cases/{id}` | Read evidence or edit title, owner, status and thread links |
+| POST | `/api/cases/{id}/reviews` | Record a review and rationale |
+| GET | `/api/cases/{id}/sitrep` | Export the case and captured evidence as text |
+| POST | `/api/ws-ticket` | Get a single-use live connection ticket |
+| WS | `/ws/live?ticket=…` | Stream analysis and alert delivery updates |
 
-`*` requires header `X-API-Key` when `API_KEY` is set.
+Use `X-API-Key: <API_KEY>` for monitoring and operations. The two ingestion
+endpoints use `INGEST_API_KEY` when configured and fall back to `API_KEY`.
+Health and the static dashboard remain public. `ALLOW_UNAUTHENTICATED=true`
+is available for isolated local demos. Use `?simulated=true` for exercise graphs,
+cases, suggestions and feedback. Collector backfills revisit a bounded recent set
+of source pages or posts.
 
 ## How the engine scores (engine.py)
 
@@ -122,14 +140,9 @@ Telegram never expose commenters' IPs. Say this to the jury before they ask.
   "state nexus" is never set automatically. Keep a human analyst between the alert and any action.
 - `ALERT_DRY_RUN=true` is the default, so nothing is sent until you turn it off.
 
-## Tested vs untested (be honest on stage)
+## Tests
 
-Tested here (`pytest`): engine on the 25-comment seed thread (matches the dashboard: 25/25,
-LEVEL 1, 13-account cluster), Albanian and English calque/doublet detection, cross-thread
-co-activity + Louvain, simulator → LEVEL 1, alert dry-run + cooldown + idempotent re-ingest,
-SitRep, YouTube response parsing (mocked), IP truncation. The dashboard's live mode was driven
-in a browser against the real pipeline through a stand-in HTTP server.
-
-Not run here (packages unavailable in the build sandbox): the FastAPI app under uvicorn, the
-WebSocket, real YouTube/Telegram calls, the MiniLM model, Telegram bot delivery. Run
-`pytest`, then the demo script once on the venue network, before you present.
+The suite covers scoring, delayed cross-thread updates, persisted analyses, authenticated
+REST and WebSocket access, source controls, ingestion validation and deduplication,
+case review and export, and exercise alert routing. YouTube data and Telegram alert
+delivery use test fixtures.

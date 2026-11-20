@@ -8,4 +8,5 @@ numpy>=1.26
 networkx>=3.2
 scikit-learn>=1.4
 telethon>=1.36
+maxminddb>=2.6
 anthropic>=0.40

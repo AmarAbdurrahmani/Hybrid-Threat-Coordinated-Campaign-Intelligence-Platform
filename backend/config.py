@@ -24,7 +24,9 @@ def _list(name: str) -> list[str]:
 @dataclass
 class Settings:
     # --- security ---
-    api_key: str = os.getenv("API_KEY", "")  # required for write endpoints when set
+    api_key: str = os.getenv("API_KEY", "")
+    ingest_api_key: str = os.getenv("INGEST_API_KEY", "")
+    allow_unauthenticated: bool = _bool("ALLOW_UNAUTHENTICATED", False)
     cors_origins: list[str] = field(default_factory=lambda: _list("CORS_ORIGINS") or ["http://localhost:8000", "http://127.0.0.1:8000", "http://localhost:5173"])
     # Lets the Vercel-hosted dashboard (production + preview URLs) call this API cross-origin.
     # No cookies are used and writes still need X-API-Key. Set CORS_ORIGIN_REGEX="" to disable,
@@ -54,6 +56,7 @@ class Settings:
     # --- Telegram bot alerting ---
     alert_bot_token: str = os.getenv("ALERT_BOT_TOKEN", "")
     alert_chat_id: str = os.getenv("ALERT_CHAT_ID", "")
+    alert_exercise_chat_id: str = os.getenv("ALERT_EXERCISE_CHAT_ID", "")
     alert_cooldown_s: int = int(os.getenv("ALERT_COOLDOWN_S", "900"))
     alert_dry_run: bool = _bool("ALERT_DRY_RUN", True)  # log instead of sending until you switch it off
     alert_on_simulated: bool = _bool("ALERT_ON_SIMULATED", True)  # simulated swarms are always tagged EXERCISE
