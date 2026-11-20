@@ -70,6 +70,8 @@ pollers and WebSocket tickets.
 | GET | `/api/graph` | Global co-activity graph (nodes/edges JSON, Louvain communities) |
 | GET | `/api/infrastructure` | Regional egress and comment coverage from current thread analyses |
 | POST | `/api/simulate-attack` | Inject an exercise swarm |
+| POST | `/api/osint/youtube` | Fetch a public video's comments (URL or ID, optional per-request `api_key`) into the pipeline |
+| POST | `/api/lab/evaluate` | LLM second opinion (bot / human) for the evaluation lab; 503 unless `LLM_ENABLED` |
 | POST | `/api/ingest/comments` | Ingest external comments with scoped IDs and optional evidence URLs |
 | POST | `/api/ingest/portal` | Ingest your portal's comments with server-side IP for GeoIP lookup |
 | GET / POST | `/api/sources` | List source health or watch a new source |
@@ -98,6 +100,14 @@ shared-egress coordination signals from available network telemetry. It also ret
 the number of comments analyzed and mapped. Individual account identifiers and IP
 addresses are omitted. Use the analyst API key, `?simulated=true` for exercises,
 and `thread_id` to limit the report to one thread.
+
+`POST /api/osint/youtube` takes `{"youtube_url_or_id": "...", "api_key": "...", "max_pages": 3}` and accepts
+`watch?v=`, `youtu.be/`, `/shorts/` and `/live/` links or a raw 11-character ID. It uses the request's `api_key`
+when given (never stored or logged), otherwise `YOUTUBE_API_KEY` from `backend/.env` or the Render environment.
+Authors are pseudonymised; `likeCount` is kept per comment. Errors come back as clear messages: missing or invalid
+key (400), quota exceeded (429), comments disabled (409), video not found (404). In the dashboard, the
+**Fetch YouTube** form uses this endpoint when the backend is connected; without a backend it fetches directly
+from the browser with the key typed into the form (kept in that tab's session storage only) and scores locally.
 
 ## How the engine scores (engine.py)
 

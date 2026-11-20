@@ -54,7 +54,7 @@ def test_youtube_parser(monkeypatch):
         "authorDisplayName": "Someone", "authorChannelId": {"value": "UCabc"}, "textOriginal": "NATO is not our friend",
         "publishedAt": "2026-11-18T09:03:00Z"}}}, "replies": {"comments": [{"id": "C1.r1", "snippet": {
         "authorDisplayName": "Other", "authorChannelId": {"value": "UCdef"}, "textOriginal": "agreed", "publishedAt": "2026-11-18T09:04:00Z"}}]}}]}
-    monkeypatch.setattr(ingest, "_yt_get", lambda ep, params: page)
+    monkeypatch.setattr(ingest, "_yt_get", lambda ep, params, api_key=None: page)
     cs = ingest.yt_fetch_comments("VID")
     assert [c["id"] for c in cs] == ["yt:C1", "yt:C1.r1"]
     assert all(c["user"].startswith("yt_") and "UC" not in c["user"] for c in cs)  # pseudonymised

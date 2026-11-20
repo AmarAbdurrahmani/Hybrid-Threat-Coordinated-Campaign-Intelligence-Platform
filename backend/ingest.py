@@ -15,10 +15,12 @@ from __future__ import annotations
 import asyncio
 import hashlib
 import hmac
+import html
 import ipaddress
 import json
 import logging
 import random
+import re
 import sys
 import time
 import urllib.error
@@ -80,13 +82,29 @@ def truncate_ip(ip: str) -> str:
 # channels.list = 1, search.list = 100 (use search sparingly).
 # ---------------------------------------------------------------------------
 class YouTubeError(RuntimeError):
-    pass
+    def __init__(self, message: str, status: int | None = None, reason: str = ""):
+        super().__init__(message)
+        self.status, self.reason = status, reason
 
 
-def _yt_get(endpoint: str, params: dict) -> dict:
-    if not settings.youtube_api_key:
-        raise YouTubeError("YOUTUBE_API_KEY not set")
-    q = urllib.parse.urlencode({**params, "key": settings.youtube_api_key})
+_YT_ID = re.compile(r"[A-Za-z0-9_-]{11}")
+_YT_URL = re.compile(r"(?:youtube(?:-nocookie)?\.com/(?:watch\?(?:.*&)?v=|shorts/|live/|embed/|v/)|youtu\.be/)([A-Za-z0-9_-]{11})(?![A-Za-z0-9_-])")
+
+
+def parse_video_id(value: str) -> str | None:
+    """Video ID from a raw 11-character ID or a watch / youtu.be / shorts / live / embed URL."""
+    value = (value or "").strip()
+    if _YT_ID.fullmatch(value):
+        return value
+    m = _YT_URL.search(value)
+    return m.group(1) if m else None
+
+
+def _yt_get(endpoint: str, params: dict, api_key: str | None = None) -> dict:
+    key = api_key or settings.youtube_api_key
+    if not key:
+        raise YouTubeError("YOUTUBE_API_KEY not set", reason="missingKey")
+    q = urllib.parse.urlencode({**params, "key": key})
     req = urllib.request.Request(YT + endpoint + "?" + q, headers={"Accept": "application/json"})
     try:
         with urllib.request.urlopen(req, timeout=20) as r:
@@ -98,7 +116,9 @@ def _yt_get(endpoint: str, params: dict) -> dict:
             reason = json.loads(body)["error"]["errors"][0]["reason"]
         except Exception:
             pass
-        raise YouTubeError(f"{endpoint} HTTP {e.code} {reason}".strip()) from None
+        raise YouTubeError(f"{endpoint} HTTP {e.code} {reason}".strip(), status=e.code, reason=reason) from None
+    except urllib.error.URLError as e:  # never include the request URL: it carries the key
+        raise YouTubeError(f"{endpoint} unreachable ({type(e.reason).__name__})", reason="unreachable") from None
 
 
 def yt_search_videos(query: str, published_after_h: int = 24, lang: str = "sq", max_results: int = 10) -> list[str]:
@@ -108,24 +128,24 @@ def yt_search_videos(query: str, published_after_h: int = 24, lang: str = "sq", 
     return [it["id"]["videoId"] for it in d.get("items", []) if it.get("id", {}).get("videoId")]
 
 
-def yt_video_meta(video_ids: list[str]) -> dict[str, dict]:
+def yt_video_meta(video_ids: list[str], api_key: str | None = None) -> dict[str, dict]:
     out = {}
     for i in range(0, len(video_ids), 50):
-        d = _yt_get("videos", {"part": "snippet", "id": ",".join(video_ids[i:i + 50])})
+        d = _yt_get("videos", {"part": "snippet", "id": ",".join(video_ids[i:i + 50])}, api_key)
         for it in d.get("items", []):
             sn = it["snippet"]
             out[it["id"]] = {"title": sn.get("title"), "channel": sn.get("channelTitle"), "published": iso_to_ms(sn.get("publishedAt"))}
     return out
 
 
-def yt_fetch_comments(video_id: str, since_ms: float | None = None, max_pages: int = 10) -> list[dict]:
+def yt_fetch_comments(video_id: str, since_ms: float | None = None, max_pages: int = 10, api_key: str | None = None) -> list[dict]:
     """Newest-first; stops paging once comments are older than `since_ms`."""
     out, token = [], None
     for _ in range(max_pages):
         params = {"part": "snippet,replies", "videoId": video_id, "order": "time", "maxResults": 100, "textFormat": "plainText"}
         if token:
             params["pageToken"] = token
-        d = _yt_get("commentThreads", params)
+        d = _yt_get("commentThreads", params, api_key)
         stop = False
         for th in d.get("items", []):
             top = th["snippet"]["topLevelComment"]
@@ -141,7 +161,7 @@ def yt_fetch_comments(video_id: str, since_ms: float | None = None, max_pages: i
                 out.append({
                     "id": f"yt:{c['id']}", "thread_id": f"yt:{video_id}", "platform": "youtube",
                     "user": pseudonym("youtube", raw, sn.get("authorDisplayName")), "_raw_channel": raw,
-                    "ts": ts, "text": sn.get("textOriginal") or sn.get("textDisplay") or "",
+                    "ts": ts, "text": sn.get("textOriginal") or _strip_html(sn.get("textDisplay") or ""), "likes": sn.get("likeCount"),
                     "url": f"https://www.youtube.com/watch?v={video_id}&lc={c['id']}",
                 })
         token = d.get("nextPageToken")
@@ -150,12 +170,12 @@ def yt_fetch_comments(video_id: str, since_ms: float | None = None, max_pages: i
     return out
 
 
-def yt_enrich_accounts(comments: list[dict]) -> None:
+def yt_enrich_accounts(comments: list[dict], api_key: str | None = None) -> None:
     """Public channel metadata: creation date + subscriber count (if not hidden)."""
     ids = sorted({c["_raw_channel"] for c in comments if c.get("_raw_channel", "").startswith("UC")})
     meta = {}
     for i in range(0, len(ids), 50):
-        d = _yt_get("channels", {"part": "snippet,statistics", "id": ",".join(ids[i:i + 50])})
+        d = _yt_get("channels", {"part": "snippet,statistics", "id": ",".join(ids[i:i + 50])}, api_key)
         for it in d.get("items", []):
             st = it.get("statistics", {})
             meta[it["id"]] = {"created": it["snippet"].get("publishedAt"),
@@ -164,6 +184,11 @@ def yt_enrich_accounts(comments: list[dict]) -> None:
         m = meta.get(c.get("_raw_channel"))
         if m:
             c["account"] = m
+
+
+def _strip_html(text: str) -> str:
+    """textDisplay is HTML (links, <br>, entities); the engine scores plain text."""
+    return html.unescape(re.sub(r"<br\s*/?>", "\n", re.sub(r"<(?!br)[^>]+>", "", text))).strip()
 
 
 def strip_private(comments: list[dict]) -> list[dict]:

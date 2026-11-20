@@ -263,6 +263,33 @@ class SimulateIn(BaseModel):
     scenario: Literal["kfor", "energy"] = "kfor"
 
 
+class YouTubeIn(BaseModel):
+    youtube_url_or_id: Annotated[str, StringConstraints(strip_whitespace=True, min_length=11, max_length=300)]
+    # Optional per-request key; never stored or logged. Falls back to YOUTUBE_API_KEY.
+    api_key: Annotated[str, StringConstraints(strip_whitespace=True, pattern=r"^[A-Za-z0-9_-]{20,80}$")] | None = None
+    max_pages: int = Field(3, ge=1, le=10)
+    enrich_channels: bool = True
+
+
+YT_ERRORS = {  # YouTube error reason -> (HTTP status, analyst-facing message)
+    "missingKey": (400, "No YouTube API key: enter one in the dashboard or set YOUTUBE_API_KEY on the backend"),
+    "keyInvalid": (400, "The YouTube API key is invalid"), "badRequest": (400, "The YouTube API key is invalid or the request was rejected"),
+    "accessNotConfigured": (403, "YouTube Data API v3 is not enabled for this API key's project"),
+    "quotaExceeded": (429, "YouTube API quota exceeded for this key, try again tomorrow or use another key"),
+    "dailyLimitExceeded": (429, "YouTube API daily limit exceeded for this key"),
+    "rateLimitExceeded": (429, "YouTube API rate limit hit, try again shortly"),
+    "commentsDisabled": (409, "Comments are disabled on this video"),
+    "videoNotFound": (404, "Video not found, private or removed"),
+    "forbidden": (403, "YouTube refused access to this video's comments"),
+    "unreachable": (502, "Could not reach the YouTube API"),
+}
+
+
+def youtube_http_error(exc: "ingest.YouTubeError") -> HTTPException:
+    status, message = YT_ERRORS.get(exc.reason, (502, f"YouTube API error ({exc.reason or exc.status or 'unknown'})"))
+    return HTTPException(status, message)
+
+
 class LabAccountIn(BaseModel):
     age_days: int | None = Field(None, ge=0, le=20000)
     followers: int | None = Field(None, ge=0, le=100_000_000)
@@ -418,6 +445,41 @@ async def simulate_attack(body: SimulateIn):
                                      background=body.background, scenario=body.scenario, start_ms=now)
     result = await pipeline.ingest(thread_records, comments)
     return {**result, "thread_ids": tids, "primary": tids[-1]}
+
+
+@app.post("/api/osint/youtube", dependencies=[Depends(require_key)])
+async def osint_youtube(body: YouTubeIn):
+    """One-shot fetch of a public video's comments (YouTube Data API v3 commentThreads.list) into the pipeline."""
+    video_id = ingest.parse_video_id(body.youtube_url_or_id)
+    if not video_id:
+        raise HTTPException(422, "Enter a YouTube URL (watch?v=, youtu.be/, /shorts/, /live/) or an 11-character video ID")
+    key = body.api_key or settings.youtube_api_key or None
+    if not key:
+        raise youtube_http_error(ingest.YouTubeError("missing key", reason="missingKey"))
+    try:
+        metadata = await asyncio.to_thread(ingest.yt_video_meta, [video_id], key)
+        if video_id not in metadata:
+            raise youtube_http_error(ingest.YouTubeError("not found", reason="videoNotFound"))
+        comments = await asyncio.to_thread(ingest.yt_fetch_comments, video_id, None, body.max_pages, key)
+    except ingest.YouTubeError as exc:
+        log.warning("YouTube fetch failed for %s (%s)", video_id, exc.reason or exc.status)
+        raise youtube_http_error(exc) from None
+    enriched = False
+    if comments and body.enrich_channels:
+        try:
+            await asyncio.to_thread(ingest.yt_enrich_accounts, comments, key)
+            enriched = True
+        except ingest.YouTubeError:
+            log.warning("Channel enrichment skipped for %s", video_id)
+    ingest.strip_private(comments)
+    meta = metadata[video_id]
+    thread = {"id": f"yt:{video_id}", "platform": "youtube", "external_id": video_id,
+              "url": f"https://www.youtube.com/watch?v={video_id}", **meta}
+    batch = await pipeline.ingest([thread], comments)
+    liked = sorted((c for c in comments if c.get("likes")), key=lambda c: -c["likes"])[:3]
+    return {"thread_id": thread["id"], "video_id": video_id, "title": meta.get("title"), "channel": meta.get("channel"),
+            "comments": len(comments), "new": batch["new"], "channels_enriched": enriched,
+            "top_liked": [{"user": c["user"], "likes": c["likes"]} for c in liked]}
 
 
 @app.post("/api/lab/evaluate", dependencies=[Depends(require_key)])

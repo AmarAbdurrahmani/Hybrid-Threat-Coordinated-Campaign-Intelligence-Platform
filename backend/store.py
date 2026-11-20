@@ -59,7 +59,7 @@ class Store:
             self._db.execute("PRAGMA foreign_keys=ON")
             self._db.executescript(SCHEMA)
             for table, columns in {
-                "comments": {"url": "TEXT", "normalized": "INTEGER NOT NULL DEFAULT 0"},
+                "comments": {"url": "TEXT", "normalized": "INTEGER NOT NULL DEFAULT 0", "likes": "INTEGER"},
                 "sources": {"last_attempt": "REAL", "last_success": "REAL", "last_error": "TEXT", "last_backfill": "REAL"},
                 "alerts": {"status": "TEXT", "exercise": "INTEGER NOT NULL DEFAULT 0",
                            "attempts": "INTEGER NOT NULL DEFAULT 0", "next_attempt": "REAL", "acknowledged_at": "REAL"},
@@ -133,12 +133,12 @@ class Store:
                         changed.add(c["thread_id"])
                     continue
             inserted = self._db.execute(
-                "INSERT OR IGNORE INTO comments(id,thread_id,platform,user,ts,text,source_text,account,infra,simulated,ingested_at,url,normalized) "
-                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,1)",
+                "INSERT OR IGNORE INTO comments(id,thread_id,platform,user,ts,text,source_text,account,infra,simulated,ingested_at,url,likes,normalized) "
+                "VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,1)",
                 (c["id"], c["thread_id"], c.get("platform"), c["user"], c.get("ts"), c.get("text"), c.get("source_text"),
                  json.dumps(c.get("account")) if c.get("account") else None,
                  json.dumps(c.get("infra")) if c.get("infra") else None,
-                 int(bool(c.get("simulated"))), time.time(), c.get("url")),
+                 int(bool(c.get("simulated"))), time.time(), c.get("url"), c.get("likes")),
             ).rowcount
             if inserted:
                 new.append(c)

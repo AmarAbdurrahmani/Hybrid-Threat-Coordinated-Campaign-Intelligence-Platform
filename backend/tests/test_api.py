@@ -180,3 +180,49 @@ def test_lab_evaluate_requires_key_and_configured_llm(api, monkeypatch):
     assert seen["cases"][0]["account"] == {"age_days": 9, "posts_24h": 140, "template_hits": 23, "in_burst": True}
     assert client.post("/api/lab/evaluate", json={"cases": []}, headers=ANALYST).status_code == 422
     assert client.post("/api/lab/evaluate", json={"cases": [{"id": "x", "text": "y" * 1001}]}, headers=ANALYST).status_code == 422
+
+@pytest.mark.parametrize("value,expected", [
+    ("dQw4w9WgXcQ", "dQw4w9WgXcQ"), ("https://www.youtube.com/watch?v=dQw4w9WgXcQ&t=42s", "dQw4w9WgXcQ"),
+    ("https://youtu.be/dQw4w9WgXcQ?si=abc", "dQw4w9WgXcQ"), ("https://www.youtube.com/shorts/abcdefghijk", "abcdefghijk"),
+    ("https://www.youtube.com/live/abcdefghijk?feature=share", "abcdefghijk"), ("https://m.youtube.com/watch?app=m&v=dQw4w9WgXcQ", "dQw4w9WgXcQ"),
+    ("https://example.com/watch?v=dQw4w9WgXcQ", None), ("hello", None),
+])
+def test_parse_video_id(value, expected):
+    assert ingest.parse_video_id(value) == expected
+
+
+def test_osint_youtube_fetches_into_pipeline_and_maps_errors(api, monkeypatch):
+    client, _ = api
+    url = {"youtube_url_or_id": "https://youtu.be/dQw4w9WgXcQ"}
+    assert client.post("/api/osint/youtube", json=url).status_code == 401
+    r = client.post("/api/osint/youtube", json=url, headers=ANALYST)
+    assert r.status_code == 400 and "API key" in r.json()["detail"]  # no request key and no YOUTUBE_API_KEY
+    assert client.post("/api/osint/youtube", json={"youtube_url_or_id": "not-a-youtube-link"}, headers=ANALYST).status_code == 422
+
+    used = []
+    monkeypatch.setattr(ingest, "yt_video_meta", lambda ids, key=None: used.append(key) or {"dQw4w9WgXcQ": {"title": "Test video", "channel": "Ch", "published": 1_700_000_000_000}})
+    now = 1_700_000_000_000
+
+    def comments(video_id, since, pages, key=None):
+        used.append(key)
+        return [{"id": f"yt:c{i}", "thread_id": f"yt:{video_id}", "platform": "youtube", "user": f"yt_user{i}", "_raw_channel": f"UC{i}",
+                 "ts": now + i * 60_000, "text": f"comment number {i}", "likes": i * 3, "url": None} for i in range(6)]
+    monkeypatch.setattr(ingest, "yt_fetch_comments", comments)
+    monkeypatch.setattr(ingest, "yt_enrich_accounts", lambda cs, key=None: None)
+    key = "AIzaTestKeyForFixtureOnly_0123456789"
+    r = client.post("/api/osint/youtube", json={**url, "api_key": key}, headers=ANALYST)
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert body["thread_id"] == "yt:dQw4w9WgXcQ" and body["comments"] == 6 and body["top_liked"][0]["likes"] == 15
+    assert key not in r.text and used == [key, key]
+    time.sleep(0.2)
+    analysis = client.get("/api/threads/yt:dQw4w9WgXcQ/analysis", headers=ANALYST).json()
+    assert sorted(i["c"]["likes"] for i in analysis["items"]) == [0, 3, 6, 9, 12, 15]
+    assert all("_raw_channel" not in i["c"] for i in analysis["items"])
+
+    for reason, status in (("commentsDisabled", 409), ("quotaExceeded", 429), ("keyInvalid", 400), ("somethingNew", 502)):
+        def boom(*a, reason=reason, **k):
+            raise ingest.YouTubeError("x", status=403, reason=reason)
+        monkeypatch.setattr(ingest, "yt_fetch_comments", boom)
+        r = client.post("/api/osint/youtube", json={**url, "api_key": key}, headers=ANALYST)
+        assert r.status_code == status and key not in r.text

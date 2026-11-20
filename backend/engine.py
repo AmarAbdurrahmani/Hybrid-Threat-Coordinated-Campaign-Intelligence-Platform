@@ -165,7 +165,7 @@ def analyze_thread(comments: list[dict], *, published: Any = None, embedder=None
         f = fold(text)
         toks = tokens_with_pos(f)
         items.append({
-            "c": {k: c.get(k) for k in ("id", "user", "ts", "text", "source_text", "account", "infra", "platform", "thread_id", "simulated", "url")},
+            "c": {k: c.get(k) for k in ("id", "user", "ts", "text", "source_text", "account", "infra", "platform", "thread_id", "simulated", "url", "likes")},
             "t": to_ms(c.get("ts")), "f": f, "toks": toks, "set": content_set(toks), "lang": lang,
             "sf": fold(sq_text) if sq_text else None, "same": not c.get("source_text"), "spans": [],
         })

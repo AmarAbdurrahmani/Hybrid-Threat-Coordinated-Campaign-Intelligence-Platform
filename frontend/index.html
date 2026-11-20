@@ -264,6 +264,13 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
             <div class="flex-1"></div>
             <button id="btnSitrep" class="chip chip-teal"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 19.5h16M6.5 16l4-5 3 3 4.5-6.5"/></svg>Generate SitRep</button>
           </div>
+          <form id="ytForm" class="ask flex flex-wrap items-center gap-2 pl-4 pr-1.5 py-1.5" autocomplete="off">
+            <svg viewBox="0 0 24 24" width="20" height="20" class="shrink-0" aria-hidden="true"><rect x="2.5" y="5.5" width="19" height="13" rx="4" fill="#ff3355"/><path d="M10 9.2v5.6l4.8-2.8z" fill="#fff"/></svg>
+            <input id="ytUrl" class="flex-1 min-w-[180px] text-[13.5px] text-slate-100 placeholder:text-slate-500 py-2" placeholder="YouTube URL or video ID (watch?v=, youtu.be/, /shorts/, /live/)" aria-label="YouTube video URL or ID">
+            <input id="ytKey" type="password" autocomplete="off" spellcheck="false" class="w-full sm:w-56 text-[12.5px] text-slate-100 bg-ink-950/70 border border-ink-600 rounded-[10px] px-3 py-2 focus:outline-none focus:border-cyan-500" placeholder="YouTube API key (optional)" aria-label="YouTube Data API v3 key">
+            <button type="submit" id="ytFetch" class="chip chip-teal !h-10">Fetch YouTube</button>
+          </form>
+          <div id="ytStatus" class="text-[11px] text-slate-500 px-1" role="status">Real comments via YouTube Data API v3 · authors are pseudonymised · the key stays in this browser tab and is never stored by the backend.</div>
         </div>
 
         <!-- Thread metrics and comment timeline -->
@@ -1582,7 +1589,7 @@ if (typeof module !== "undefined") module.exports = Engine;
         <button type="button" data-row="${esc(it.c.id)}" aria-expanded="${open}" class="w-full text-left px-3 sm:px-4 py-2.5 hover:bg-ink-800/70 flex items-start sm:items-center gap-3">
           <span class="font-mono text-[11px] text-slate-500 w-14 shrink-0 pt-0.5 sm:pt-0">${hhmm(it.t, true)}</span>
           <span class="min-w-0 flex-1">
-            <span class="flex items-center gap-2 flex-wrap"><span class="font-mono text-xs text-slate-300">@${esc(it.c.user)}</span>${it.c.source === 'live' ? '<span class="text-[9px] font-mono px-1.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">LIVE</span>' : ''}${it.tropes.slice(0, 2).map((t) => `<span class="hidden sm:inline text-[10px] text-rose-300/80">#${esc(t.key)}</span>`).join('')}</span>
+            <span class="flex items-center gap-2 flex-wrap"><span class="font-mono text-xs text-slate-300">@${esc(it.c.user)}</span>${it.c.likes != null ? `<span class="text-[10px] font-mono text-slate-500" title="YouTube likes">♥ ${Number(it.c.likes)}</span>` : ''}${it.c.source === 'live' ? '<span class="text-[9px] font-mono px-1.5 rounded bg-cyan-500/15 text-cyan-300 border border-cyan-500/30">LIVE</span>' : ''}${it.tropes.slice(0, 2).map((t) => `<span class="hidden sm:inline text-[10px] text-rose-300/80">#${esc(t.key)}</span>`).join('')}</span>
             <span class="block text-xs text-slate-400 ${open ? '' : 'truncate'}">${esc(it.c.text)}</span>
           </span>
           <span class="hidden sm:flex items-end gap-0.5 h-5">${minis}</span>
@@ -1620,11 +1627,12 @@ if (typeof module !== "undefined") module.exports = Engine;
   function render() {
     const threadKind = state.live
       ? (state.live.thread?.simulated ? 'Exercise thread' : 'Monitored thread')
-      : (state.standalone ? 'Imported batch' : 'Demo thread');
+      : (state.external ? 'YouTube video (real comments)' : state.standalone ? 'Imported batch' : 'Demo thread');
     $('#artKind').textContent = threadKind;
     if (state.live) { const lt = state.live.thread || {}; $('#artTitle').textContent = lt.title || lt.id || 'Live thread'; $('#artMeta').textContent = `${(lt.platform || 'live').toUpperCase()} · ${lt.url || lt.id} · analysed ${new Date(state.live.generated).toLocaleTimeString()} · embedder ${state.live.embedder}`; $('#artCount').textContent = `${state.res.thread.n} comments · ${state.res.users.size} accounts`; renderKPIs(); renderTimeline(); renderVectors(); renderSignals(); renderInfra(); renderImpact(); renderNetwork(); renderClusters(); renderInspector(); renderExtras(); return; }
-    $('#artTitle').textContent = state.standalone ? 'Live batch (standalone thread)' : ARTICLE.title;
-    $('#artMeta').textContent = state.standalone ? 'Scored without the seed thread as context' : `${ARTICLE.portal} · published ${hhmm(Date.parse(ARTICLE.published))}, 18 Nov 2026 · monitored surface`;
+    const ext = state.external;
+    $('#artTitle').textContent = ext ? ext.title : state.standalone ? 'Live batch (standalone thread)' : ARTICLE.title;
+    $('#artMeta').textContent = ext ? `YOUTUBE · ${ext.channel || ''} · youtube.com/watch?v=${ext.vid} · analysed in this browser` : state.standalone ? 'Scored without the seed thread as context' : `${ARTICLE.portal} · published ${hhmm(Date.parse(ARTICLE.published))}, 18 Nov 2026 · monitored surface`;
     $('#artCount').textContent = `${state.res.thread.n} comments · ${state.res.users.size} accounts`;
     renderKPIs(); renderTimeline(); renderVectors(); renderSignals(); renderInfra(); renderImpact(); renderNetwork(); renderClusters(); renderInspector(); renderExtras();
   }
@@ -1655,7 +1663,7 @@ if (typeof module !== "undefined") module.exports = Engine;
   }
   $('#runAppend').addEventListener('click', () => run(true));
   $('#runStandalone').addEventListener('click', () => run(false));
-  $('#btnReset').addEventListener('click', () => { state.sel = null; state.filter = 'all'; state.q = ''; $('#search').value = ''; load(SEED_COMMENTS.map((c) => ({ ...c, source: 'seed' })), ARTICLE.published, false); toast('Demo thread reloaded'); });
+  $('#btnReset').addEventListener('click', () => { state.external = null; state.sel = null; state.filter = 'all'; state.q = ''; $('#search').value = ''; load(SEED_COMMENTS.map((c) => ({ ...c, source: 'seed' })), ARTICLE.published, false); toast('Demo thread reloaded'); });
   $('#search').addEventListener('input', (e) => { state.q = e.target.value; inspectorPage = 0; renderInspector(); });
   $('#btnCopy').addEventListener('click', async () => {
     const out = { thread: { ...state.res.thread, published: new Date(state.res.thread.published).toISOString() }, clusters: state.res.clusters,
@@ -1818,7 +1826,9 @@ if (typeof module !== "undefined") module.exports = Engine;
       thread: { ...a.thread, published: a.thread.published ?? (isFinite(firstT) ? firstT : Date.now()) },
     };
   }
+  let liveReady = false;
   function setLive(ok, msg) {
+    liveReady = !!ok;
     $('#liveDot').className = 'w-2.5 h-2.5 rounded-full ' + (ok ? 'bg-emerald-400' : 'bg-rose-500');
     $('#liveStatus').textContent = msg;
   }
@@ -3056,6 +3066,77 @@ if (typeof module !== "undefined") module.exports = Engine;
     return { corpus: 'exercise', engine: 'rules-v1', llm_model: LAB.llmModel, results: allCases().map((c) => { const r = LAB.res.get(c.id), l = LAB.llm.get(c.id); return { id: c.id, theatre: c.theatre, lang: c.lang, text: c.text, expected: c.expect, engine: r && { verdict: r.verdict, bot_probability: Math.round(r.p * 100), signals: r.fired.map((x) => x.k) }, llm: l || null }; }),
       sanity: labSanity().map(([id, label, ok]) => ({ id, label, pass: ok })) };
   }
+
+
+  // =====================================================================
+  // YOUTUBE OSINT: real comments via YouTube Data API v3 commentThreads.list.
+  // Backend connected -> POST /api/osint/youtube (stored, channel-enriched).
+  // Backend offline   -> fetched in this browser with the analyst's own key
+  // and scored by the in-page engine. Authors are pseudonymised either way;
+  // the key lives only in this tab's sessionStorage.
+  // =====================================================================
+  const YT_API = 'https://www.googleapis.com/youtube/v3/';
+  const YT_MSG = { keyInvalid: 'The YouTube API key is invalid', badRequest: 'The YouTube API key is invalid or the request was rejected',
+    accessNotConfigured: 'YouTube Data API v3 is not enabled for this key’s project', quotaExceeded: 'YouTube API quota exceeded for this key, try again tomorrow or use another key',
+    dailyLimitExceeded: 'YouTube API daily limit exceeded for this key', rateLimitExceeded: 'YouTube API rate limit hit, try again shortly',
+    commentsDisabled: 'Comments are disabled on this video', videoNotFound: 'Video not found, private or removed', forbidden: 'YouTube refused access to this video’s comments' };
+  function ytVideoId(v) {
+    v = String(v || '').trim(); if (/^[A-Za-z0-9_-]{11}$/.test(v)) return v;
+    const m = v.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|shorts\/|live\/|embed\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})(?![A-Za-z0-9_-])/);
+    return m ? m[1] : null;
+  }
+  const ytPseud = (raw) => { let h = 0x811c9dc5; for (let i = 0; i < raw.length; i++) { h ^= raw.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return 'yt_' + h.toString(36).padStart(7, '0'); };
+  const ytPlain = (t) => new DOMParser().parseFromString(String(t).replace(/<br\s*\/?>/gi, '\n'), 'text/html').body.textContent.trim(); // inert document: no scripts or image loads
+  async function ytGet(ep, params, key) {
+    let r; try { r = await fetch(YT_API + ep + '?' + new URLSearchParams({ ...params, key }), { headers: { Accept: 'application/json' } }); } catch (e) { throw new Error('Could not reach the YouTube API'); }
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) { const reason = j?.error?.errors?.[0]?.reason || ''; throw new Error(YT_MSG[reason] || `YouTube API error (${reason || r.status})`); }
+    return j;
+  }
+  async function ytBrowserFetch(vid, key, pages = 3) {
+    const v = await ytGet('videos', { part: 'snippet', id: vid }, key), it = v.items && v.items[0];
+    if (!it) throw new Error(YT_MSG.videoNotFound);
+    const out = []; let token = null;
+    for (let p = 0; p < pages; p++) {
+      const d = await ytGet('commentThreads', { part: 'snippet,replies', videoId: vid, order: 'time', maxResults: 100, textFormat: 'plainText', ...(token ? { pageToken: token } : {}) }, key);
+      (d.items || []).forEach((th) => [th.snippet.topLevelComment, ...((th.replies || {}).comments || [])].forEach((c) => {
+        const sn = c.snippet, raw = (sn.authorChannelId && sn.authorChannelId.value) || sn.authorDisplayName || 'unknown';
+        out.push({ id: 'yt:' + c.id, user: ytPseud(raw), ts: sn.publishedAt, text: sn.textOriginal || ytPlain(sn.textDisplay || ''), likes: sn.likeCount ?? null,
+          url: `https://www.youtube.com/watch?v=${vid}&lc=${c.id}`, platform: 'youtube', source: 'youtube' });
+      }));
+      token = d.nextPageToken; if (!token) break;
+    }
+    return { meta: { title: it.snippet.title, channel: it.snippet.channelTitle, published: it.snippet.publishedAt }, comments: out };
+  }
+  function ytStatus(msg, tone) { const el = $('#ytStatus'); el.textContent = msg; el.className = 'text-[11px] px-1 ' + (tone === 'err' ? 'text-rose-300' : tone === 'ok' ? 'text-emerald-300' : 'text-slate-400'); }
+  try { $('#ytKey').value = sessionStorage.getItem('htccip_ytkey') || ''; } catch (e) {}
+  $('#ytForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const raw = $('#ytUrl').value.trim(), vid = ytVideoId(raw), key = $('#ytKey').value.trim(), btn = $('#ytFetch');
+    if (!vid) { ytStatus('Enter a YouTube URL (watch?v=, youtu.be/, /shorts/, /live/) or an 11-character video ID.', 'err'); return; }
+    try { key ? sessionStorage.setItem('htccip_ytkey', key) : sessionStorage.removeItem('htccip_ytkey'); } catch (err) {}
+    btn.disabled = true; btn.textContent = 'Fetching…'; ytStatus(`Fetching comments for ${vid}…`);
+    try {
+      if (liveReady) {
+        const r = await apiFetch('/api/osint/youtube', { method: 'POST', body: JSON.stringify({ youtube_url_or_id: raw, ...(key ? { api_key: key } : {}) }) });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(typeof j.detail === 'string' ? j.detail : r.status === 401 ? 'Enter the analyst API key in the LIVE bar' : 'HTTP ' + r.status);
+        delete $('#liveThreads').dataset.demo; await refreshThreadList(j.thread_id); await loadLiveThread(j.thread_id);
+        ytStatus(`${j.comments} real comments from “${j.title}” stored and analysed on the backend${j.channels_enriched ? ' · channel ages added' : ''}.`, 'ok');
+        toast(`YouTube: ${j.comments} comments analysed (${j.new} new)`);
+      } else {
+        if (!key) throw new Error('The backend is not connected: enter a YouTube API key to fetch directly from this browser.');
+        const { meta, comments } = await ytBrowserFetch(vid, key);
+        if (!comments.length) throw new Error('This video has no public comments yet.');
+        state.external = { ...meta, vid }; state.sel = null; state.filter = 'all'; state.q = ''; $('#search').value = '';
+        load(comments, meta.published, false);
+        ytStatus(`${comments.length} real comments from “${meta.title}” analysed in this browser (no backend: channel ages unavailable, so the network signal is skipped).`, 'ok');
+        toast(`YouTube: ${comments.length} comments analysed in the browser`);
+      }
+      go('#sec-overview');
+    } catch (err) { ytStatus(err.message, 'err'); toast('YouTube: ' + err.message); }
+    finally { btn.disabled = false; btn.textContent = 'Fetch YouTube'; }
+  });
 
   let tt; function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(tt); tt = setTimeout(() => t.classList.add('hidden'), 3200); }
 
