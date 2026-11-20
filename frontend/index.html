@@ -221,6 +221,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
               <div id="globeHud" class="hidden sm:block pointer-events-none absolute right-4 bottom-4 text-right font-mono text-[10px] leading-relaxed text-cyan-300/75"></div>
             </div>
           </div>
+          <p id="globeCoverage" role="status" class="border-t border-ink-700 px-4 py-2.5 text-xs text-slate-300 sm:px-5"></p>
           <section id="threatPanel" class="replay-deck grid gap-4 px-4 py-4 sm:grid-cols-[minmax(150px,210px)_minmax(0,1fr)] sm:px-5" aria-label="Threat replay">
             <div class="min-w-0">
               <div class="flex items-center justify-between gap-2">
@@ -265,15 +266,19 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
           </div>
         </div>
 
-        <!-- KPI TILES + TEMPORAL BURST -->
-        <div class="grid gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] items-stretch">
-          <section id="kpis" class="grid grid-cols-2 gap-3"></section>
+        <!-- Thread metrics and comment timeline -->
+        <div class="grid gap-4">
+          <section id="kpis" class="grid grid-cols-2 gap-3 2xl:grid-cols-4"></section>
           <div id="sec-timeline" class="panel p-4 sm:p-5 scroll-mt-6 flex flex-col">
-            <div class="flex items-start justify-between gap-2 mb-2">
-              <div><h2 class="hud-title">Comment timeline</h2><p class="hud-sub">Comments per five minutes after publication</p></div>
-              <div class="flex gap-3 text-[11px] text-slate-400" id="tlLegend"></div>
+            <div class="flex flex-wrap items-start justify-between gap-x-4 gap-y-2">
+              <div>
+                <h2 class="hud-title">Comment timeline</h2>
+                <p class="hud-sub">Select a five-minute bar to filter comments.</p>
+              </div>
+              <div class="flex flex-wrap gap-x-3 gap-y-1 text-xs text-slate-300" id="tlLegend"></div>
             </div>
-            <div id="timeline" class="w-full my-auto pt-2"></div>
+            <p id="tlSummary" class="mt-3 text-xs text-slate-300"></p>
+            <div id="timeline" class="w-full pt-2"></div>
           </div>
         </div>
       </div>
@@ -285,11 +290,6 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
             <a href="#sec-network" class="card-ico" title="Open the account network"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8 8M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></svg></a></div>
           <div id="radar" class="mt-1"></div>
         </div>
-        <div class="panel p-5">
-          <div class="flex items-center justify-between gap-2"><h2 class="hud-title">Comment volume</h2>
-            <a href="#sec-timeline" class="card-ico" title="Open the temporal burst timeline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8 8M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></svg></a></div>
-          <div id="volume" class="mt-3"></div>
-        </div>
         <div class="panel p-5 sm:col-span-2 xl:col-span-1">
           <div class="flex items-center justify-between gap-2"><h2 class="hud-title">Detection breakdown</h2>
             <a href="#sec-inspector" class="card-ico" title="Open the comment inspector"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8 8M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></svg></a></div>
@@ -297,11 +297,11 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
           <h3 class="hud-title mt-6">Signal scores</h3>
           <p class="hud-sub">Mean sub-score of flagged comments · cross-domain correlation</p>
           <div id="confidence" class="space-y-3.5 mt-4"></div>
+          <details class="mt-4 border-t border-ink-700 pt-3">
+            <summary class="cursor-pointer text-sm text-slate-300">Risk score distribution</summary>
+            <div id="riskDistribution" class="mt-2"></div>
+          </details>
         </div>
-        <section class="panel p-5 sm:col-span-2 xl:col-span-1">
-          <h2 class="hud-title">Activity around the peak</h2>
-          <div id="activity" class="mt-3"></div>
-        </section>
       </aside>
     </section>
 
@@ -1360,7 +1360,10 @@ if (typeof module !== "undefined") module.exports = Engine;
   });
 
   function renderTimeline() {
-    const pub = state.res.thread.published;
+    const { n, high, medium, published: pub, peak: pk } = state.res.thread;
+    const summary = [`${n.toLocaleString()} comments`, `${(high + medium).toLocaleString()} flagged`];
+    if (pk) summary.push(`Peak: ${pk.count} comments in ${Math.round((pk.end - pk.start) / 1000)}s`);
+    $('#tlSummary').textContent = summary.join(' · ');
     const W = 720, H = 230, m = { l: 30, r: 10, t: 22, b: 28 };
     const buckets = new Map();
     let first = 0, last = 35, maxC = 4;
@@ -1384,11 +1387,10 @@ if (typeof module !== "undefined") module.exports = Engine;
     const y = (v) => m.t + ih - (v / maxC) * ih;
     let g = '';
     for (let v = 0; v <= maxC; v += Math.ceil(maxC / 4)) g += `<line x1="${m.l}" x2="${W - m.r}" y1="${y(v)}" y2="${y(v)}" stroke="#1e2a38"/><text x="${m.l - 6}" y="${y(v) + 3}" fill="#64748b" font-size="10" text-anchor="end" font-family="JetBrains Mono, ui-monospace, monospace">${v}</text>`;
-    const pk = state.res.thread.peak;
     if (pk) {
-      const x0 = m.l + (((pk.start - pub) / 60000 - minMin) / 5) * bw, x1 = m.l + (((pk.end - pub) / 60000 - minMin) / 5) * bw;
-      g += `<rect x="${x0 - 3}" y="${m.t - 4}" width="${Math.max(6, x1 - x0 + 6)}" height="${ih + 4}" fill="#f43f5e" fill-opacity=".08" stroke="#f43f5e" stroke-opacity=".5" stroke-dasharray="3 3" rx="3"/>
-            <text x="${x1 + 8}" y="${m.t + 6}" fill="#fda4af" font-size="10.5" font-family="JetBrains Mono, ui-monospace, monospace">◀ swarm: ${pk.count} in ${Math.round((pk.end - pk.start) / 1000)}s</text>`;
+      const x0 = m.l + ((pk.start - pub) / TIMELINE_BUCKET_MS - first) * bw;
+      const x1 = m.l + ((pk.end - pub) / TIMELINE_BUCKET_MS - first) * bw;
+      g += `<rect x="${x0 - 3}" y="${m.t}" width="${Math.max(6, x1 - x0 + 6)}" height="${ih}" fill="#f43f5e" fill-opacity=".08" stroke="#f43f5e" stroke-opacity=".5" stroke-dasharray="3 3" rx="3"/>`;
     }
     for (const offset of [...buckets.keys()].sort((a, b) => a - b)) {
       const x = buckets.get(offset);
@@ -2335,15 +2337,29 @@ if (typeof module !== "undefined") module.exports = Engine;
     const RP = { on: true, speed: 120, t: 0, last: 0, idx: 0, res: null, evs: [], t0: 0, span: 1, comets: [], ripples: [], cnt: {}, feed: [], off: new Set(), dirty: true };
     const hsh = (str) => { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h; };
     const resetLoop = () => { RP.t = 0; RP.idx = 0; RP.cnt = { high: 0, medium: 0, organic: 0, uas: 0 }; RP.dirty = true; };
+    const hasCoordinates = (point) => point && Number.isFinite(point.lat) && Number.isFinite(point.lon)
+      && Math.abs(point.lat) <= 90 && Math.abs(point.lon) <= 180;
+    const coverage = $('#globeCoverage');
+
     function buildEvents() {
       const r = state.res; RP.res = r; const evs = [], nodes = new Map((r.infra || []).map((g) => [g.node, g]));
+      let mappedComments = 0;
       r.items.forEach((i) => {
-        const inf = i.c.infra; if (isNaN(i.t) || !inf) return;
-        const g = nodes.get(inf.node), lat = isFinite(inf.lat) ? +inf.lat : g && g.lat, lon = isFinite(inf.lon) ? +inf.lon : g && g.lon;
-        if (!isFinite(lat) || !isFinite(lon) || !TT[i.tier]) return;
+        const inf = i.c.infra;
+        if (!inf) return;
+        const g = nodes.get(inf.node);
+        const point = hasCoordinates(inf) ? inf : g;
+        if (!hasCoordinates(point)) return;
+        mappedComments++;
+        if (!Number.isFinite(i.t) || !TT[i.tier]) return;
+        const { lat, lon } = point;
         const h = hsh(String(i.c.id) + i.c.user), cc = inf.cc || (g && g.cc) || ''; // deterministic jitter so a node fans out instead of firing from one pixel
         evs.push({ t: i.t, cat: i.tier, from: [lat + ((h % 100) / 100 - 0.5) * 1.1, lon + (((h >> 8) % 100) / 100 - 0.5) * 1.5], who: '@' + i.c.user, via: inf.node, cc });
       });
+      const coverageText = r.items.length
+        ? `${mappedComments.toLocaleString()} of ${r.items.length.toLocaleString()} comments have an approximate network location.`
+        : 'No comments to map in this thread.';
+      if (coverage.textContent !== coverageText) coverage.textContent = coverageText;
       uasAnalysis().tracks.filter((t) => t.hostile).forEach((t) => evs.push({ t: t.start, cat: 'uas', site: [t.siteObj.lat, t.siteObj.lon], who: t.id, via: t.siteObj.id }));
       evs.sort((a, b) => a.t - b.t);
       RP.evs = evs; RP.t0 = evs.length ? evs[0].t - 60000 : 0; RP.span = evs.length ? evs[evs.length - 1].t - RP.t0 + 5 * 60000 : 1;
@@ -2435,7 +2451,7 @@ if (typeof module !== "undefined") module.exports = Engine;
       // infrastructure, arcs, spikes
       hits = [];
       const T = vec(TARGET.lat, TARGET.lon), now2 = now;
-      const nodes = (state.res && state.res.infra) || [];
+      const nodes = ((state.res && state.res.infra) || []).filter(hasCoordinates);
       nodes.forEach((n, i) => {
         const a = vec(n.lat, n.lon), sel = state.infraSel === n.node;
         if (n.hostile) {
@@ -2651,27 +2667,6 @@ if (typeof module !== "undefined") module.exports = Engine;
       <div class="absolute inset-x-0 bottom-3 text-center"><div class="big-num !text-[42px]">${flaggedAcc}</div><div class="text-[12.5px] text-slate-400 mt-1.5">Flagged accounts · ${Math.round(frac * 100)}% coordinated</div></div></div>
       <div class="flex items-center justify-center gap-2 mt-1"><span class="w-2 h-2 rounded-full ${lv[3]}"></span><span class="text-[11px] font-mono ${lv[2]}">${lv[0]} · ${lv[1].toUpperCase()}</span></div>`;
   }
-  function renderVolume() {
-    const r = state.res, th = r.thread, it = r.items.filter((i) => !isNaN(i.t));
-    const flagged = it.filter((i) => i.tier !== 'organic').length;
-    if (!it.length) { $('#volume').innerHTML = '<div class="text-xs text-slate-500 py-8 text-center">No timestamps in this batch</div>'; return; }
-    const t0 = Math.min(...it.map((i) => i.t)), t1 = Math.max(...it.map((i) => i.t)), span = Math.max(60000, t1 - t0);
-    const NB = 44, bins = Array.from({ length: NB }, () => [0, 0]);
-    it.forEach((i) => { const k = Math.min(NB - 1, Math.floor((i.t - t0) / span * NB)); bins[k][0]++; if (i.tier !== 'organic') bins[k][1]++; });
-    const max = Math.max(2, ...bins.map((b) => b[0])), W = 300, H = 128, L = 30, B = 18, iw = W - L - 4, ih = H - B - 8, bw = iw / NB, pk = th.peak;
-    let g = '';
-    [0, 0.5, 1].forEach((f) => { const y = 8 + ih - f * ih; g += `<text x="0" y="${y + 3}" fill="#4f6463" font-size="9" font-family="IBM Plex Sans">${Math.round(max * f * f)}</text>`; }); // sqrt scale so the quiet tail stays visible
-    g += `<line x1="${L}" x2="${W}" y1="${8 + ih * 0.06}" y2="${8 + ih * 0.06}" stroke="${TEAL}" stroke-opacity=".35"/>`;
-    bins.forEach(([n, f], k) => {
-      const sq = Math.sqrt(n / max), x = L + k * bw + bw * 0.25, w = Math.max(1, bw * 0.5), mid = t0 + (k + 0.5) / NB * span, inPk = pk && mid >= pk.start - span / NB && mid <= pk.end + span / NB;
-      if (n) g += `<rect x="${x.toFixed(1)}" y="${(8 + ih - sq * ih).toFixed(1)}" width="${w.toFixed(1)}" height="${(sq * ih).toFixed(1)}" rx="1" fill="${inPk ? '#5ff5e6' : TEAL}" fill-opacity="${inPk ? 1 : 0.45}"><title>${hhmm(t0 + k / NB * span)} · ${n} comments (${f} flagged)</title></rect>`;
-      else g += `<rect x="${x.toFixed(1)}" y="${8 + ih - 2}" width="${w.toFixed(1)}" height="2" fill="#1d2a2a"/>`;
-    });
-    for (let q = 0; q <= 3; q++) g += `<text x="${L + iw * q / 3}" y="${H - 3}" fill="#5b6f6e" font-size="9" text-anchor="${q === 0 ? 'start' : q === 3 ? 'end' : 'middle'}" font-family="IBM Plex Sans">${hhmm(t0 + span * q / 3)}</text>`;
-    g += `<path d="M${L - 2} ${8 + ih * 0.06 - 4}l5 4-5 4z" fill="${TEAL}"/>`;
-    $('#volume').innerHTML = `<div class="flex items-baseline gap-1.5"><span class="big-num !text-[24px]">${th.n.toLocaleString()}</span><span class="text-[12px] text-slate-400">events · ${flagged} flagged</span></div>
-      <svg viewBox="0 0 ${W} ${H}" class="w-full h-auto block mt-3">${g}</svg>`;
-  }
   function renderDetect() {
     const th = state.res.thread, A = uasAnalysis();
     const rows = [['high', 'High-risk comments', th.high], ['medium', 'Medium-risk comments', th.medium],
@@ -2697,19 +2692,9 @@ if (typeof module !== "undefined") module.exports = Engine;
       <div class="flex-1 min-w-0"><div class="flex justify-between text-[12px] mb-1.5"><span class="text-slate-300 truncate">${l}</span><span class="font-mono text-slate-400">${v === null ? 'n/a' : v + '%'}</span></div>
       <div class="conf-track"><div class="conf-fill" style="width:${v || 0}%;--c:${c}"></div></div></div></div>`).join('');
   }
-  function renderActivity() {
-    const r = state.res, it = r.items.filter((i) => !isNaN(i.t)), pk = r.thread.peak;
-    if (!it.length) { $('#activity').innerHTML = '<div class="text-xs text-slate-500 py-6 text-center">No timestamps</div>'; return; }
+  function renderRiskDistribution() {
+    const r = state.res;
     const W = 280, H = 92, mono = 'font-family="IBM Plex Sans, system-ui, sans-serif"';
-    // (1) per-minute comment rate around the swarm window
-    const c0 = pk ? pk.start - 18 * 60000 : Math.min(...it.map((i) => i.t)), c1 = pk ? pk.end + 18 * 60000 : Math.max(...it.map((i) => i.t)) + 60000;
-    const nb = 70, bins = new Array(nb).fill(0), span = Math.max(60000, c1 - c0);
-    it.forEach((i) => { if (i.t >= c0 && i.t < c1) bins[Math.floor((i.t - c0) / span * nb)]++; });
-    const mx = Math.max(2, ...bins), bw = W / nb, X = (t) => (t - c0) / span * W;
-    let g1 = '';
-    bins.forEach((n, k) => { const mid = c0 + (k + 0.5) / nb * span, on = pk && mid >= pk.start && mid <= pk.end, h = 3 + n / mx * 54; g1 += `<rect x="${(k * bw + bw * 0.18).toFixed(1)}" y="${(66 - h).toFixed(1)}" width="${Math.max(1, bw * 0.64).toFixed(1)}" height="${h.toFixed(1)}" fill="${on ? TEAL : '#3a4a49'}" fill-opacity="${on ? 0.95 : 0.55}"/>`; });
-    if (pk) [pk.start, pk.end].forEach((t) => { const x = X(t); g1 += `<line x1="${x}" x2="${x}" y1="8" y2="80" stroke="#cbd5e1" stroke-dasharray="2 3"/><path d="M${x - 4} 4h8l-4 6z" fill="#e2e8f0"/><text x="${x}" y="${H - 1}" fill="#7f9392" font-size="9" text-anchor="middle" ${mono}>${hhmm(t)}</text>`; });
-    // (2) risk-score distribution with the tier thresholds
     const sb = new Array(25).fill(0); r.items.forEach((i) => sb[Math.min(24, Math.floor(i.score / 4))]++);
     const sm = Math.max(1, ...sb); let g2 = '';
     sb.forEach((n, k) => {
@@ -2719,10 +2704,7 @@ if (typeof module !== "undefined") module.exports = Engine;
     });
     [35, 60].forEach((v) => { const x = v / 100 * W; g2 += `<line x1="${x}" x2="${x}" y1="4" y2="76" stroke="#cbd5e1" stroke-dasharray="2 3"/><path d="M${x - 4} 2h8l-4 6z" fill="#e2e8f0"/><text x="${x}" y="${H - 3}" fill="#7f9392" font-size="9" text-anchor="middle" ${mono}>${v}</text>`; });
     g2 += `<text x="0" y="${H - 3}" fill="#5b6f6e" font-size="9" ${mono}>0</text><text x="${W}" y="${H - 3}" fill="#5b6f6e" font-size="9" text-anchor="end" ${mono}>100</text>`;
-    $('#activity').innerHTML = `<div class="text-[10.5px] text-slate-500 mb-1">Comments / min · swarm window${pk ? ` · <span class="text-cyan-300 whitespace-nowrap">${pk.count} in ${Math.round((pk.end - pk.start) / 1000)}s</span>` : ''}</div>
-      <svg viewBox="0 0 ${W} ${H}" class="w-full h-auto block">${g1}</svg>
-      <div class="text-[10.5px] text-slate-500 mt-3 mb-1">Risk-score distribution · tier thresholds 35 / 60</div>
-      <svg viewBox="0 0 ${W} ${H}" class="w-full h-auto block">${g2}</svg>`;
+    $('#riskDistribution').innerHTML = `<svg viewBox="0 0 ${W} ${H}" class="w-full h-auto block" role="img" aria-label="Distribution of comment risk scores">${g2}</svg>`;
   }
   function notifItems() {
     const r = state.res, th = r.thread, lv = ALERT[th.level], A = uasAnalysis(), hostile = r.infra.filter((g) => g.hostile), k1 = r.clusters[0], pk = th.peak;
@@ -2743,7 +2725,7 @@ if (typeof module !== "undefined") module.exports = Engine;
       <span class="w-2 h-2 rounded-full mt-1.5 shrink-0" style="background:${c}"></span>
       <span class="min-w-0"><span class="block text-[12.5px] text-slate-100">${esc(t)}</span>${s ? `<span class="block text-[11px] text-slate-500 truncate">${esc(s)}</span>` : ''}</span></a>`).join('');
   }
-  function renderHero() { renderRadar(); renderVolume(); renderDetect(); renderConfidence(); renderActivity(); renderNotif(); }
+  function renderHero() { renderRadar(); renderDetect(); renderConfidence(); renderRiskDistribution(); renderNotif(); }
 
   // ---- top-bar controls ----
   $('#pillTier').addEventListener('change', (e) => { state.filter = e.target.value; state.sel = null; inspectorPage = 0; renderInspector(); go('#sec-inspector'); });
@@ -2768,7 +2750,7 @@ if (typeof module !== "undefined") module.exports = Engine;
     const routes = [[/\b(lab|evaluat\w*|smoke|sanity|bot or human|human or bot|is (it|this) a bot)\b/, '#sec-lab', 'Bot / human evaluation lab'], [/\b(psyops?|farms?|influence|russia|serbia|greece|hungary|bulgaria|turkey|t[üu]rkiye)\b/, '#sec-psyop', 'Influence exercise'], [/\b(drones?|uas|uav|c-uas|counter[- ]?uas|remote id)\b/, '#sec-uas', 'Counter-UAS detection'], [/\b(clusters?|network|bots?|accounts?|sockpuppets?)\b/, '#sec-network', 'Account network & clusters'],
       [/\b(infra|infrastructure|asn|ip|hosting|vps|proxy|nodes?)\b/, '#sec-infra', 'Infrastructure node inspector'], [/\b(fusion|correlat\w*|alerts?)\b/, '#sec-alerts', 'Forensic fusion timeline'],
       [/\b(playbook|mitigat\w*|actions?|respond|response)\b/, '#sec-playbook', 'Mitigation playbook'], [/\b(impact|audience|portals?|surfaces?)\b/, '#sec-impact', 'Impact zone'],
-      [/\b(timeline|burst|swarm|peak)\b/, '#sec-timeline', 'Temporal burst timeline'], [/\b(vectors?|narratives?|tropes?)\b/, '#vectors', 'Threat vectors']];
+      [/\b(timeline|burst|swarm|peak)\b/, '#sec-timeline', 'Comment timeline'], [/\b(vectors?|narratives?|tropes?)\b/, '#vectors', 'Threat vectors']];
     const hit = routes.find(([rx]) => rx.test(lq));
     if (hit) { go(hit[1]); toast('→ ' + hit[2]); return; }
     const n = state.res.items.filter((i) => i.c.text.toLowerCase().includes(lq) || i.c.user.toLowerCase().includes(lq)).length;
