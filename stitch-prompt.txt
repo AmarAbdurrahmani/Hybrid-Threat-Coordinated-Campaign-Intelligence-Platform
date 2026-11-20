@@ -1,0 +1,29 @@
+Redesign the Hybrid Threat & Coordinated Campaign Intelligence Platform as a responsive analyst workspace. It helps analysts triage possible coordination in online comment threads, examine the supporting evidence, and document a human review. Use the accompanying SQLite schema as data context and the FastAPI responses described below as the UI contract. Use fictional threads and pseudonymous account IDs in all mockups.
+
+Design direction
+
+Create a desktop-first workspace for 1440px and a mobile view at 390px. Use graphite surfaces, restrained teal for primary actions and selection, amber for Exercise, and red for the highest severity. Use Inter for interface text and a monospace face for timestamps and IDs. Prioritize legible tables, clear action hierarchy, and readable charts. Give severity, delivery state, and exercise mode visible text labels. Keep keyboard focus visible and provide a table or list alternative to the map and network graph.
+
+Use a left sidebar with Monitor, Cases, Sources, and Alerts. Put connection status and a clearly labeled Live / Exercise switch in the header. Keep the exercise label visible on simulated records, alerts, and briefings. Preserve the selected thread when opening a comment, graph node, or briefing.
+
+Design these screens and flows
+
+1. Monitor. Open on a searchable, filterable queue of monitored threads with platform, title, latest activity, comment count, flagged share, and severity. Show Level 1 as the highest and Level 4 as Baseline. Show “Analysis pending” when a thread has no current score.
+
+2. Thread investigation. Open a thread into a workspace with a source link and severity summary. Lead with total comments, flagged share, largest cluster, and a five-minute comment-burst chart. Use tabs for Overview, Comments, Network, and Infrastructure. In Overview, compare the four signals (temporal, linguistic, narrative, and network) and show recurring narratives. In Comments, select a row to open an evidence drawer with the comment, score, tier, signal reasons, text highlights, similar comments, and a source link when available. Use “Unavailable” for missing signal values. In Network, let analysts inspect pseudonymous accounts, clusters, and connection types. In Infrastructure, pair a map with a node list and show an empty state when the source supplies no location data. Label map points as observed infrastructure; keep actor location and attribution out of the interface. Include actions for creating or linking a case and previewing a SitRep. Keep paste-a-batch testing and the exercise simulator discoverable under Exercise tools.
+
+3. Campaign cases. Show a case queue and suggested cases with an open-or-dismiss action. On case detail, show title, optional owner, status (Open, Reviewing, Closed, Dismissed), linked threads, preserved evidence snapshots, and review history. When an analyst unlinks a thread, retain its snapshot and mark it “Unlinked.” Add a review form with reviewer, decision (Likely coordinated, Organic, Inconclusive), and required rationale. Let the analyst preview or download the SitRep with supporting evidence and any exercise marking.
+
+4. Sources. Show monitored YouTube and Telegram sources with reference, active or paused state, last attempt, last success, and the latest error when one exists. Include Add source, Pause / Resume, Retry, and Backfill. The Add source form accepts a YouTube video ID or a public Telegram channel username. The monitor can also display data from authorized portals.
+
+5. Alerts. Show thread, severity, recorded time, delivery status, delivery attempts, exercise marker, and acknowledgment. Keep acknowledgment independent of delivery status. Let analysts open the source thread and acknowledge an alert. Include queued, delivered, failed, and dry-run examples.
+
+Data bindings
+
+- The thread list comes from GET /api/threads, with derived n, last_ts, level, and pct. Format pct as a percentage from a 0–1 fraction.
+- GET /api/threads/{id}/analysis returns contract v1 with thread summary, items, edges, clusters, scoreByUser, users, and infra. Treat these as derived analysis data. A score indicates possible coordination. Attribution requires separate evidence.
+- Cases use /api/cases, /api/cases/suggestions, and the case detail, review, and SitRep routes. The case association and preserved snapshot have independent lifecycles.
+- Sources and alerts come from /api/sources and /api/alerts. A recorded alert may be awaiting delivery.
+- Use Unix milliseconds for comment publication time, thread publication time, latest thread activity, and analysis generation time. Storage metadata such as source polling, case review, and alert creation timestamps use Unix seconds.
+
+Deliver a connected prototype that demonstrates the primary flow from opening a flagged thread through inspecting a comment, creating a case, recording a review, and previewing the briefing. Include loading, empty, unavailable, and connection-error states. If generating frontend code, use mock API responses behind a replaceable data layer. Keep all database access and credentials on the server.

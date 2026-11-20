@@ -5,166 +5,96 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hybrid Threat Operations Center</title>
 <script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
 <script>
 tailwind.config = { darkMode: 'class', theme: { extend: {
-  fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], mono: ['JetBrains Mono', 'ui-monospace', 'monospace'] },
+  fontFamily: { sans: ['IBM Plex Sans', 'system-ui', 'sans-serif'], mono: ['JetBrains Mono', 'ui-monospace', 'monospace'] },
   colors: { ink: { 950: '#040707', 900: '#080c0d', 850: '#0b1112', 800: '#101718', 700: '#182123', 600: '#243032' },
     cyan: { 50: '#effffd', 100: '#dcfffb', 200: '#b5fff5', 300: '#6ff7e6', 400: '#2ee6d3', 500: '#14c9b8', 600: '#0ea596', 700: '#0f7c73', 800: '#115e58', 900: '#134e4a' } }
 } } };
 </script>
 <style>
-  body { background: #070a0f; }
-  /* --- Leaflet 1.9 core styles (inlined: the hosted viewer only allows inline CSS) --- */
-  .leaflet-pane,.leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-tile-container,.leaflet-pane>svg,.leaflet-pane>canvas,.leaflet-zoom-box,.leaflet-image-layer,.leaflet-layer{position:absolute;left:0;top:0}
-  .leaflet-container{overflow:hidden;background:#05080c;outline-offset:1px;font-family:Inter,system-ui,sans-serif;-webkit-tap-highlight-color:transparent}
-  .leaflet-tile,.leaflet-marker-icon,.leaflet-marker-shadow{-webkit-user-select:none;user-select:none;-webkit-user-drag:none}
-  .leaflet-tile::selection{background:transparent}
-  .leaflet-container img.leaflet-tile,.leaflet-container img{max-width:none!important;max-height:none!important;display:inline}
-  .leaflet-container svg{display:inline;max-width:none!important}
-  .leaflet-container.leaflet-touch-zoom{touch-action:pan-x pan-y}
-  .leaflet-container.leaflet-touch-drag{touch-action:none}
-  .leaflet-container.leaflet-touch-drag.leaflet-touch-zoom{touch-action:none}
-  .leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}
-  .leaflet-zoom-box{width:0;height:0;box-sizing:border-box;z-index:800;border:2px dotted #2ee6d3;background:#2ee6d322}
-  .leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}
-  .leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}
-  .leaflet-control{position:relative;z-index:800;pointer-events:auto;float:left;clear:both}
-  .leaflet-top,.leaflet-bottom{position:absolute;z-index:1000;pointer-events:none}
-  .leaflet-top{top:0}.leaflet-right{right:0}.leaflet-bottom{bottom:0}.leaflet-left{left:0}
-  .leaflet-right .leaflet-control{float:right}.leaflet-top .leaflet-control{margin-top:10px}.leaflet-bottom .leaflet-control{margin-bottom:10px}.leaflet-left .leaflet-control{margin-left:10px}.leaflet-right .leaflet-control{margin-right:10px}
-  .leaflet-fade-anim .leaflet-popup{opacity:0;transition:opacity .2s linear}.leaflet-fade-anim .leaflet-map-pane .leaflet-popup{opacity:1}
-  .leaflet-zoom-animated{transform-origin:0 0}
-  svg.leaflet-zoom-animated{will-change:transform}
-  .leaflet-zoom-anim .leaflet-zoom-animated{transition:transform .25s cubic-bezier(0,0,.25,1)}
-  .leaflet-zoom-anim .leaflet-tile,.leaflet-pan-anim .leaflet-tile{transition:none}
-  .leaflet-zoom-anim .leaflet-zoom-hide{visibility:hidden}
-  .leaflet-interactive{cursor:pointer}
-  .leaflet-grab{cursor:grab}.leaflet-crosshair,.leaflet-crosshair .leaflet-interactive{cursor:crosshair}
-  .leaflet-dragging .leaflet-grab,.leaflet-dragging .leaflet-grab .leaflet-interactive,.leaflet-dragging .leaflet-marker-draggable{cursor:move;cursor:grabbing}
-  .leaflet-marker-icon,.leaflet-marker-shadow,.leaflet-image-layer,.leaflet-pane>svg path,.leaflet-tile-container{pointer-events:none}
-  .leaflet-marker-icon.leaflet-interactive,.leaflet-image-layer.leaflet-interactive,.leaflet-pane>svg path.leaflet-interactive,svg.leaflet-image-layer.leaflet-interactive path{pointer-events:auto}
-  .leaflet-bar{box-shadow:0 1px 6px #0008;border-radius:8px;border:1px solid #2b3a4d;overflow:hidden}
-  .leaflet-bar a{background:#0f151e;color:#cbd5e1;border-bottom:1px solid #2b3a4d;width:30px;height:30px;line-height:28px;display:block;text-align:center;text-decoration:none;font:600 16px/28px 'JetBrains Mono',monospace}
-  .leaflet-bar a:hover{background:#1e2a38;color:#fff}.leaflet-bar a:last-child{border-bottom:none}
-  .leaflet-bar a.leaflet-disabled{cursor:default;color:#475569;background:#0b1017}
-  .leaflet-control-zoom-in,.leaflet-control-zoom-out{text-indent:0}
-  .leaflet-control-attribution{background:#070a0fcc!important;color:#64748b;font-size:9.5px;padding:1px 6px;margin:0!important;border-top-left-radius:6px}
-  .leaflet-control-attribution a{color:#94a3b8;text-decoration:none}
-  .leaflet-attribution-flag{display:none!important}
-  .leaflet-tooltip{position:absolute;padding:3px 7px;background:#0b1017ee;border:1px solid #2b3a4d;border-radius:6px;color:#e2e8f0;white-space:nowrap;pointer-events:none;box-shadow:0 2px 8px #0009;font:500 10.5px/1.35 'JetBrains Mono',ui-monospace,monospace}
-  .leaflet-tooltip.leaflet-interactive{cursor:pointer;pointer-events:auto}
-  .leaflet-tooltip-top:before,.leaflet-tooltip-bottom:before,.leaflet-tooltip-left:before,.leaflet-tooltip-right:before{position:absolute;pointer-events:none;border:5px solid transparent;background:transparent;content:""}
-  .leaflet-tooltip-right{margin-left:6px}.leaflet-tooltip-left{margin-left:-6px}.leaflet-tooltip-top{margin-top:-6px}.leaflet-tooltip-bottom{margin-top:6px}
-  .leaflet-tooltip-right:before{left:0;margin-left:-10px;top:50%;margin-top:-5px;border-right-color:#2b3a4d}
-  .leaflet-tooltip-left:before{right:0;margin-right:-10px;top:50%;margin-top:-5px;border-left-color:#2b3a4d}
-  .leaflet-tooltip-top:before{bottom:0;margin-bottom:-10px;left:50%;margin-left:-5px;border-top-color:#2b3a4d}
-  .leaflet-tooltip-bottom:before{top:0;margin-top:-10px;left:50%;margin-left:-5px;border-bottom-color:#2b3a4d}
-  .leaflet-div-icon{background:transparent;border:none}
-  /* --- map theme --- */
-  /* OpenStreetMap tiles are light; darken only the tile layer so markers/lines/tooltips keep their colours */
-  .osm-dark-tiles{filter:invert(1) hue-rotate(180deg) brightness(.78) contrast(.92) saturate(.35)}
-  .tip-hostile{border-color:#f43f5e88;color:#fecdd3}.tip-hostile.leaflet-tooltip-right:before{border-right-color:#f43f5e88}.tip-hostile.leaflet-tooltip-left:before{border-left-color:#f43f5e88}
-  .tip-target{border-color:#e2e8f055;font-weight:600}
-  .hostile-node{filter:drop-shadow(0 0 5px #f43f5e) drop-shadow(0 0 12px #f43f5e99)}
-  .pulse-ring{animation:ring 2s ease-out infinite;transform-box:fill-box;transform-origin:center}
-  @keyframes ring{0%{opacity:.9;transform:scale(.6)}100%{opacity:0;transform:scale(1.9)}}
-  .attack-line{stroke-dasharray:9 7;animation:dash 1.1s linear infinite;filter:drop-shadow(0 0 3px #f43f5e)}
-  @keyframes dash{to{stroke-dashoffset:-32}}
-  .packet{filter:drop-shadow(0 0 6px #fda4af)}
-  .grid-line{stroke-dasharray:2 5}
-  .map-label{color:#475569;font:500 10px 'JetBrains Mono',ui-monospace,monospace;white-space:nowrap;text-shadow:0 0 3px #000}
-  .map-region{color:#1f3a33;font:700 13px Inter,system-ui,sans-serif;letter-spacing:.3em;white-space:nowrap}
-  .panel { min-width: 0; position: relative; border: 1px solid #17212c; border-radius: 3px; box-shadow: inset 0 1px 0 #ffffff06;
-    background:
-      linear-gradient(#3d566c, #3d566c) left top / 12px 1px no-repeat, linear-gradient(#3d566c, #3d566c) left top / 1px 12px no-repeat,
-      linear-gradient(#3d566c, #3d566c) right top / 12px 1px no-repeat, linear-gradient(#3d566c, #3d566c) right top / 1px 12px no-repeat,
-      linear-gradient(#3d566c, #3d566c) left bottom / 12px 1px no-repeat, linear-gradient(#3d566c, #3d566c) left bottom / 1px 12px no-repeat,
-      linear-gradient(#3d566c, #3d566c) right bottom / 12px 1px no-repeat, linear-gradient(#3d566c, #3d566c) right bottom / 1px 12px no-repeat,
-      linear-gradient(180deg, #0b1118 0%, #070b10 100%); }
-  .grid-bg { background-image: linear-gradient(#1e2a3833 1px, transparent 1px), linear-gradient(90deg, #1e2a3833 1px, transparent 1px); background-size: 28px 28px; }
   mark { border-radius: 3px; padding: 0 2px; color: inherit; cursor: help; }
   mark.trope   { background: #f43f5e33; box-shadow: inset 0 -2px 0 #f43f5e; }
   mark.calque  { background: #a78bfa33; box-shadow: inset 0 -2px 0 #a78bfa; }
   mark.dialect { background: #f59e0b33; box-shadow: inset 0 -2px 0 #f59e0b; }
   mark.ngram   { background: #2ee6d326; box-shadow: inset 0 -2px 0 #2ee6d3; }
-  .scan { position: relative; overflow: hidden; }
-  .scan::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, #2ee6d314, transparent); transform: translateX(-100%); animation: scan 3.5s ease-in-out infinite; pointer-events: none; }
-  @keyframes scan { to { transform: translateX(100%); } }
-  .pulse-dot { animation: pulse 1.6s ease-in-out infinite; }
-  @keyframes pulse { 50% { opacity: .35; } }
   ::-webkit-scrollbar { width: 8px; height: 8px; } ::-webkit-scrollbar-thumb { background: #1e2a38; border-radius: 8px; }
   .node { cursor: pointer; transition: r .15s; }
   .fade-in { animation: fade .25s ease-out; } @keyframes fade { from { opacity: 0; transform: translateY(4px); } }
-  /* ===================== SOC THEME (black glass · teal accent) ===================== */
-  :root { --teal: #2ee6d3; --teal-2: #5ff5e6; --line: #172123; --line-2: #22302f; --txt: #e8f3f2; color-scheme: dark; }
+  /* Dashboard surfaces and controls */
+  :root {
+    --page: #0b1014;
+    --surface: #11181e;
+    --raised: #192229;
+    --line: #29343d;
+    --line-2: #39464f;
+    --txt: #e8eff2;
+    --muted: #a3b0bc;
+    --teal: #65cfbe;
+    color-scheme: dark;
+  }
   html { scroll-behavior: smooth; }
-  body { background: #031012; }
-  .grid-bg { background-color: #020809; background-image: radial-gradient(1100px 700px at 88% -12%, #0f3a3c 0%, transparent 62%), radial-gradient(900px 620px at -12% 112%, #0b3033 0%, transparent 60%), linear-gradient(160deg, #06191b 0%, #020707 55%, #041517 100%); background-attachment: fixed; }
-  .soc-frame { background: #000; border: 1px solid #ffffff10; box-shadow: 0 0 0 6px #ffffff05, 0 40px 120px -24px #000, inset 0 1px 0 #ffffff0a; }
-  @media (max-width: 639px) { .soc-frame { border-left: 0; border-right: 0; box-shadow: none; } }
-  .panel { min-width: 0; position: relative; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(180deg, #0c1213 0%, #080c0d 100%); box-shadow: inset 0 1px 0 #ffffff07; }
-  .glass { background: linear-gradient(180deg, #0f1718d9, #080c0dd9); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid #ffffff14; border-radius: 16px; }
-  .hud-title { font: 500 15px/1.3 Inter, system-ui, sans-serif; letter-spacing: -.005em; color: var(--txt); display: flex; align-items: center; gap: 8px; }
-  .hud-sub { font-size: 11.5px; line-height: 1.45; color: #6f8584; margin-top: 3px; }
-  .card-ico { width: 28px; height: 28px; display: grid; place-items: center; flex: none; border-radius: 8px; color: #9db1b0; border: 1px solid transparent; transition: color .15s, border-color .15s, background .15s; }
+  body { background: var(--page); }
+  .dashboard-header { border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+  .panel { min-width: 0; position: relative; border: 1px solid var(--line); border-radius: 6px; background: var(--surface); }
+  .hud-title { font-size: 16px; font-weight: 600; line-height: 1.3; color: var(--txt); display: flex; align-items: center; gap: 8px; }
+  .hud-sub { font-size: 12px; line-height: 1.45; color: var(--muted); margin-top: 4px; }
+  .stage-frame { height: clamp(340px, 44vw, 580px); background: #070d11; }
+  .stage-heading, .replay-deck { border-bottom: 1px solid var(--line); }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .fade-in { animation: none; }
+  }
+  .card-ico { width: 28px; height: 28px; display: grid; place-items: center; flex: none; border-radius: 5px; color: #9db1b0; border: 1px solid transparent; transition: color .15s, border-color .15s, background .15s; }
   .card-ico:hover { color: var(--teal); border-color: #2ee6d340; background: #2ee6d30d; }
-  .btn-hud { font: 500 12px/1 Inter, system-ui, sans-serif; padding: 9px 13px; border-radius: 11px; border: 1px solid var(--line-2); background: #0d1415; color: #cfdede; transition: background .15s, border-color .15s, color .15s; }
+  .btn-hud { font: 500 12px/1 IBM Plex Sans, system-ui, sans-serif; padding: 9px 13px; border-radius: 5px; border: 1px solid var(--line-2); background: #0d1415; color: #cfdede; transition: background .15s, border-color .15s, color .15s; }
   .btn-hud:hover { border-color: #2f4442; background: #121c1d; color: #fff; }
   .btn-hud:disabled, .chip:disabled { opacity: .6; cursor: wait; }
   .btn-cyan { border-color: #2ee6d355; color: #7ff5e9; } .btn-cyan:hover { background: #2ee6d314; border-color: var(--teal); color: #d7fffa; }
   .btn-amber { background: #f59e0b; border-color: #f59e0b; color: #0a0d12; } .btn-amber:hover { background: #fbbf24; border-color: #fbbf24; color: #000; }
   .btn-crimson { background: #e11d48; border-color: #f43f5e; color: #fff; } .btn-crimson:hover { background: #f43f5e; color: #fff; }
-  .seg { font: 500 11px/1 Inter, system-ui, sans-serif; padding: 7px 10px; border-radius: 9px; border: 1px solid var(--line-2); color: #9ab0af; background: #0b1112e6; white-space: nowrap; transition: background .15s, color .15s; }
+  .seg { font: 500 11px/1 IBM Plex Sans, system-ui, sans-serif; padding: 7px 10px; border-radius: 5px; border: 1px solid var(--line-2); color: #9ab0af; background: #0b1112e6; white-space: nowrap; transition: background .15s, color .15s; }
   .seg:hover { background: #111a1b; color: #e2eeee; }
-  .seg-on { border-color: #2ee6d366; color: #a9fff6; background: #0f2b2a; box-shadow: inset 0 0 0 1px #2ee6d31f; }
-  .seg-amber.seg-on, #uasToggle.seg-on { border-color: #f59e0b77; color: #fde68a; background: #2a1f0a; box-shadow: inset 0 0 0 1px #f59e0b1f; }
-  .pill { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 12px 0 14px; border-radius: 12px; background: #0c1213; border: 1px solid var(--line); color: #7f9392; font-size: 12.5px; white-space: nowrap; transition: border-color .15s; }
+  .seg-on { border-color: #2ee6d366; color: #a9fff6; background: #0f2b2a; }
+  .seg-amber.seg-on, #uasToggle.seg-on { border-color: #f59e0b77; color: #fde68a; background: #2a1f0a; }
+  .pill { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 12px 0 14px; border-radius: 5px; background: #0c1213; border: 1px solid var(--line); color: #7f9392; font-size: 12.5px; white-space: nowrap; transition: border-color .15s; }
   .pill:focus-within, .pill:hover { border-color: #2ee6d340; }
-  .pill select { background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right center; color: #e6f1f0; font: 500 12.5px Inter, system-ui, sans-serif; border: 0; outline: 0; -webkit-appearance: none; appearance: none; padding-right: 18px; cursor: pointer; max-width: 170px; }
+  .pill select { background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right center; color: #e6f1f0; font: 500 12.5px IBM Plex Sans, system-ui, sans-serif; border: 0; outline: 0; -webkit-appearance: none; appearance: none; padding-right: 18px; cursor: pointer; max-width: 170px; }
   .pill select option { background: #0c1213; color: #e6f1f0; }
   .pill input[type=search]::-webkit-search-cancel-button { filter: invert(.7); }
-  .icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: #0c1213; border: 1px solid var(--line); color: #b8c9c8; position: relative; transition: color .15s, border-color .15s; }
+  .icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 5px; background: #0c1213; border: 1px solid var(--line); color: #b8c9c8; position: relative; transition: color .15s, border-color .15s; }
   button.icon-btn:hover { color: #fff; border-color: #2a3a3a; }
-  .avatar { background: linear-gradient(135deg, #14514d, #0b2323); color: #b5fff5; border-color: #2ee6d333; cursor: default; }
-  .rail-btn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 13px; color: #8aa09f; background: #0b1011; border: 1px solid #141c1e; transition: color .15s, border-color .15s, background .15s; }
-  .rail-btn:hover { color: #e6f6f4; border-color: #24403e; }
-  .rail-btn.on { color: #eafffc; background: linear-gradient(180deg, #133332, #0a1a1a); border-color: #2ee6d355; box-shadow: inset 0 0 14px #2ee6d322; }
-  .logo-grid i { display: block; width: 9px; height: 9px; border-radius: 2.5px; background: var(--teal); box-shadow: 0 0 6px #2ee6d366; }
-  .hero-stage { background: radial-gradient(ellipse 70% 85% at 55% 55%, #05292a 0%, #021112 45%, #000 82%); }
-  .hero-title { font: 500 clamp(24px, 2.5vw, 38px)/1.1 Inter, system-ui, sans-serif; letter-spacing: -.02em; color: #f4fbfa; text-shadow: 0 2px 18px #000; }
-  .big-num { font: 300 34px/1 Inter, system-ui, sans-serif; letter-spacing: -.02em; color: #f2faf9; font-variant-numeric: tabular-nums; }
-  .delta { font: 500 11px/1 Inter, system-ui, sans-serif; padding: 5px 8px; border-radius: 8px; background: #2ee6d312; color: #5ff5e6; white-space: nowrap; }
+  .rail-btn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 5px; color: var(--muted); border: 1px solid transparent; transition: color .15s, border-color .15s, background .15s; }
+  .rail-btn:hover { color: var(--txt); background: var(--raised); }
+  .rail-btn.on { color: var(--teal); background: var(--raised); border-color: var(--line-2); }
+  .logo-grid i { display: block; width: 7px; height: 7px; border-radius: 1px; background: var(--teal); }
+  .hero-title { font-size: clamp(24px, 2.65vw, 40px); font-weight: 600; line-height: 1.12; letter-spacing: -.025em; color: var(--txt); }
+  .big-num { font: 300 34px/1 IBM Plex Sans, system-ui, sans-serif; letter-spacing: -.02em; color: #f2faf9; font-variant-numeric: tabular-nums; }
+  .delta { font: 500 11px/1 IBM Plex Sans, system-ui, sans-serif; padding: 5px 8px; border-radius: 8px; background: #2ee6d312; color: #5ff5e6; white-space: nowrap; }
   .delta.bad { background: #f43f5e14; color: #fda4af; } .delta.warn { background: #f59e0b14; color: #fcd34d; } .delta.mute { background: #ffffff08; color: #94a3b8; }
-  .tile { border-radius: 12px; background: #0e1415; border: 1px solid #172022; padding: 10px 12px 12px; text-align: left; transition: border-color .15s, background .15s; }
+  .tile { border-radius: 5px; background: #0e1415; border: 1px solid #172022; padding: 10px 12px 12px; text-align: left; transition: border-color .15s, background .15s; }
   button.tile:hover { border-color: #2ee6d340; background: #101a1b; }
-  .tag { font: 500 9.5px/1 Inter, system-ui, sans-serif; padding: 3px 6px; border-radius: 6px; background: #2ee6d310; color: #5ff5e6; white-space: nowrap; }
+  .tag { font: 500 9.5px/1 IBM Plex Sans, system-ui, sans-serif; padding: 3px 6px; border-radius: 6px; background: #2ee6d310; color: #5ff5e6; white-space: nowrap; }
   .tag-rose { background: #f43f5e14; color: #fda4af; } .tag-amber { background: #f59e0b14; color: #fcd34d; } .tag-green { background: #34d39914; color: #6ee7b7; }
-  .conf-track { height: 7px; border-radius: 99px; background: repeating-linear-gradient(90deg, #1c2728 0 3px, transparent 3px 5px); overflow: hidden; }
-  .conf-fill { height: 100%; border-radius: 99px; background: repeating-linear-gradient(90deg, var(--c, #2ee6d3) 0 3px, transparent 3px 4.5px); box-shadow: 0 0 10px color-mix(in srgb, var(--c, #2ee6d3) 55%, transparent); transition: width .5s ease; }
-  .ask { border-radius: 14px; background: linear-gradient(90deg, #0d1718, #0a1011); border: 1px solid #1a2527; transition: border-color .15s, box-shadow .15s; }
+  .conf-track { height: 5px; border-radius: 2px; background: var(--line); overflow: hidden; }
+  .conf-fill { height: 100%; background: var(--c, var(--teal)); }
+  .ask { border-radius: 5px; background: var(--surface); border: 1px solid var(--line); }
   .ask input { background: transparent; outline: 0; border: 0; }
-  .ask:focus-within { border-color: #2ee6d355; box-shadow: 0 0 0 3px #2ee6d312; }
-  .chip { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 12px; border-radius: 11px; background: #0d1415; border: 1px solid var(--line); color: #d6e4e3; font: 500 12.5px Inter, system-ui, sans-serif; white-space: nowrap; transition: border-color .15s, color .15s, background .15s; }
+  .ask:focus-within { border-color: var(--teal); }
+  .chip { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 12px; border-radius: 5px; background: #0d1415; border: 1px solid var(--line); color: #d6e4e3; font: 500 12.5px IBM Plex Sans, system-ui, sans-serif; white-space: nowrap; transition: border-color .15s, color .15s, background .15s; }
   .chip:hover { border-color: #2a3d3c; color: #fff; background: #111b1c; }
   .chip-teal { background: #2ee6d314; border-color: #2ee6d355; color: #a9fff6; } .chip-teal:hover { background: #2ee6d322; border-color: var(--teal); color: #eafffc; }
   .notif { position: absolute; right: 0; top: 48px; width: min(92vw, 340px); z-index: 1300; }
-  .notif a { display: flex; gap: 10px; align-items: flex-start; padding: 9px 10px; border-radius: 10px; }
+  .notif a { display: flex; gap: 10px; align-items: flex-start; padding: 9px 10px; border-radius: 5px; }
   .notif a:hover { background: #ffffff08; }
-  .ticker { border: 1px solid var(--line); background: #070b0c; border-radius: 12px; }
+  .ticker { border: 1px solid var(--line); background: #070b0c; border-radius: 5px; }
   .ticker b { color: #cfe0df; font-weight: 600; }
-  .uas-icon svg { filter: drop-shadow(0 0 4px #f59e0b) drop-shadow(0 0 10px #f59e0b88); }
-  .uas-line { filter: drop-shadow(0 0 3px #f59e0b); }
-  .tip-uas { border-color: #f59e0b99; color: #fde68a; } .tip-uas.leaflet-tooltip-top:before { border-top-color: #f59e0b99; }
-  .tip-site { border-color: #2ee6d366; color: #b5fff5; font-size: 9.5px; }
   .corr-bar { background: linear-gradient(90deg, #34d399, #f59e0b 55%, #f43f5e); }
-  .leaflet-container { background: #000 !important; }
   #globe:active { cursor: grabbing; }
   .flag { display: inline-block; width: auto; border-radius: 2px; vertical-align: -2px; box-shadow: 0 0 0 1px #ffffff26; }
   .flag-fb { display: inline-block; font: 600 9px/1.4 'JetBrains Mono', ui-monospace, monospace; padding: 0 3px; border-radius: 3px; background: #ffffff14; color: #cbd5e1; vertical-align: 1px; }
-  .psy-line { stroke-dasharray: 6 6; animation: dash 1.4s linear infinite; }
   :focus-visible { outline: 2px solid #2ee6d3aa; outline-offset: 2px; }
   /* --- SitRep PDF export (window.print): print only #printArea, black on white --- */
   @media print {
@@ -172,7 +102,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
     html, body { background: #fff !important; color: #000 !important; }
     body { background-image: none !important; }
     body > *:not(#printArea) { display: none !important; }
-    #printArea { display: block !important; font-family: Inter, system-ui, sans-serif; color: #000; }
+    #printArea { display: block !important; font-family: 'IBM Plex Sans', system-ui, sans-serif; color: #000; }
     #printArea .pa-banner { text-align: center; font: 600 8pt/1.6 'JetBrains Mono', ui-monospace, monospace; letter-spacing: .18em; border: 1px solid #000; padding: 1mm 0; }
     #printArea .pa-foot { margin-top: 6mm; }
     #printArea .pa-head { display: flex; justify-content: space-between; align-items: baseline; gap: 6mm; margin: 5mm 0 3mm; padding-bottom: 2mm; border-bottom: 1.5px solid #000; }
@@ -182,9 +112,9 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
   }
 </style>
 </head>
-<body class="text-slate-200 font-sans antialiased grid-bg min-h-screen">
+<body class="text-slate-200 font-sans antialiased min-h-screen">
 <div class="sm:p-4 xl:p-6">
-<div class="soc-frame cc-shell max-w-[1880px] mx-auto sm:rounded-[30px] p-3 sm:p-4 lg:p-5">
+<div class="cc-shell max-w-[1680px] mx-auto p-3 sm:p-4 lg:p-5">
  <div class="flex gap-4 lg:gap-5">
 
   <!-- LEFT RAIL: section navigation -->
@@ -194,7 +124,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
     </a>
     <a class="rail-btn on" href="#sec-overview" data-rail="sec-overview" title="Overview"><svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg></a>
     <a class="rail-btn" href="#sec-alerts" data-rail="sec-alerts" title="Alerts · forensic fusion timeline"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3.5 21 19.5H3z"/><path d="M12 10v4.5M12 17.3v.2" stroke-linecap="round"/></svg></a>
-    <a class="rail-btn" href="#sec-psyop" data-rail="sec-psyop" title="Live PSYOP feed · account farms"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M8.2 15.8a5.4 5.4 0 0 1 0-7.6M15.8 8.2a5.4 5.4 0 0 1 0 7.6M5.4 18.6a9.4 9.4 0 0 1 0-13.2M18.6 5.4a9.4 9.4 0 0 1 0 13.2"/></svg></a>
+    <a class="rail-btn" href="#sec-psyop" data-rail="sec-psyop" title="Influence exercise · account farms"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M8.2 15.8a5.4 5.4 0 0 1 0-7.6M15.8 8.2a5.4 5.4 0 0 1 0 7.6M5.4 18.6a9.4 9.4 0 0 1 0-13.2M18.6 5.4a9.4 9.4 0 0 1 0 13.2"/></svg></a>
     <a class="rail-btn" href="#sec-infra" data-rail="sec-infra" title="Source infrastructure"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="16" height="6.5" rx="2"/><rect x="4" y="13.5" width="16" height="6.5" rx="2"/><path d="M8 7.2h.01M8 16.7h.01" stroke-linecap="round" stroke-width="2.4"/></svg></a>
     <a class="rail-btn" href="#sec-uas" data-rail="sec-uas" title="Counter-UAS detection"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3 19.5 6v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z"/><path d="m8.8 12 2.2 2.2 4.4-4.4" stroke-linecap="round"/></svg></a>
     <a class="rail-btn" href="#sec-network" data-rail="sec-network" title="Account network · clusters"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.3"/><path d="M3.5 19.5c.6-3.3 2.8-5 5.5-5s4.9 1.7 5.5 5"/><circle cx="16.5" cy="9.5" r="2.6"/><path d="M16.2 14.6c2.3.1 3.9 1.6 4.3 4.4"/></svg></a>
@@ -209,24 +139,21 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
   <div class="flex-1 min-w-0 space-y-4">
 
     <!-- TOP BAR -->
-    <header class="flex flex-wrap items-center gap-2.5">
+    <header class="dashboard-header flex flex-wrap items-center gap-2.5">
       <a href="#sec-overview" class="lg:hidden logo-grid grid grid-cols-3 gap-[3px] mr-1" aria-label="Overview"><i></i><i style="opacity:.55"></i><i></i><i style="opacity:.55"></i><i></i><i style="opacity:.3"></i><i></i><i style="opacity:.3"></i><i></i></a>
       <div class="min-w-0 mr-auto">
         <div class="flex items-center gap-2 flex-wrap">
           <span class="text-[13px] font-semibold tracking-tight text-slate-100">HTCCIP</span>
-          <span class="text-[10px] font-medium px-2 py-0.5 rounded-md bg-cyan-400/10 text-cyan-300 border border-cyan-400/20 whitespace-nowrap">UNCLASSIFIED // EXERCISE · SIMULATED DATA</span>
         </div>
         <div class="flex items-center gap-3 font-mono text-[10.5px] text-slate-500 mt-1">
-          <span>ZULU <span id="clkZ" class="text-cyan-300">--:--:--Z</span></span>
-          <span class="hidden sm:inline">LOCAL <span id="clkL" class="text-slate-300">--:--:--</span></span>
+          <span>UTC <span id="clkZ" class="text-cyan-300">--:--:--Z</span></span>
+          <span class="hidden sm:inline">Local <span id="clkL" class="text-slate-300">--:--:--</span></span>
           <span class="hidden md:inline">DTG <span id="clkD" class="text-slate-400">------</span></span>
         </div>
       </div>
-      <label class="pill"><span>Region:</span><select id="pillRegion" aria-label="Map region"><option value="strategic">Europe (strategic)</option><option value="theatre">Kosovo / Albania</option></select></label>
-      <label class="pill"><span>View:</span><select id="pillStage" aria-label="Map mode"><option value="3d">3D globe</option><option value="2d">2D map</option></select></label>
-      <label class="pill"><span>Tier:</span><select id="pillTier" aria-label="Comment filter"><option value="all">All</option></select></label>
+      <label class="pill"><span>Risk</span><select id="pillTier" aria-label="Comment filter"><option value="all">All</option></select></label>
       <label class="pill w-full sm:w-auto sm:min-w-[230px] 2xl:min-w-[270px]">
-        <input id="search" type="search" autocomplete="off" placeholder="Search comments or @user…" class="flex-1 min-w-0 bg-transparent text-[12.5px] text-slate-100 placeholder:text-slate-500 outline-none">
+        <input id="search" type="search" autocomplete="off" aria-label="Search comments or accounts" placeholder="Search comments or @account" class="flex-1 min-w-0 bg-transparent text-[12.5px] text-slate-100 placeholder:text-slate-500 outline-none">
         <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" class="shrink-0"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4" stroke-linecap="round"/></svg>
       </label>
       <div class="relative">
@@ -234,10 +161,9 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
           <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.8h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></svg>
           <span id="bellDot" class="hidden absolute top-[9px] right-[10px] w-2 h-2 rounded-full bg-rose-500 ring-2 ring-black"></span>
         </button>
-        <div id="notif" class="notif hidden glass p-2 shadow-2xl" role="dialog" aria-label="Notifications"></div>
+        <div id="notif" class="notif hidden panel p-2" role="dialog" aria-label="Notifications"></div>
       </div>
-      <a href="./monitor.html" class="pill !text-slate-200 hover:!text-white" title="Analyst workspace: triage queue, cases, sources, alerts"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M3.5 9h17M8.5 9v10.5"/></svg><span class="hidden sm:inline">Workspace</span></a>
-      <div class="icon-btn avatar text-[12px] font-semibold" title="Analyst session (local)">AN</div>
+      <a href="./monitor.html" class="pill !text-slate-200 hover:!text-white" title="Analyst workspace: triage queue, cases, sources, alerts"><svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4.5" width="17" height="15" rx="2.5"/><path d="M3.5 9h17M8.5 9v10.5"/></svg><span>Workspace</span></a>
     </header>
 
     <!-- LIVE BACKEND (shown when the API at API_BASE answers /api/health) -->
@@ -273,52 +199,44 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
     <!-- OVERVIEW: globe/map stage + telemetry column -->
     <section id="sec-overview" class="grid gap-4 xl:grid-cols-[minmax(0,1fr)_350px] 2xl:grid-cols-[minmax(0,1fr)_380px] items-start scroll-mt-6">
       <div class="min-w-0 space-y-4">
-        <div class="panel hero-stage overflow-hidden">
-          <div class="relative stage-frame">
-           <div class="relative">
-            <div id="map" class="w-full h-[460px] sm:h-[560px] xl:h-[640px] 2xl:h-[680px] bg-black overflow-hidden"></div>
-            <div id="globeWrap" class="hidden absolute inset-0 z-[1050] hero-stage overflow-hidden">
-              <canvas id="globe" class="w-full h-full block cursor-grab" aria-label="3D globe: hostile infrastructure, attack arcs and counter-UAS activity"></canvas>
-              <div id="threatPanel" class="hidden sm:block absolute right-4 top-16 z-10 w-[236px] glass p-3.5">
-                <div class="flex items-center justify-between gap-2"><span class="text-[12.5px] font-medium text-slate-100">Threat replay</span><span id="tpClock" class="font-mono text-[10.5px] text-cyan-300">T+0 min</span></div>
-                <div class="text-[10.5px] text-slate-500 mt-0.5 leading-snug">Every comment in the thread, re-played from its source infrastructure · simulated data</div>
-                <div id="tpTypes" class="mt-2.5 space-y-0.5"></div>
-                <div class="flex items-center gap-1 mt-2.5"><button type="button" id="tpPlay" class="seg">Pause</button><div id="tpSpeed" class="flex gap-1"></div></div>
-                <div class="text-[10px] uppercase tracking-wider text-slate-500 mt-3 mb-1.5">Latest events</div>
-                <div id="tpFeed" class="space-y-1 font-mono text-[10px] min-h-[70px]"></div>
-              </div>
-              <div id="globeHud" class="hidden sm:block pointer-events-none absolute right-4 bottom-11 text-right font-mono text-[10px] leading-relaxed text-cyan-300/75"></div>
-              <div class="hidden sm:block pointer-events-none absolute right-4 bottom-4 font-mono text-[10px] text-slate-500 text-right">ORTHOGRAPHIC · WGS84 · drag to rotate · scroll to zoom</div>
+        <div class="panel overflow-hidden">
+          <div class="stage-heading px-4 py-4 sm:px-5">
+            <h1 class="hero-title">Hybrid Threat Operations Center</h1>
+            <div class="mt-3 flex flex-wrap items-baseline gap-x-3 gap-y-1 text-sm">
+              <span id="artKind" class="text-[12px] font-medium text-slate-400"></span>
+              <span id="artTitle" class="min-w-0 font-medium text-slate-100"></span>
+              <span id="artCount" class="text-[12px] text-slate-400 sm:ml-auto"></span>
             </div>
-
-            <!-- hero title + monitored surface -->
-            <div class="pointer-events-none absolute left-0 top-0 z-[1080] p-4 sm:p-7 w-full sm:w-auto sm:max-w-[min(700px,62%)]">
-              <h1 class="hero-title">Hybrid Threat Operations Center</h1>
-              <p class="text-[13px] sm:text-[15px] text-slate-300/85 mt-1.5 sm:mt-2.5">Real-time coordinated-campaign &amp; counter-UAS monitoring</p>
-              <div class="pointer-events-auto mt-3 sm:mt-4 glass px-3 py-2.5 flex items-center gap-3 max-w-[540px]">
-                <span class="text-[10px] font-semibold uppercase tracking-wider text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded-md px-2 py-0.5 shrink-0">Breaking</span>
-                <div class="min-w-0 flex-1"><div class="text-[13px] font-medium truncate text-slate-100" id="artTitle"></div><div class="text-[11px] text-slate-500 truncate" id="artMeta"></div></div>
-                <div class="hidden md:block text-[11px] font-mono text-slate-400 shrink-0" id="artCount"></div>
-              </div>
-              <div id="uasChip" class="pointer-events-auto mt-2 hidden sm:flex"></div>
-            </div>
-
-            <!-- stage controls -->
-            <div class="absolute z-[1090] left-3 bottom-3 sm:left-auto sm:bottom-auto sm:right-4 sm:top-4 flex flex-wrap sm:justify-end items-center gap-1.5 max-w-[calc(100%-24px)] sm:max-w-[46%]">
-              <div id="stageModes" class="flex gap-1.5"></div>
-              <div id="mapViews" class="flex gap-1.5"></div>
-              <button id="uasToggle" class="seg seg-on" title="Show / hide the counter-UAS layer">UAS layer</button>
-            </div>
-            <div id="mapNotice" class="hidden absolute left-3 right-3 sm:right-auto bottom-14 sm:bottom-4 xl:left-[350px] z-[1100] max-w-sm text-[10.5px] leading-snug px-3 py-2 rounded-xl bg-ink-900/95 border border-amber-500/40 text-amber-200"></div>
-
-           </div>
-            <!-- floating threat-activity card (inline below the map on smaller screens) -->
-            <div class="m-3 xl:m-0 xl:absolute xl:left-4 xl:bottom-4 xl:z-[1085] xl:w-[310px] glass p-4">
-              <div class="flex items-center justify-between gap-2"><h2 class="hud-title">Threat activity timeline</h2>
-                <a href="#sec-alerts" class="card-ico" title="Open the forensic fusion timeline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8 8M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></svg></a></div>
-              <div id="activity" class="mt-2"></div>
+            <div id="artMeta" class="mt-1 break-words text-[12px] text-slate-400"></div>
+          </div>
+          <div class="flex flex-wrap items-center gap-x-3 gap-y-2 px-4 py-2.5 sm:px-5">
+            <div id="mapViews" class="flex gap-1" role="group" aria-label="Map region"></div>
+            <button id="uasToggle" class="seg seg-on" aria-pressed="true" title="Show or hide the counter-UAS layer">UAS layer</button>
+            <div id="uasChip" class="hidden sm:flex sm:ml-auto"></div>
+          </div>
+          <div class="stage-frame relative">
+            <div id="globeWrap" class="absolute inset-0 overflow-hidden">
+              <canvas id="globe" class="w-full h-full block cursor-grab" aria-label="3D globe of source infrastructure and counter-UAS activity"></canvas>
+              <div id="globeHud" class="hidden sm:block pointer-events-none absolute right-4 bottom-4 text-right font-mono text-[10px] leading-relaxed text-cyan-300/75"></div>
             </div>
           </div>
+          <section id="threatPanel" class="replay-deck grid gap-4 px-4 py-4 sm:grid-cols-[minmax(150px,210px)_minmax(0,1fr)] sm:px-5" aria-label="Threat replay">
+            <div class="min-w-0">
+              <div class="flex items-center justify-between gap-2">
+                <h2 class="hud-title">Threat replay</h2>
+                <span id="tpClock" class="font-mono text-[11px] text-slate-400">T+0 min</span>
+              </div>
+              <div class="mt-2 flex flex-wrap items-center gap-1">
+                <button type="button" id="tpPlay" class="seg">Pause</button>
+                <div id="tpSpeed" class="flex flex-wrap gap-1"></div>
+              </div>
+              <div id="tpTypes" class="mt-2 space-y-0.5"></div>
+            </div>
+            <div class="min-w-0 border-t border-ink-700 pt-3 sm:border-t-0 sm:border-l sm:pl-4 sm:pt-0">
+              <h3 class="text-[13px] font-medium text-slate-200">Replay events</h3>
+              <div id="tpFeed" class="mt-2 min-h-[70px] space-y-1 font-mono text-[11px]"></div>
+            </div>
+          </section>
           <div class="flex flex-wrap gap-x-4 gap-y-1.5 px-4 sm:px-5 py-3 border-t border-ink-700 text-[11px] text-slate-400">
             <span class="inline-flex items-center gap-1.5"><svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="#f43f5e"/></svg>Hostile infrastructure</span>
             <span class="inline-flex items-center gap-1.5"><svg width="11" height="11"><circle cx="5.5" cy="5.5" r="4" fill="#34d399" fill-opacity=".7"/></svg>Residential ISP (organic)</span>
@@ -326,24 +244,23 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
             <span class="inline-flex items-center gap-1.5"><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="none" stroke="#e2e8f0"/><path d="M7 0v4M7 10v4M0 7h4M10 7h4" stroke="#e2e8f0"/></svg>Targeted portal</span>
             <span class="inline-flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1L13 7L7 13L1 7Z" fill="none" stroke="#fbbf24" stroke-width="1.5"/></svg>UAS track</span>
             <span class="inline-flex items-center gap-1.5"><svg width="14" height="14"><rect x="2" y="2" width="10" height="10" rx="2" fill="#2ee6d3" fill-opacity=".25" stroke="#2ee6d3"/></svg>Critical site / sensor</span>
-            <span id="mapHint" class="text-slate-500 sm:ml-auto">Drag to pan · scroll or pinch to zoom · tap a node to inspect</span>
+            <span class="text-slate-500 sm:ml-auto">Drag to rotate · scroll to zoom · select a marker to inspect</span>
           </div>
         </div>
 
         <!-- ASK BAR + ACTIONS -->
         <div class="space-y-2.5">
           <form id="askForm" class="ask flex items-center gap-2.5 pl-4 pr-1.5 py-1.5" autocomplete="off">
-            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5ff5e6" stroke-width="1.6" stroke-linejoin="round" class="shrink-0"><path d="M12 3c.6 4.3 2.7 6.4 7 7-4.3.6-6.4 2.7-7 7-.6-4.3-2.7-6.4-7-7 4.3-.6 6.4-2.7 7-7z"/></svg>
-            <input id="askInput" class="flex-1 min-w-0 text-[13.5px] text-slate-100 placeholder:text-slate-500 py-2" placeholder="Ask threat intelligence… try “drones”, “clusters”, “@korab”, “high”, “NATO” or “sitrep”" aria-label="Ask threat intelligence">
-            <button type="submit" class="w-10 h-10 grid place-items-center rounded-[11px] bg-cyan-400 text-black hover:bg-cyan-300 shrink-0" aria-label="Ask"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M20.6 3.4 3.8 10.2c-.8.3-.7 1.4.1 1.6l6.6 1.7 1.7 6.6c.2.8 1.3.9 1.6.1z"/></svg></button>
+            <input id="askInput" class="flex-1 min-w-0 py-2 text-sm text-slate-100 placeholder:text-slate-400" placeholder="Find a panel or @account" aria-label="Find a panel or account">
+            <button type="submit" class="btn-hud btn-cyan shrink-0">Go</button>
           </form>
           <div class="flex flex-wrap items-center gap-2">
-            <button id="btnLive" class="chip"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M12 8.5v7M8.5 12h7"/></svg>Live test</button>
+            <button id="btnLive" class="chip"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M12 8.5v7M8.5 12h7"/></svg>Analyze a batch</button>
             <button id="btnCopy" class="chip"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/></svg>Copy JSON</button>
             <button id="btnPdf" class="chip" title="Opens the print dialog — choose “Save as PDF”"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M6 3.5h8l4.5 4.5v12.5H6z"/><path d="M14 3.5V8h4.5M9 13h6M9 16.5h4" stroke-linecap="round"/></svg>Export SitRep PDF</button>
             <button id="btnReset" class="chip"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3L4.5 9"/><path d="M4.5 4.5V9H9"/></svg>Reset demo</button>
             <div class="flex-1"></div>
-            <button id="btnSitrep" class="chip chip-teal"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 19.5h16M6.5 16l4-5 3 3 4.5-6.5"/></svg>Generate briefing / SitRep</button>
+            <button id="btnSitrep" class="chip chip-teal"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 19.5h16M6.5 16l4-5 3 3 4.5-6.5"/></svg>Generate SitRep</button>
           </div>
         </div>
 
@@ -352,7 +269,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
           <section id="kpis" class="grid grid-cols-2 gap-3"></section>
           <div id="sec-timeline" class="panel p-4 sm:p-5 scroll-mt-6 flex flex-col">
             <div class="flex items-start justify-between gap-2 mb-2">
-              <div><h2 class="hud-title">Temporal burst timeline</h2><p class="hud-sub">Comments per 5-min bucket after publication</p></div>
+              <div><h2 class="hud-title">Comment timeline</h2><p class="hud-sub">Comments per five minutes after publication</p></div>
               <div class="flex gap-3 text-[11px] text-slate-400" id="tlLegend"></div>
             </div>
             <div id="timeline" class="w-full my-auto pt-2"></div>
@@ -363,23 +280,27 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
       <!-- TELEMETRY COLUMN -->
       <aside class="grid sm:grid-cols-2 xl:grid-cols-1 gap-4 min-w-0">
         <div class="panel p-5">
-          <div class="flex items-center justify-between gap-2"><h2 class="hud-title">Global threat radar</h2>
+          <div class="flex items-center justify-between gap-2"><h2 class="hud-title">Coordination overview</h2>
             <a href="#sec-network" class="card-ico" title="Open the account network"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8 8M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></svg></a></div>
           <div id="radar" class="mt-1"></div>
         </div>
         <div class="panel p-5">
-          <div class="flex items-center justify-between gap-2"><h2 class="hud-title">Attack volume trend</h2>
+          <div class="flex items-center justify-between gap-2"><h2 class="hud-title">Comment volume</h2>
             <a href="#sec-timeline" class="card-ico" title="Open the temporal burst timeline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8 8M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></svg></a></div>
           <div id="volume" class="mt-3"></div>
         </div>
         <div class="panel p-5 sm:col-span-2 xl:col-span-1">
-          <div class="flex items-center justify-between gap-2"><h2 class="hud-title">AI threat detection</h2>
+          <div class="flex items-center justify-between gap-2"><h2 class="hud-title">Detection breakdown</h2>
             <a href="#sec-inspector" class="card-ico" title="Open the comment inspector"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8 8M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></svg></a></div>
-          <div id="detect" class="grid grid-cols-2 gap-2 mt-4"></div>
-          <h3 class="hud-title mt-6">Engine confidence</h3>
+          <div id="detect" class="mt-3 divide-y divide-ink-700"></div>
+          <h3 class="hud-title mt-6">Signal scores</h3>
           <p class="hud-sub">Mean sub-score of flagged comments · cross-domain correlation</p>
           <div id="confidence" class="space-y-3.5 mt-4"></div>
         </div>
+        <section class="panel p-5 sm:col-span-2 xl:col-span-1">
+          <h2 class="hud-title">Activity around the peak</h2>
+          <div id="activity" class="mt-3"></div>
+        </section>
       </aside>
     </section>
 
@@ -387,8 +308,8 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
     <section id="sec-psyop" class="panel p-4 sm:p-5 scroll-mt-6">
       <div class="flex flex-col lg:flex-row lg:items-start justify-between gap-3 mb-4">
         <div>
-          <div class="flex items-center gap-2 flex-wrap"><span class="w-2 h-2 rounded-full bg-rose-500 pulse-dot"></span><h2 class="hud-title">Live PSYOP feed</h2><span class="tag tag-rose">EXERCISE · SIMULATED</span></div>
-          <p class="hud-sub">Coordinated influence operations as they are detected · account-farm egress country → targeted country</p>
+          <h2 class="hud-title">Influence operations exercise</h2>
+          <p class="hud-sub">Simulated account-farm events by network egress and target country.</p>
         </div>
         <div class="flex items-center gap-3 flex-wrap">
           <div id="psyStats" class="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate-400"></div>
@@ -398,11 +319,11 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
       <div id="psyVectors" class="flex flex-wrap gap-2 mb-4"></div>
       <div class="grid gap-4 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] items-start">
         <div class="min-w-0">
-          <div class="text-[11px] uppercase tracking-wider text-slate-500 mb-2">Event stream</div>
+          <div class="text-[13px] font-medium text-slate-300 mb-2">Event stream</div>
           <div id="psyFeed" class="divide-y divide-ink-700 border border-ink-700 rounded-xl overflow-hidden"></div>
         </div>
         <div class="min-w-0">
-          <div class="text-[11px] uppercase tracking-wider text-slate-500 mb-2">Detected account farms · tap to show on the globe</div>
+          <div class="text-[13px] font-medium text-slate-300 mb-2">Account farms</div>
           <div id="psyFarms" class="space-y-2.5"></div>
         </div>
       </div>
@@ -517,7 +438,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
 
 <!-- LIVE TEST MODAL -->
 <div id="modal" class="fixed inset-0 z-50 hidden">
-  <div class="absolute inset-0 bg-black/70 backdrop-blur-sm" data-close></div>
+  <div class="absolute inset-0 bg-black/70" data-close></div>
   <div class="relative max-w-2xl mx-auto mt-6 sm:mt-16 mx-3 sm:mx-auto panel p-4 sm:p-5 fade-in max-h-[92vh] overflow-auto">
     <div class="flex items-start justify-between gap-3 mb-3">
       <div><h2 class="font-semibold">Live Test — paste a comment batch</h2>
@@ -538,7 +459,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
 </div>
 <!-- SITREP MODAL -->
 <div id="sitrep" class="fixed inset-0 z-50 hidden">
-  <div class="absolute inset-0 bg-black/75 backdrop-blur-sm" data-sclose></div>
+  <div class="absolute inset-0 bg-black/75" data-sclose></div>
   <div class="relative max-w-3xl mx-3 sm:mx-auto mt-4 sm:mt-10 panel p-4 sm:p-5 fade-in max-h-[94vh] flex flex-col">
     <div class="flex items-start justify-between gap-3 mb-3">
       <div><h2 class="font-semibold">Operational Briefing / SitRep</h2><p class="text-xs text-slate-500">Generated from the current analysis. Review before circulation.</p></div>
@@ -1267,7 +1188,7 @@ if (typeof module !== "undefined") module.exports = Engine;
         <div class="mt-5"><div class="flex items-end justify-between gap-2 flex-wrap">${value}${pill ? `<span class="delta ${tone}">${pill}</span>` : ''}</div>
         ${sub ? `<div class="text-[11px] text-slate-500 mt-2 leading-snug">${sub}</div>` : ''}</div></div>`;
     const cards = [
-      card('PSYOP / hybrid warfare alert', `<div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full ${lv[3]} pulse-dot"></span><span class="big-num !text-[30px] ${lv[2]}">${lv[0]}</span></div>`, lv[1], lvTone, 'Analytic indicator, not attribution', `scan border ${lv[4]}`),
+      card('PSYOP / hybrid warfare alert', `<div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full ${lv[3]}"></span><span class="big-num !text-[30px] ${lv[2]}">${lv[0]}</span></div>`, lv[1], lvTone, 'Analytic indicator, not attribution', `border ${lv[4]}`),
       card('Coordinated comments', `<div class="big-num">${Math.round(th.pct * 100)}<span class="text-slate-500 text-xl">%</span></div>`, `${th.high} high`, th.high ? 'bad' : 'mute',
         `<div class="flex h-1.5 rounded-full overflow-hidden mb-1.5 bg-ink-700"><div style="width:${th.high / th.n * 100}%" class="bg-rose-500"></div><div style="width:${th.medium / th.n * 100}%" class="bg-amber-500"></div></div>${th.medium} medium · ${th.organic} organic${state.res.clusters[0] ? ' · cluster of ' + state.res.clusters[0].size : ''}`),
       card('Peak swarm window', `<div class="big-num !text-[26px]">${peak ? hhmm(peak.start) + '<span class="text-slate-500">–</span>' + hhmm(peak.end) : '—'}</div>`, peak ? `${peak.count} in ${Math.floor(dur / 60)}m ${dur % 60}s` : '', 'warn',
@@ -1287,157 +1208,8 @@ if (typeof module !== "undefined") module.exports = Engine;
       : '<div class="text-xs text-slate-500">No threat vectors detected.</div>';
   }
 
-  // ---------------- MAP ----------------
-  const MAPV = { strategic: { lon: [-2, 33], lat: [38.6, 54.0], step: 5, label: 'Strategic (Europe)' }, theatre: { lon: [17.1, 24.1], lat: [40.1, 43.3], step: 1, label: 'Theatre [XK/AL]' } };
-  const REF = [['Belgrade', 44.79, 20.45], ['Skopje', 42.0, 21.43], ['Podgorica', 42.44, 19.26], ['Sarajevo', 43.86, 18.41], ['Sofia', 42.70, 23.32], ['Thessaloniki', 40.64, 22.94], ['Vienna', 48.21, 16.37], ['Budapest', 47.50, 19.04], ['Berlin', 52.52, 13.40], ['Zagreb', 45.81, 15.98], ['Bucharest', 44.43, 26.10], ['Rome', 41.90, 12.50], ['Paris', 48.86, 2.35]];
-  const REGIONS = { strategic: [['WESTERN EUROPE', 50.3, 4.0], ['CENTRAL EUROPE', 49.6, 15.0], ['BALKANS', 43.9, 22.3], ['ADRIATIC', 43.0, 15.6], ['IONIAN', 39.2, 18.2]], theatre: [['KOSOVO', 42.82, 21.6], ['ALBANIA', 41.0, 20.25], ['ADRIATIC', 41.75, 18.0], ['N. MACEDONIA', 41.55, 22.1]] };
   const TARGET = { lat: 42.66, lon: 21.17, label: 'Security Desk (Pristina)' };
   const km = (a, b, c, d) => { const R = 6371, r = Math.PI / 180; const x = Math.sin((c - a) * r / 2) ** 2 + Math.cos(a * r) * Math.cos(c * r) * Math.sin((d - b) * r / 2) ** 2; return Math.round(2 * R * Math.asin(Math.sqrt(x))); };
-  function proj(v, W, H) { const V = MAPV[v]; return (lat, lon) => [((lon - V.lon[0]) / (V.lon[1] - V.lon[0])) * W, H - ((lat - V.lat[0]) / (V.lat[1] - V.lat[0])) * H]; }
-  function renderSchematic() {
-    const W = 720, H = 420, v = state.mapView, V = MAPV[v], P = proj(v, W, H);
-    $('#mapViews').innerHTML = Object.entries(MAPV).map(([k, x]) => `<button data-mv="${k}" class="seg ${v === k ? 'seg-on' : ''}">${x.label}</button>`).join('');
-    $('#mapViews').querySelectorAll('[data-mv]').forEach((b) => b.addEventListener('click', () => { state.mapView = b.dataset.mv; renderMap(); }));
-    $('#map').style.height = 'auto';
-    let g = `<defs><radialGradient id="glow"><stop offset="0" stop-color="#f43f5e" stop-opacity=".45"/><stop offset="1" stop-color="#f43f5e" stop-opacity="0"/></radialGradient>
-      <marker id="arr" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0 0L10 5L0 10z" fill="#f43f5e"/></marker></defs>`;
-    for (let lo = Math.ceil(V.lon[0] / V.step) * V.step; lo <= V.lon[1]; lo += V.step) { const [x] = P(V.lat[0], lo); g += `<line x1="${x}" x2="${x}" y1="0" y2="${H}" stroke="#1e2a38" stroke-dasharray="2 4"/><text x="${x + 3}" y="${H - 5}" fill="#334155" font-size="9" font-family="JetBrains Mono, ui-monospace, monospace">${lo}°E</text>`; }
-    for (let la = Math.ceil(V.lat[0] / V.step) * V.step; la <= V.lat[1]; la += V.step) { const [, y] = P(la, V.lon[0]); g += `<line x1="0" x2="${W}" y1="${y}" y2="${y}" stroke="#1e2a38" stroke-dasharray="2 4"/><text x="4" y="${y - 3}" fill="#334155" font-size="9" font-family="JetBrains Mono, ui-monospace, monospace">${la}°N</text>`; }
-    REGIONS[v].forEach(([n, la, lo]) => { const [x, y] = P(la, lo); g += `<text x="${x}" y="${y}" fill="#1f3a33" font-size="${v === 'strategic' ? 13 : 15}" font-weight="600" letter-spacing="4" text-anchor="middle" font-family="Inter, system-ui, sans-serif">${n}</text>`; });
-    REF.forEach(([n, la, lo]) => { const [x, y] = P(la, lo); if (x < 0 || x > W || y < 0 || y > H) return; g += `<circle cx="${x}" cy="${y}" r="1.8" fill="#475569"/><text x="${x + 5}" y="${y + 3}" fill="#475569" font-size="9.5" font-family="JetBrains Mono, ui-monospace, monospace">${n}</text>`; });
-    const [tx, ty] = P(TARGET.lat, TARGET.lon);
-    const inside = (x, y) => x >= 14 && x <= W - 14 && y >= 14 && y <= H - 14;
-    const clampEdge = (x, y) => { const dx = x - tx, dy = y - ty; let s = 1; if (x < 14) s = Math.min(s, (14 - tx) / dx); if (x > W - 14) s = Math.min(s, (W - 14 - tx) / dx); if (y < 14) s = Math.min(s, (14 - ty) / dy); if (y > H - 14) s = Math.min(s, (H - 14 - ty) / dy); return [tx + dx * s, ty + dy * s]; };
-    const nodes = state.res.infra;
-    const placed = [];
-    const pos = (n) => {
-      let [x, y] = P(n.lat, n.lon); const off = !inside(x, y); if (off) [x, y] = clampEdge(x, y);
-      if (off) { for (let k = 0; k < 6; k++) { const hit = placed.find((q) => Math.hypot(q[0] - x, q[1] - y) < 34); if (!hit) break; if (y < 40 || y > H - 40) x += 230; else y += 36; } placed.push([x, y]); }
-      return [x, y, off];
-    };
-    const POS = new Map(nodes.map((n) => [n.node, pos(n)]));
-    // arcs
-    nodes.filter((n) => n.hostile).forEach((n, i) => {
-      const [x, y] = POS.get(n.node);
-      const mx = (x + tx) / 2, my = (y + ty) / 2, dx = tx - x, dy = ty - y, d = Math.hypot(dx, dy) || 1, bend = Math.min(90, d * 0.25);
-      const cx = mx - (dy / d) * bend, cy = my + (dx / d) * bend;
-      const sel = state.infraSel === n.node;
-      g += `<path d="M${x},${y} Q${cx},${cy} ${tx},${ty}" fill="none" stroke="#f43f5e" stroke-opacity="${sel ? .9 : .45}" stroke-width="${1 + n.comments / 2.5}" stroke-dasharray="6 5" marker-end="url(#arr)"><animate attributeName="stroke-dashoffset" from="22" to="0" dur="1.1s" repeatCount="indefinite"/></path>`;
-    });
-    // target
-    g += `<g><circle cx="${tx}" cy="${ty}" r="11" fill="none" stroke="#e2e8f0" stroke-width="1.2"/><circle cx="${tx}" cy="${ty}" r="18" fill="none" stroke="#e2e8f0" stroke-opacity=".3"><animate attributeName="r" from="11" to="26" dur="2s" repeatCount="indefinite"/><animate attributeName="stroke-opacity" from=".5" to="0" dur="2s" repeatCount="indefinite"/></circle>
-      <path d="M${tx} ${ty - 17}v9M${tx} ${ty + 8}v9M${tx - 17} ${ty}h9M${tx + 8} ${ty}h9" stroke="#e2e8f0" stroke-width="1.2"/>
-      <text x="${tx + 14}" y="${ty + (v === 'strategic' ? 30 : -16)}" fill="#e2e8f0" font-size="10" font-family="JetBrains Mono, ui-monospace, monospace">TARGET · ${esc(TARGET.label)}</text></g>`;
-    // nodes
-    nodes.forEach((n) => {
-      const [x, y, off] = POS.get(n.node);
-      const sel = state.infraSel === n.node, r = 5 + Math.sqrt(n.comments) * 3;
-      const nearT = false;
-      const lx = nearT ? x - r - 6 : x + (x > W - 140 ? -r - 6 : r + 6), ly = nearT ? y + r + 12 : y - 2, la = nearT || x > W - 140 ? 'end' : 'start';
-      const dist = km(n.lat, n.lon, TARGET.lat, TARGET.lon);
-      if (n.hostile) {
-        g += `<g class="node" data-inf="${esc(n.node)}"><circle cx="${x}" cy="${y}" r="${r * 2.6}" fill="url(#glow)"/>
-          ${sel ? `<path d="M${x} ${y - r - 7}L${x + r + 7} ${y}L${x} ${y + r + 7}L${x - r - 7} ${y}Z" fill="none" stroke="#fecdd3" stroke-dasharray="3 2"/>` : ''}
-          <path d="M${x} ${y - r}L${x + r} ${y}L${x} ${y + r}L${x - r} ${y}Z" fill="#f43f5e" stroke="#070a0f" stroke-width="1.5"/>
-          <text x="${x}" y="${y + 3.5}" fill="#070a0f" font-size="9" font-weight="700" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, monospace">${n.comments}</text>
-          <text x="${lx}" y="${ly}" text-anchor="${la}" fill="#fda4af" font-size="10" font-weight="600" font-family="JetBrains Mono, ui-monospace, monospace">${esc(n.node)} · ${esc(n.asn)}</text>
-          <text x="${lx}" y="${ly + 12}" text-anchor="${la}" fill="#94a3b8" font-size="9" font-family="JetBrains Mono, ui-monospace, monospace">${esc(n.city)} ${esc(n.cc)}${off ? ' · off-map ' + dist + ' km' : ''}</text><title>${esc(n.node)} — click to inspect</title></g>`;
-      } else if (!off) {
-        const s = 4 + n.comments * 1.5;
-        g += `<g class="node" data-inf="${esc(n.node)}">${sel ? `<rect x="${x - s - 4}" y="${y - s - 4}" width="${(s + 4) * 2}" height="${(s + 4) * 2}" fill="none" stroke="#a7f3d0" stroke-dasharray="2 2"/>` : ''}
-          <rect x="${x - s}" y="${y - s}" width="${s * 2}" height="${s * 2}" fill="#34d399" fill-opacity=".55" stroke="#070a0f"/>${v === 'theatre' ? `<text x="${x}" y="${y + s + 11}" fill="#6ee7b7" font-size="9" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, monospace" opacity=".8">${esc(n.city)}</text>` : ''}<title>${esc(n.city)} residential · ${n.comments} comment(s)</title></g>`;
-      }
-    });
-    g += `<text x="${W - 8}" y="${H - 18}" fill="#334155" font-size="9" text-anchor="end" font-family="JetBrains Mono, ui-monospace, monospace">SCHEMATIC · EQUIRECTANGULAR · SIMULATED TELEMETRY</text>`;
-    $('#map').innerHTML = nodes.length ? `<div class="overflow-x-auto"><svg viewBox="0 0 ${W} ${H}" class="w-full min-w-[560px] h-auto select-none">${g}</svg></div>` : '<div class="text-xs text-slate-500 py-16 text-center">No infrastructure telemetry in this batch. Paste JSON with an <span class="font-mono">infra</span> object to plot sources.</div>';
-    $('#map').querySelectorAll('[data-inf]').forEach((el) => el.addEventListener('click', () => { state.infraSel = el.dataset.inf; renderMap(); renderInfra(); }));
-  }
-
-  // ---- Interactive Leaflet map (falls back to the schematic SVG if Leaflet is unavailable) ----
-  const VIEW_BOUNDS = { strategic: [[36.8, 3], [56.4, 39]], theatre: [[40.35, 18.9], [43.2, 21.95]] };
-  let LMAP = null, LDATA = null, LREF = null, tileOk = 0, tileErr = 0, packets = [], packetTimer = null;
-  function mapNotice(msg) { const n = $('#mapNotice'); if (!msg) { n.classList.add('hidden'); return; } n.innerHTML = msg; n.classList.remove('hidden'); }
-  function addReferenceLayer() {
-    if (LREF || !LMAP) return;
-    LREF = L.layerGroup().addTo(LMAP);
-    for (let lo = -5; lo <= 35; lo += 1) L.polyline([[34, lo], [58, lo]], { color: lo % 5 ? '#141c27' : '#1e2a38', weight: 1, interactive: false, className: 'grid-line' }).addTo(LREF);
-    for (let la = 34; la <= 58; la += 1) L.polyline([[la, -5], [la, 35]], { color: la % 5 ? '#141c27' : '#1e2a38', weight: 1, interactive: false, className: 'grid-line' }).addTo(LREF);
-    REF.concat([['Pristina', 42.66, 21.17], ['Tirana', 41.33, 19.82], ['Frankfurt', 50.11, 8.68], ['Amsterdam', 52.37, 4.90]]).forEach(([n, la, lo]) => {
-      L.circleMarker([la, lo], { radius: 1.8, color: '#475569', fillColor: '#475569', fillOpacity: 1, weight: 0, interactive: false }).addTo(LREF);
-      L.marker([la, lo], { interactive: false, icon: L.divIcon({ className: 'map-label', html: n, iconSize: null, iconAnchor: [-6, 6] }) }).addTo(LREF);
-    });
-    REGIONS.strategic.concat(REGIONS.theatre).forEach(([n, la, lo]) => L.marker([la, lo], { interactive: false, icon: L.divIcon({ className: 'map-region', html: n, iconSize: null, iconAnchor: [40, 8] }) }).addTo(LREF));
-    mapNotice('Map tiles are blocked inside this hosted viewer, so a reference grid is shown. Pan, zoom and fly-to all work. Open the HTML file directly in a browser for the OpenStreetMap basemap.');
-  }
-  function initLeaflet() {
-    if (LMAP) return true;
-    if (!window.L || !L.map) return false;
-    const el = $('#map'); el.innerHTML = '';
-    LMAP = L.map(el, { zoomSnap: 0.25, minZoom: 3, maxZoom: 13, worldCopyJump: false, attributionControl: true, zoomControl: false });
-    L.control.zoom({ position: 'bottomright' }).addTo(LMAP); // top-left is taken by the hero title overlay
-    LMAP.attributionControl.setPrefix('Leaflet');
-    LMAP.fitBounds(VIEW_BOUNDS[state.mapView], { padding: [10, 10] });
-    const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, className: 'osm-dark-tiles', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors' }).addTo(LMAP);
-    tiles.on('tileload', () => { tileOk++; if (LREF) { LMAP.removeLayer(LREF); LREF = null; mapNotice(null); } });
-    tiles.on('tileerror', () => { tileErr++; if (!tileOk && tileErr >= 2) addReferenceLayer(); });
-    setTimeout(() => { if (!tileOk) addReferenceLayer(); }, 3500);
-    LDATA = L.layerGroup().addTo(LMAP);
-    window.addEventListener('resize', () => LMAP.invalidateSize());
-    setTimeout(() => LMAP.invalidateSize(), 150);
-    if (!packetTimer) packetTimer = setInterval(() => { const now = performance.now(); packets.forEach((p) => { const f = ((now + p.phase) % p.period) / p.period; const k = Math.min(p.pts.length - 1, Math.floor(f * (p.pts.length - 1))); p.m.setLatLng(p.pts[k]); }); }, 40);
-    return true;
-  }
-  function curve(a, b, bendK = 0.22) {
-    const [la1, lo1] = a, [la2, lo2] = b; const mla = (la1 + la2) / 2, mlo = (lo1 + lo2) / 2; const dla = la2 - la1, dlo = lo2 - lo1; const d = Math.hypot(dla, dlo) || 1;
-    const cla = mla + (dlo / d) * d * bendK, clo = mlo - (dla / d) * d * bendK; const pts = [];
-    for (let i = 0; i <= 48; i++) { const t = i / 48; pts.push([(1 - t) ** 2 * la1 + 2 * (1 - t) * t * cla + t * t * la2, (1 - t) ** 2 * lo1 + 2 * (1 - t) * t * clo + t * t * lo2]); }
-    return pts;
-  }
-  function renderLeaflet() {
-    LDATA.clearLayers(); packets = [];
-    const nodes = state.res.infra; const T = [TARGET.lat, TARGET.lon];
-    // trajectories first (under markers)
-    nodes.filter((n) => n.hostile).forEach((n, i) => {
-      const sel = state.infraSel === n.node; const pts = curve([n.lat, n.lon], T, Math.hypot(n.lat - T[0], n.lon - T[1]) < 1 ? 0.6 : 0.22);
-      L.polyline(pts, { color: '#f43f5e', weight: 1.5 + n.comments / 2.2, opacity: sel ? 0.95 : 0.5, className: 'attack-line', interactive: false }).addTo(LDATA);
-      const p0 = LMAP.project(pts[pts.length - 4], 6), p1 = LMAP.project(pts[pts.length - 1], 6); const ang = Math.atan2(p1.y - p0.y, p1.x - p0.x) * 180 / Math.PI;
-      L.marker(pts[pts.length - 1], { interactive: false, icon: L.divIcon({ className: '', iconSize: [14, 14], iconAnchor: [7, 7], html: `<svg width="14" height="14" viewBox="0 0 14 14" style="transform:rotate(${ang}deg);overflow:visible"><path d="M1 2L13 7L1 12L4 7Z" fill="#f43f5e"/></svg>` }) }).addTo(LDATA);
-      const m = L.circleMarker(pts[0], { radius: 3.2, color: '#fff', weight: 0, fillColor: '#ffe4e6', fillOpacity: 1, interactive: false, className: 'packet' }).addTo(LDATA);
-      packets.push({ m, pts, period: 2600 + i * 400, phase: i * 700 });
-    });
-    // target
-    const tgt = L.marker(T, { zIndexOffset: 500, icon: L.divIcon({ className: '', iconSize: [46, 46], iconAnchor: [23, 23], html: `<svg width="46" height="46" viewBox="0 0 46 46" style="overflow:visible"><circle cx="23" cy="23" r="10" fill="none" stroke="#e2e8f0" stroke-width="1.4"/><circle cx="23" cy="23" r="10" fill="none" stroke="#e2e8f0" class="pulse-ring"/><path d="M23 4v10M23 32v10M4 23h10M32 23h10" stroke="#e2e8f0" stroke-width="1.4"/><circle cx="23" cy="23" r="2" fill="#e2e8f0"/></svg>` }) }).addTo(LDATA);
-    tgt.bindTooltip('TARGET · ' + esc(TARGET.label), { permanent: true, direction: 'top', offset: [0, -20], className: 'tip-target' });
-    // nodes
-    nodes.forEach((n) => {
-      const sel = state.infraSel === n.node;
-      if (n.hostile) {
-        const r = 7 + Math.sqrt(n.comments) * 3.2;
-        L.circleMarker([n.lat, n.lon], { radius: r + 6, color: '#f43f5e', weight: 1.5, fill: false, interactive: false, className: 'pulse-ring' }).addTo(LDATA);
-        if (sel) L.circleMarker([n.lat, n.lon], { radius: r + 5, color: '#fecdd3', weight: 1.5, dashArray: '3 3', fill: false, interactive: false }).addTo(LDATA);
-        const mk = L.circleMarker([n.lat, n.lon], { radius: r, color: '#fecdd3', weight: sel ? 2 : 1, fillColor: '#f43f5e', fillOpacity: 0.92, className: 'hostile-node' }).addTo(LDATA);
-        const left = n.lon > TARGET.lon - 0.2 && n.lon < TARGET.lon + 2 && Math.abs(n.lat - TARGET.lat) < 1.5;
-        mk.bindTooltip(`<b>${esc(n.node)}</b> · ${esc(n.asn)}<br><span style="color:#94a3b8">${flag(n.cc, 10)} ${esc(n.city)} · ${n.comments} comments</span>`, { permanent: true, direction: left ? 'right' : 'left', offset: [left ? r : -r, 0], className: 'tip-hostile' });
-        mk.on('click', () => { state.infraSel = n.node; renderMap(); renderInfra(); });
-      } else {
-        const mk = L.circleMarker([n.lat, n.lon], { radius: 4 + n.comments * 1.4, color: sel ? '#a7f3d0' : '#065f46', weight: sel ? 2 : 1, fillColor: '#34d399', fillOpacity: 0.6 }).addTo(LDATA);
-        mk.bindTooltip(`${esc(n.city)} · residential · ${n.comments} comment(s)`, { direction: 'top', offset: [0, -6] });
-        mk.on('click', () => { state.infraSel = n.node; renderMap(); renderInfra(); });
-      }
-    });
-    if (state.uasOn) drawUasLeaflet();
-    drawPsyLeaflet();
-  }
-  function renderMap() {
-    const v = state.mapView;
-    if ($('#pillRegion')) $('#pillRegion').value = v;
-    $('#mapViews').innerHTML = Object.entries(MAPV).map(([k, x]) => `<button data-mv="${k}" class="seg inline-flex items-center gap-1.5 ${v === k ? 'seg-on' : ''}">${k === 'theatre' ? 'Theatre ' + flag('XK', 11) + flag('AL', 11) : x.label}</button>`).join('');
-    if (!initLeaflet()) { $('#mapHint').textContent = 'Interactive map library unavailable offline: showing the schematic view. Tap a node to inspect.'; renderSchematic(); return; }
-    $('#mapViews').querySelectorAll('[data-mv]').forEach((b) => b.addEventListener('click', () => { state.mapView = b.dataset.mv; renderMap(); LMAP.flyToBounds(VIEW_BOUNDS[state.mapView], { padding: [10, 10], duration: 1.3 }); }));
-    if (!state.res.infra.length) { LDATA.clearLayers(); packets = []; if (state.uasOn) drawUasLeaflet(); drawPsyLeaflet(); mapNotice('No infrastructure telemetry in this batch. Paste JSON with an <span class="font-mono">infra</span> object to plot sources.'); return; }
-    renderLeaflet();
-  }
-
   function renderInfra() {
     const nodes = state.res.infra; const n = nodes.find((x) => x.node === state.infraSel) || nodes[0];
     if (!n) { $('#infraDetail').innerHTML = '<div class="text-xs text-slate-500">No infrastructure telemetry.</div>'; $('#infraList').innerHTML = ''; return; }
@@ -1468,7 +1240,7 @@ if (typeof module !== "undefined") module.exports = Engine;
     </div>`;
     $('#infraList').innerHTML = `<div class="text-[11px] text-slate-500 mb-1">All sources</div>` + nodes.map((x) => `<button data-inf2="${esc(x.node)}" class="w-full flex items-center gap-2 text-[11px] px-2 py-1 rounded-lg ${x.node === n.node ? 'bg-ink-800' : 'hover:bg-ink-800/60'}">
       <span class="w-2 h-2 ${x.hostile ? 'rotate-45 bg-rose-500' : 'bg-emerald-400/70'}"></span>${flag(x.cc, 10)}<span class="font-mono text-slate-300">${esc(x.node.replace('RES-', ''))}</span><span class="text-slate-500 truncate flex-1 text-left">${esc(x.asn)}</span><span class="font-mono ${x.avgRisk >= 60 ? 'text-rose-300' : 'text-slate-500'}">${x.comments}</span></button>`).join('');
-    $('#infraList').querySelectorAll('[data-inf2]').forEach((b) => b.addEventListener('click', () => { state.infraSel = b.dataset.inf2; renderMap(); renderInfra(); }));
+    $('#infraList').querySelectorAll('[data-inf2]').forEach((b) => b.addEventListener('click', () => { state.infraSel = b.dataset.inf2; renderInfra(); }));
     $('#infraDetail').querySelectorAll('[data-jump]').forEach((b) => b.addEventListener('click', () => jumpTo(b.dataset.jump)));
     $('#infraFilter').addEventListener('click', () => { state.filter = 'infra'; state.sel = null; inspectorPage = 0; renderInspector(); document.getElementById('rows').scrollIntoView({ behavior: 'smooth', block: 'start' }); });
   }
@@ -1799,11 +1571,15 @@ if (typeof module !== "undefined") module.exports = Engine;
   });
 
   function render() {
-    if (state.live) { const lt = state.live.thread || {}; $('#artTitle').textContent = lt.title || lt.id || 'Live thread'; $('#artMeta').textContent = `${(lt.platform || 'live').toUpperCase()} · ${lt.url || lt.id} · analysed ${new Date(state.live.generated).toLocaleTimeString()} · embedder ${state.live.embedder}`; $('#artCount').textContent = `${state.res.thread.n} comments · ${state.res.users.size} accounts`; renderKPIs(); renderTimeline(); renderVectors(); renderSignals(); renderMap(); renderInfra(); renderImpact(); renderNetwork(); renderClusters(); renderInspector(); renderExtras(); return; }
+    const threadKind = state.live
+      ? (state.live.thread?.simulated ? 'Exercise thread' : 'Monitored thread')
+      : (state.standalone ? 'Imported batch' : 'Demo thread');
+    $('#artKind').textContent = threadKind;
+    if (state.live) { const lt = state.live.thread || {}; $('#artTitle').textContent = lt.title || lt.id || 'Live thread'; $('#artMeta').textContent = `${(lt.platform || 'live').toUpperCase()} · ${lt.url || lt.id} · analysed ${new Date(state.live.generated).toLocaleTimeString()} · embedder ${state.live.embedder}`; $('#artCount').textContent = `${state.res.thread.n} comments · ${state.res.users.size} accounts`; renderKPIs(); renderTimeline(); renderVectors(); renderSignals(); renderInfra(); renderImpact(); renderNetwork(); renderClusters(); renderInspector(); renderExtras(); return; }
     $('#artTitle').textContent = state.standalone ? 'Live batch (standalone thread)' : ARTICLE.title;
     $('#artMeta').textContent = state.standalone ? 'Scored without the seed thread as context' : `${ARTICLE.portal} · published ${hhmm(Date.parse(ARTICLE.published))}, 18 Nov 2026 · monitored surface`;
     $('#artCount').textContent = `${state.res.thread.n} comments · ${state.res.users.size} accounts`;
-    renderKPIs(); renderTimeline(); renderVectors(); renderSignals(); renderMap(); renderInfra(); renderImpact(); renderNetwork(); renderClusters(); renderInspector(); renderExtras();
+    renderKPIs(); renderTimeline(); renderVectors(); renderSignals(); renderInfra(); renderImpact(); renderNetwork(); renderClusters(); renderInspector(); renderExtras();
   }
 
   // ---------------- LIVE TEST ----------------
@@ -1996,7 +1772,7 @@ if (typeof module !== "undefined") module.exports = Engine;
     };
   }
   function setLive(ok, msg) {
-    $('#liveDot').className = 'w-2.5 h-2.5 rounded-full ' + (ok ? 'bg-emerald-400 pulse-dot' : 'bg-rose-500');
+    $('#liveDot').className = 'w-2.5 h-2.5 rounded-full ' + (ok ? 'bg-emerald-400' : 'bg-rose-500');
     $('#liveStatus').textContent = msg;
   }
   async function loadLiveThread(tid) {
@@ -2191,7 +1967,7 @@ if (typeof module !== "undefined") module.exports = Engine;
       t.path = pts;
     });
   })();
-  Object.assign(state, { uasOn: true, uasSel: 'UAS-01', stage: '3d', playDone: new Set() });
+  Object.assign(state, { uasOn: true, uasSel: 'UAS-01', playDone: new Set() });
   const fmtLL = (la, lo) => `${Math.abs(la).toFixed(3)}${la >= 0 ? 'N' : 'S'} ${String(Math.abs(lo).toFixed(3)).padStart(7, '0')}${lo >= 0 ? 'E' : 'W'}`;
   const tRel = (m) => (m === 0 ? 'T±0' : (m > 0 ? 'T+' : 'T') + m) + ' min';
 
@@ -2235,14 +2011,19 @@ if (typeof module !== "undefined") module.exports = Engine;
   function renderUasChip() {
     const A = uasAnalysis(); const el = $('#uasChip');
     if (!A.hostile.length) { el.innerHTML = ''; return; }
-    el.innerHTML = `<button id="uasChipBtn" class="seg seg-amber seg-on inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-400 pulse-dot"></span>${A.hostile.length} UAS near critical sites · ${A.top ? A.top.band : ''}</button>`;
+    el.innerHTML = `<button id="uasChipBtn" class="seg seg-amber seg-on inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-400"></span>${A.hostile.length} UAS near critical sites · ${A.top ? A.top.band : ''}</button>`;
     $('#uasChipBtn').addEventListener('click', () => focusUas(A.top ? A.top.id : A.hostile[0].id));
   }
   function focusUas(id) {
-    state.uasSel = id; state.uasOn = true; state.mapView = 'theatre'; setStage('2d'); renderUAS(); renderMap();
-    const t = UAS_TRACKS.find((x) => x.id === id), s = t && siteOf(t.site);
-    if (LMAP && s) LMAP.flyTo([s.lat, s.lon], 12, { duration: 1.2 });
-    document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+    state.uasSel = id;
+    setUasLayer(true);
+    state.mapView = 'theatre';
+    renderGlobeRegions();
+    renderUAS();
+    const track = UAS_TRACKS.find((track) => track.id === id);
+    const site = track && siteOf(track.site);
+    if (site) Globe.focus(site.lat, site.lon, 1000);
+    $('#globeWrap').scrollIntoView({ behavior: 'smooth', block: 'center' });
   }
   function renderUAS() {
     const A = uasAnalysis(); const sel = A.tracks.find((t) => t.id === state.uasSel) || A.tracks[0];
@@ -2283,7 +2064,7 @@ if (typeof module !== "undefined") module.exports = Engine;
           <button id="uasExport" class="seg seg-amber seg-on">Export evidence (.json)</button>
         </div>
       </div>`;
-    $('#uas').querySelectorAll('[data-uas]').forEach((b) => b.addEventListener('click', () => { state.uasSel = b.dataset.uas; renderUAS(); if (state.uasOn) renderMap(); }));
+    $('#uas').querySelectorAll('[data-uas]').forEach((b) => b.addEventListener('click', () => { state.uasSel = b.dataset.uas; renderUAS(); }));
     $('#uasFocus').addEventListener('click', () => focusUas(sel.id));
     $('#uasExport').addEventListener('click', () => exportEvidence(sel));
     hashFor(sel).then((h) => { const el = document.getElementById('uasHash'); if (el && state.uasSel === sel.id) el.textContent = `${h.alg} ${h.hex.slice(0, 16)}…${h.hex.slice(-8)}`; });
@@ -2334,7 +2115,7 @@ if (typeof module !== "undefined") module.exports = Engine;
         <rect x="${mx - 34}" y="${(ay + by) / 2 - 9}" width="68" height="16" fill="#0a0d12" stroke="#f59e0b88"/><text x="${mx}" y="${(ay + by) / 2 + 3}" fill="#fde68a" font-size="9.5" text-anchor="middle" ${mono}>Δ ${A.top.lead} min</text>`;
     }
     $('#fusion').innerHTML = `<div class="overflow-x-auto -mx-1 px-1"><svg viewBox="0 0 ${W} ${H}" class="w-full min-w-[620px] h-auto select-none">${g}</svg></div>`;
-    $('#fusion').querySelectorAll('[data-fuas]').forEach((el) => el.addEventListener('click', () => { state.uasSel = el.dataset.fuas; renderUAS(); renderFusion(); if (state.uasOn) renderMap(); }));
+    $('#fusion').querySelectorAll('[data-fuas]').forEach((el) => el.addEventListener('click', () => { state.uasSel = el.dataset.fuas; renderUAS(); renderFusion(); }));
     $('#fusionVerdict').innerHTML = A.top ? `<span class="text-slate-500">CROSS-DOMAIN CORRELATION</span> <span class="${BAND_CLS[A.top.band]}">${A.top.band} · ${A.top.score}/100</span>` : '<span class="text-slate-500">No unauthorised UAS activity</span>';
   }
 
@@ -2399,29 +2180,6 @@ if (typeof module !== "undefined") module.exports = Engine;
       sensors: t.sensors, operator_estimate: { lat: t.pilot[0], lon: t.pilot[1], cep_m: t.cep }, correlation: { band: t.band, score: t.score, reasons: t.why } }));
   }
 
-  // Leaflet layer for the counter-UAS picture (drawn into LDATA by renderLeaflet).
-  function drawUasLeaflet() {
-    const A = uasAnalysis(), near = state.mapView === 'theatre';
-    UAS_SENSORS.forEach((s) => {
-      L.circle([s.lat, s.lon], { radius: s.r, color: '#2ee6d3', weight: 1, opacity: 0.45, dashArray: '2 6', fillColor: '#2ee6d3', fillOpacity: 0.025, interactive: false }).addTo(LDATA);
-      L.marker([s.lat, s.lon], { icon: L.divIcon({ className: '', iconSize: [12, 12], iconAnchor: [6, 6], html: '<svg width="12" height="12"><rect x="1.5" y="1.5" width="9" height="9" fill="#2ee6d333" stroke="#2ee6d3"/><circle cx="6" cy="6" r="1.5" fill="#b5fff5"/></svg>' }) })
-        .addTo(LDATA).bindTooltip(`${s.id} · ${s.label} · ${s.r / 1000} km`, { direction: 'bottom', offset: [0, 6], className: 'tip-site' });
-    });
-    CRIT_SITES.forEach((s) => {
-      L.marker([s.lat, s.lon], { icon: L.divIcon({ className: '', iconSize: [14, 14], iconAnchor: [7, 7], html: `<svg width="14" height="14"><rect x="1" y="1" width="12" height="12" fill="none" stroke="#e2e8f0" stroke-width="1.2"/><rect x="4.5" y="4.5" width="5" height="5" fill="${s.kind === 'energy' ? '#fbbf24' : s.kind === 'water' ? '#38bdf8' : '#e2e8f0'}"/></svg>` }) })
-        .addTo(LDATA).bindTooltip(`${s.id} · ${esc(s.label)}`, { permanent: near, direction: 'right', offset: [8, 0], className: 'tip-site' });
-    });
-    A.tracks.forEach((t) => {
-      const col = t.hostile ? '#fbbf24' : '#94a3b8', sel = state.uasSel === t.id;
-      L.polyline(t.path, { color: col, weight: sel ? 2.2 : 1.3, opacity: sel ? 0.95 : 0.55, dashArray: t.hostile ? null : '3 4', className: t.hostile ? 'uas-line' : '', interactive: false }).addTo(LDATA);
-      if (t.hostile) L.circle(t.pilot, { radius: t.cep, color: '#f59e0b', weight: 1, dashArray: '3 3', fillColor: '#f59e0b', fillOpacity: 0.08 }).addTo(LDATA).bindTooltip(`${t.id} · operator point estimate · CEP ${t.cep} m`, { direction: 'top', className: 'tip-uas' });
-      const m = L.marker(t.path[0], { zIndexOffset: 400, icon: L.divIcon({ className: 'uas-icon', iconSize: [20, 20], iconAnchor: [10, 10], html: `<svg width="20" height="20" viewBox="0 0 20 20" style="overflow:visible"><path d="M10 2L18 10L10 18L2 10Z" fill="${t.hostile ? '#f59e0b33' : '#64748b33'}" stroke="${col}" stroke-width="1.6"/><circle cx="10" cy="10" r="2" fill="${col}"/>${sel ? `<circle cx="10" cy="10" r="12" fill="none" stroke="${col}" stroke-dasharray="2 3"/>` : ''}</svg>` }) }).addTo(LDATA);
-      m.bindTooltip(`<b>${t.id}</b> · ${esc(t.cls)}<br><span style="color:#94a3b8">${t.hostile ? 'NO REMOTE ID' : 'Remote ID OK'} · ${esc(t.siteObj.id)} · ${t.band}</span>`, { direction: 'top', offset: [0, -10], className: t.hostile ? 'tip-uas' : '', permanent: near && sel });
-      m.on('click', () => { state.uasSel = t.id; renderUAS(); renderFusion(); renderMap(); });
-      packets.push({ m, pts: t.path, period: 9000 + t.path.length * 45, phase: Math.abs(t.t0) * 997 }); // phase must stay >= 0 (index into pts)
-    });
-  }
-
   // =====================================================================
   // LIVE PSYOP FEED (EXERCISE SCENARIO): a simulated real-time stream of
   // coordinated influence operations between countries. Each event is
@@ -2456,7 +2214,7 @@ if (typeof module !== "undefined") module.exports = Engine;
       <span class="inline-flex items-center gap-1 shrink-0">${flag(e.farm.origin, 13)}${psyArrow}${flag(e.to, 13)}</span>
       <span class="min-w-0 flex-1"><span class="block truncate"><span class="text-slate-100">${esc(CC_NAME[e.farm.origin])} → ${esc(CC_NAME[e.to])}</span> <span class="text-slate-500">· ${esc(e.narrative)}</span></span>
         <span class="block font-mono text-[10.5px] text-slate-500 truncate">${e.farm.id} · ${e.n} accounts · ${e.ip}</span></span>
-      <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background:${e.farm.col};box-shadow:0 0 8px ${e.farm.col}"></span></div>`;
+      <span class="w-1.5 h-1.5 rounded-full shrink-0" style="background:${e.farm.col}"></span></div>`;
   function renderPsy(full) {
     const now = Date.now(), perMin = PSY.events.filter((e) => now - e.t < 60000).length;
     const seen = [...PSY.farm.values()].reduce((a, st) => a + st.seen.size, 0), active = [...PSY.farm.values()].filter((st) => now - st.last < 120000).length;
@@ -2492,32 +2250,14 @@ if (typeof module !== "undefined") module.exports = Engine;
     PSY.sel = PSY.sel === b.dataset.farm ? null : b.dataset.farm; renderPsy(true);
     if (PSY.sel) {
       const f = PSY_FARMS.find((x) => x.id === PSY.sel), a = CAPITAL[f.origin], c = CAPITAL[f.targets[0]];
-      setStage('3d'); Globe.focus((a[0] + c[0]) / 2, (a[1] + c[1]) / 2, 1.5); go('#sec-overview');
+      Globe.focus((a[0] + c[0]) / 2, (a[1] + c[1]) / 2, 1.5); go('#sec-overview');
     } else Globe.view();
-    if (LMAP && state.stage === '2d') renderMap();
   });
   function psyExport() {
     return { classification: 'UNCLASSIFIED // EXERCISE — SIMULATED DATA', note: 'Origin = farm network egress, not state attribution. RFC 5737 / RFC 5398 documentation numbers.',
       farms: PSY_FARMS.map((f) => ({ id: f.id, egress_country: f.origin, targets: f.targets, kind: f.kind, asn: f.asn, ips: f.ips, accounts_seen: PSY.farm.get(f.id).seen.size, bursts: PSY.farm.get(f.id).hits })),
       events: PSY.events.slice(0, 50).map((e) => ({ t: new Date(e.t).toISOString(), farm: e.farm.id, from: e.farm.origin, to: e.to, accounts: e.n, ip: e.ip, narrative: e.narrative })) };
   }
-  // 2D map: one animated trajectory per farm → target, with flags at both ends
-  function drawPsyLeaflet() {
-    if (!LMAP || !LDATA) return;
-    const shown = new Set();
-    PSY_FARMS.forEach((f, i) => f.targets.forEach((t, j) => {
-      const a = CAPITAL[f.origin], b = CAPITAL[t], dim = PSY.sel && PSY.sel !== f.id, pts = curve(a, b, 0.18 + j * 0.08);
-      L.polyline(pts, { color: f.col, weight: PSY.sel === f.id ? 2.6 : 1.6, opacity: dim ? 0.15 : 0.7, className: 'psy-line', interactive: false }).addTo(LDATA);
-      const m = L.circleMarker(pts[0], { radius: 3, weight: 0, fillColor: '#fff', fillOpacity: dim ? 0.3 : 1, interactive: false }).addTo(LDATA);
-      packets.push({ m, pts, period: 3200 + (i * 2 + j) * 500, phase: (i * 3 + j) * 900 });
-      [f.origin, t].forEach((cc) => {
-        if (shown.has(cc)) return; shown.add(cc);
-        L.marker(CAPITAL[cc], { zIndexOffset: 300, icon: L.divIcon({ className: '', iconSize: null, iconAnchor: [9, 7], html: `<span style="display:inline-flex;align-items:center;gap:4px;white-space:nowrap;font:600 10px Inter,system-ui,sans-serif;color:#e2e8f0;text-shadow:0 0 3px #000">${flag(cc, 14)}${cc === 'XK' ? '' : esc(CC_NAME[cc])}</span>` }) })
-          .bindTooltip(`${esc(CC_NAME[cc])} · PSYOP exercise vector`, { direction: 'top', offset: [0, -8] }).addTo(LDATA);
-      });
-    }));
-  }
-
   // ---------------- 3D GLOBE (canvas orthographic, no library) ----------------
   const Globe = (() => {
     const LAND = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADg/wEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADA/v8/AOD//z8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+///D/////5//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPAH/j/+//////8PAAAAgB0AAHgAAAAAAD8AAAAAAAAAAAAAAAAAAAAAAAAAAOD//wP8//////8BAACAfx4AAAAAAAAAAP4AAAAAAAAAAAAAAAAAAAAAAAA4+I73//n///////8AAAAAfwAAAAAAAAAAAAAfAAAAAAAAAAAAAAAAAAAAAOAQACDwP4D///////8BAAAAPAQAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAADzAgPP5H8D//////38AAAAAAAAAAAAA4AEAAAD+DwAAAAAAAAAAAAAAAAAAAIC/g7PfBwAA/v////8AAAAAAAAAAADgBwAAwP//PwAA4B8AAAAAAAAAAAAAAAAMAAD8AgAA+P////8AAAAAAAAAAABwAAAA/P//AwAAAAAAAAAAAAAAAAAAAP8Ahvc5OwAA8P///38AAAAAAAAAAAAcAADg////34cHAAcAAAAAAAAAAAAAgN9/xzf8RwAA4P///z8AAAAAAAAAAAAPAB7g//////8fgB8AAAAAAT4AAAAAAO//B3f8/wsA4P///z8AAAAAAAAAAAAPAG////////8f2f8HAAAAAAD4HwAAAAD8H/D4/38A4P///xMAAAAAAPAHAAAAgN//////////////DwAAAAD+///h/4//H+/Bg/8BwP7//w8AAAAAwP8fAAAAj9///////////////88//h8AAAAAAAD8+Dsw+AH//wAAAP//////DwAA/P8cgEEAAAAAAAAAAAAAAAAA8P8AAAAAAAAAAAAQeAbwPwAA+P//////AwAA4AwAAGAAAAAAAAAAAAAAAAAAIH4DAAAAAAAAAAAA/gPAfwAA/v//////AQBg4AAAABAAAAAAAAAAAAAAAAAAAQ8AAAAAAAAAAACg/wPnfwDw/x/A////AByADwAAAAAAAAAAAAAAAAAAAAAAQID4///////////Pw/0DAP8HAMAfAACA//F//v////////////////////8/AAP4///////////BBPAHAP4HAAAAAADg//z///////////////////////9/AID///////////8AQ8ABAPwBAAAAAAD8P/7///////////////////////9fAMD//////////z8AwA8AAPgBAAAAAAD+H/7/////////////////////Of8BAID///z//////z8AwD8AAMABAAAAAAD+P/z///////////////////9/wH8AAAD8MwD//////x8AwH8MAAAAAAAAAAD+P2D///////////////////95cAAAAACAAwD8/////38AwP8eAAAAAAAAgAGcH/D//////////////////wEAOAAAAADADgDA/////38AgP8/AAAAAAAAwANAH/T//////////////////wAAfgAAAAAwAAAA//////8PgP8/AAAAAAAAwAFwD/7/////////////////PwAAfwAAAAAGAAAA//////8/wP//AAAAAAAAwAOwA/7/////////////////DwCAPwAAAIAAAAAA/v//////8///BwAAAAAAOAcgcP//////////////////HwAAHwAAAAAAAACA+P//////4///DwAAAAAAOA74/////////////////////wUADwAAAAAAAAAA8P//////4///DwAAAAAAGD///////////////////////wUAAwAAAAAAAAAA8P//////7///FwAAAAAAAB///////////////////////wUAAgAAAAAAAAAA0P//////////CAAAAAAAgOH//////////////////////w0AAAAAAAAAAAAAYP////////8xLAAAAAAAAPz//////////////////////wwAAAAAAAAAAAAAAP7//////38HfgAAAAAAgP///////////////////////wQAAAAAAAAAAAAAAP3///////8HUAAAAAAAAP7/////////////////////fwQAAAAAAAAAAAAAAP////////+XAAAAAAAAAPz///93/D/+////////////PwwAAAAAAAAAAAAAAP////////9/AAAAAAAAAPj//f9j/g/+////////////HwAAAAAAAAAAAAAAAP////////8MAAAAAAAAAPj/+P8B/Mf/////////////DwQAAAAAAAAAAAAAAP///////z8AAAAAAAAAcPzH8/8A8I//////////////Bx4AAAAAAAAAAAAAAP///////x8AAAAAAAAA+H+Aw/8AwA/+//////////9/AA8AAAAAAAAAAAAAAP///////x8AAAAAAAAA+D8Aj//w4R/8//////////8/AAAAAAAAAAAAAAAAAP///////wMAAAAAAAAA+B8wuE/+/z/+/////////98fAAMAAAAAAAAAAAAAAP///////wMAAAAAAAAA+A8wEMf//x/+/////////0cOAAMAAAAAAAAAAAAAAP7//////wEAAAAAAAAA+A8AAI7//x/8/////////wMOAAEAAAAAAAAAAAAAAP7//////wAAAAAAAAAA+AcABob//z/8/////////zccwAEAAAAAAAAAAAAAAPz//////wAAAAAAAAAAQOB/AAQ2/////////////x8c8AEAAAAAAAAAAAAAAPj//////wAAAAAAAAAAQPx/AAAA/////////////w8Y/gEAAAAAAAAAAAAAAPD/////fwAAAAAAAAAA4P8/AAAA/////////////w+EGwAAAAAAAAAAAAAAAMD/////HwAAAAAAAAAA8P9/AACA/////////////x/AAwAAAAAAAAAAAAAAAID/////DwAAAAAAAAAA+P//BwaA/////////////x/AAAAAAAAAAAAAAAAAAID9////BwAAAAAAAAAA/P//D3+E/////////////z9AAAAAAAAAAAAAAAAAAAD5////BwAAAAAAAAAA/P//f////////////////x8AAAAAAAAAAAAAAAAAAADy/x8GBgAAAAAAAAAA/P/////v/8///////////z8AAAAAAAAAAAAAAAAAAAD0/w8ABgAAAAAAAAAA/v////+//4///////////z8AAAAAAAAAAAAAAAAAAADu/wcADgAAAAAAAACA//////8f/x/+/////////x8AAAAAAAAAAAAAAAAAAACI/wcALAAAAAAAAADA//////8//z/g/////////w8AAAAAAAAAAAAAAAAAAACQ/wcACAAAAAAAAADg//////9//r+A/////////wcAAAAAAAAAAAAAAAAAAAAQ/wMAAAAAAAAAAADg//////9//n8cgP///////ycAAAAAAAAAAAAAAAAAAAAA/gMAAAAAAAAAAADw////////+P9/AP///////xEAAAAAAAAAAAAAAAAAAAAA/AMAHQAAAAAAAADw////////+P//APz/f///fxAAAAAAAAAAAAAAAAAAAAAA+AcAYAAAAAAAAAD4////////+f9/APz/B///BgAAAAAAAAAAAAAAAAAAAAAA/AccgAEAAAAAAADw////////8f9/AOD/B/5/AAAAAAAAAAAAAAAAAQAAAAAA+A8eADgAAAAAAADw////////4f8/AOD/Afw/BgAAAAAAAAAAAAAAAAAAAAAA8J8PAPwCAAAAAADw////////4/8fAOD/APw/AgAAAAAAAAAAAAAAAAAAAAAAgP8PAAAAAAAAAADw////////x/8HAOB/APx/ADAAAAAAAAAAAAAAAAAAAAAAAP4PAAAAAAAAAAD4////////h/8BAOA/APz/ADAAAAAAAAAAAAAAAAAAAAAAAID/AAAAAAAAAAD4////////j/8AAMAPAMD/ATAAAAAAAAAAAAAAAAAAAAAAAAD/AQAAAAAAAAD4////////nx8AAMAPAMD/ATAAAAAAAAAAAAAAAAAAAAAAAAD8AAAAAAAAAAD4////////vwcAAIAPAMD/AcAAAAAAAAAAAAAAAAAAAAAAAADgAQAAAAAAAAD4////////fwAAAIAPAMD8AQABAAAAAAAAAAAAAAAAAAAAAADAAAgAAAAAAADw////////f2AAAAAPAID4AUACAAAAAAAAAAAAAAAAAAAAAADAAe9zAAAAAADg/////////34AAAAPAEBwAAgAAAAAAAAAAAAAAAAAAAAAAAAAE+9/AAAAAADA/////////38AAAAXAEAgAAQCAAAAAAAAAAAAAAAAAAAAAAAAz///AAAAAACA/////////z8AAAASAMAAAIACAAAAAAAAAAAAAAAAAAAAAAAAyP//AQAAAACA/////////z8AAAAwAIAAAEAHAAAAAAAAAAAAAAAAAAAAAAAAgP//AwAAAAAA/v///////x8AAAAwAAADAAMBAAAAAAAAAAAAAAAAAAAAAAAAwP//fwAAAAAA/A/+/////x8AAAAAAAAHAAcAAAAAAAAAAAAAAAAAAAAAAAAAgP///wAAAAAAEAD8/////w8AAAAAADAGwAcAAAAAAAAAAAAAAAAAAAAAAAAAgP///wEAAAAAAADA/////wcAAAAAAGAG4AEAAAAAAAAAAAAAAAAAAAAAAAAA4P///wEAAAAAAADA/////wMAAAAAAMAM+AMAAAAAAAAAAAAAAAAAAAAAAAAA4P///wMAAAAAAADg/////wEAAAAAAIAL/gMQAAAAAAAAAAAAAAAAAAAAAAAA8P///wMAAAAAAADg////fwAAAAAAAIAH/vMQAAAAAAAAAAAAAAAAAAAAAAAA8P///wcAAAAAAADg////PwAAAAAAAAAP/gMAAQAAAAAAAAAAAAAAAAAAAAAA+P///38AAAAAAADg////PwAAAAAAAAAO/DmAAwAAAAAAAAAAAAAAAAAAAAAA+P///38BAAAAAADA////HwAAAAAAAAA+/DkA8gAAAAAAAAAAAAAAAAAAAAAA8P////8fAAAAAACA////DwAAAAAAAAA8wChE/gcAAAAAAAAAAAAAAAAAAAAA+P////8/AAAAAACA////BwAAAAAAAAA4AEAA8B8AAAAAAAAAAAAAAAAAAAAA+P//////AQAAAAAA////BwAAAAAAAAAwAEAAxD8NAAAAAAAAAAAAAAAAAAAA+P//////AQAAAAAA////BwAAAAAAAADAAQAAxP+AAAAAAAAAAAAAAAAAAAAA8P//////AQAAAAAA/v//BwAAAAAAAACAHwAAwH8ABAAAAAAAAAAAAAAAAAAA4P//////AQAAAAAA/v//BwAAAAAAAAAAQFYEAMcAAAAAAAAAAAAAAAAAAAAA4P//////AAAAAAAA/v//DwAAAAAAAAAAAAgBAIABMAAAAAAAAAAAAAAAAAAAwP//////AAAAAAAA/v//DwAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAgP////9/AAAAAAAA/P//DwAAAAAAAAAAAAAAAQQAAAAAAAAAAAAAAAAAAAAAgP////8/AAAAAAAA/v//HyAAAAAAAAAAAACAHwQAAAAAAAAAAAAAAAAAAAAAAP////8fAAAAAAAA/v//HyAAAAAAAAAAAADADwwAAAAAAAAAAAAAAAAAAAAAAP////8fAAAAAAAA////HzAAAAAAAAAAAADsDxwAAAAAAAAAAAAAAAAAAAAAAP7///8fAAAAAAAA////DzgAAAAAAAAAAAD/DxwAAAAA/////////////////wcAAADg////////AAAA8MD///////////8AwMH///d/AAAAAAAAAAAAAAAAAOD///8fAAAAAAAA////Ax8AAAAAAAAAAMD//z4AAABAAAAAAAAAAAAAAAAAAMD///8PAAAAAAAA////AB8AAAAAAAAAAMD//z8AAAAAAAAAAAAAAAAAAAAAAMD///8PAAAAAAAA/v9/AB8AAAAAAAAAAOD//38AAAAAAAAAAAAAAAAAAAAAAMD///8PAAAAAAAA/v9/AB8AAAAAAAAAAPz///8BAAEAAAAAAAAAAAAAAAAAAMD///8HAAAAAAAA/P9/gA8AAAAAAAAAgP////8BAAIAAAAAAAAAAAAAAAAAAMD///8DAAAAAAAA/P//gA8AAAAAAAAAwP////8DAAAAAAAAAAAAAAAAAAAAAMD//38AAAAAAAAA/P9/AA8AAAAAAAAAwP////8HAAAAAAAAAAAAAAAAAAAAAOD//x8AAAAAAAAA+P9/AAcAAAAAAAAA4P////8PAAAAAAAAAAAAAAAAAAAAAOD//w8AAAAAAAAA+P8fAAIAAAAAAAAAwP////8fAAAAAAAAAAAAAAAAAAAAAOD//wcAAAAAAAAA+P8fAAAAAAAAAAAA4P////8fAAAAAAAAAAAAAAAAAAAAAOD//wcAAAAAAAAA+P8fAAAAAAAAAAAAwP////8fAAAAAAAAAAAAAAAAAAAAAOD//wcAAAAAAAAA8P8PAAAAAAAAAAAAgP////8/AAAAAAAAAAAAAAAAAAAAAOD//wMAAAAAAAAA4P8HAAAAAAAAAAAAgP////8fAAAAAAAAAAAAAAAAAAAAAPD//wMAAAAAAAAA4P8HAAAAAAAAAAAAgP////8fAAAAAAAAAAAAAAAAAAAAAPD//wEAAAAAAAAAwP8DAAAAAAAAAAAAAP////8fAAAAAAAAAAAAAAAAAAAAAOD//wAAAAAAAAAAwP8BAAAAAAAAAAAAAP8D/P8PAAAAAAAAAAAAAAAAAAAAAPD/fwAAAAAAAAAAwH8AAAAAAAAAAAAAgP8A2P8HAAAAAAAAAAAAAAAAAAAAAPD/OwAAAAAAAAAAgAEAAAAAAAAAAAAAAAcA6P8HAAAAAAAAAAAAAAAAAAAAAPj/BwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwP8DAAACAAAAAAAAAAAAAAAAAPj/BwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP8DAAAEAAAAAAAAAAAAAAAAAPz/BwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP8DAAAIAAAAAAAAAAAAAAAAAPj/AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGgAAAA4AAAAAAAAAAAAAAAAAPg/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAAAPw/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAPwHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAAALAAAAAAAAAAAAAAAAAPwfAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAIADAAAAAAAAAAAAAAAAAPgHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAMABAAAAAAAAAAAAAAAAAPwHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAP4BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHgAAAAAAAAAAAAAAAAAAP4BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAP4DAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP8BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP8AAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6AAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAAAAAAAAAAAAAAAIAfAAAAAAAeeADADwAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAPD/AADA/////////z8AAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAgP///wH4//////////8DAAAAAAAAAAAAAAAAAAAAADAfAAAAAAAAAAAAAADw8////wP+////////////AwAAAAAAAAAAAAAAAAAAAHA/AAAAAAAAAAA8//P//////+D/////////////HwAAAAAAAAAAAAAAAAAAAP5+AAAAAAAA5v////////////D//////////////38AAAAAAAAAAAAAAAAAAAB+AAAAAACA/////////////////////////////38AAAAAAAAAYAYA4ON/OPh/AAAAAADw/////////////////////////////x8AAAAAAADwv/MXgP////8fAAAAAADw/////////////////////////////wMAAAAAAPz///////////8HAAAAAAD+/////////////////////////////wAAAAAAAPz//////////z8AAAAAAP///////////////////////////////wAAAADA/////////////wEAAAAA8P///////////////////////////////wAAAACH////////////PwAAAPgA/////////////////////////////////wcAAAAcgP//////////fwAAAP4BwP//////////////////////////////HwAAAAAAAP7//////////wf8wD8AwP//////////////////////////////DwAAAAAA/v////////////8HAAD4////////////////////////////////HwAAAAAA+P//////////////4f///////////////////////////////////wAAAAAA/P///////////////////////////////////////////////////x8A3x8AAP7/////////////////////////////////////////////fwAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'; // 360x180 1-degree land bitmask (Natural Earth 1:110m, public domain), base64
@@ -2561,7 +2301,7 @@ if (typeof module !== "undefined") module.exports = Engine;
       if (!tp.types) return;
       if (full) {
         tp.types.innerHTML = Object.entries(TT).map(([k, [l, c]]) => `<button type="button" data-tt="${k}" aria-pressed="${!RP.off.has(k)}" title="Show / hide ${l.toLowerCase()} events" class="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 text-left transition-opacity ${RP.off.has(k) ? 'opacity-35' : ''}">
-          <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${c};box-shadow:0 0 8px ${c}"></span><span class="flex-1 text-[11.5px] text-slate-200">${l}</span><span data-ttn="${k}" class="font-mono text-[11px] text-slate-300">0</span></button>`).join('');
+          <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${c}"></span><span class="flex-1 text-[11.5px] text-slate-200">${l}</span><span data-ttn="${k}" class="font-mono text-[11px] text-slate-300">0</span></button>`).join('');
         tp.speed.innerHTML = SPEEDS.map((v) => `<button type="button" data-sp="${v}" class="seg ${RP.speed === v ? 'seg-on' : ''}">${v}×</button>`).join('');
         tp.play.textContent = RP.on ? 'Pause' : 'Play';
       }
@@ -2728,7 +2468,7 @@ if (typeof module !== "undefined") module.exports = Engine;
           ctx.fillStyle = '#e2e8f0'; ctx.beginPath(); ctx.arc(p.x, p.y, 2, 0, Math.PI * 2); ctx.fill();
           if (cc === 'XK') { drawFlag(cc, p.x - 34, p.y - 6, 11); return; } // the target crosshair already labels Pristina
           const w = drawFlag(cc, p.x + 6, p.y - 13, 11); if (rot.z < 2 && !['RU', 'TR'].includes(cc)) return; // Balkan names overlap at strategic zoom: flags only until zoomed in
-          ctx.font = '600 9.5px Inter, system-ui, sans-serif'; ctx.fillStyle = '#e2e8f0'; label(CC_NAME[cc] || cc, p.x + 10 + w, p.y - 4);
+          ctx.font = '600 9.5px IBM Plex Sans, system-ui, sans-serif'; ctx.fillStyle = '#e2e8f0'; label(CC_NAME[cc] || cc, p.x + 10 + w, p.y - 4);
         });
       }
       if (frame % 10 === 0 || RP.dirty) renderTP(false);
@@ -2779,7 +2519,7 @@ if (typeof module !== "undefined") module.exports = Engine;
       const b = cv.getBoundingClientRect(), x = e.clientX - b.left, y = e.clientY - b.top;
       const h = hits.filter((q) => Math.hypot(q.x - x, q.y - y) < q.r).sort((a, c) => (a.kind === 'uas' ? -1 : 1) - (c.kind === 'uas' ? -1 : 1))[0];
       if (!h) return;
-      if (h.kind === 'infra') { state.infraSel = h.id; renderInfra(); renderMap(); return; }
+      if (h.kind === 'infra') { state.infraSel = h.id; renderInfra(); return; }
       state.uasSel = h.id; renderUAS(); renderFusion();
       if (rot.z < DETAIL_Z) { userLock = true; tgt.lon = 21.125; tgt.lat = 42.68; tgt.z = 1000; } // fly down to the counter-UAS picture
     });
@@ -2793,20 +2533,29 @@ if (typeof module !== "undefined") module.exports = Engine;
     };
   })();
 
-  function renderStageModes() {
-    $('#stageModes').innerHTML = [['2d', '2D map'], ['3d', '3D globe']].map(([k, l]) => `<button data-stage="${k}" class="seg ${state.stage === k ? 'seg-on' : ''}">${l}</button>`).join('');
-    $('#stageModes').querySelectorAll('[data-stage]').forEach((b) => b.addEventListener('click', () => setStage(b.dataset.stage)));
-    if ($('#pillStage')) $('#pillStage').value = state.stage;
+  function renderGlobeRegions() {
+    const regions = [['strategic', 'Strategic (Europe)'], ['theatre', 'Theatre ' + flag('XK', 11) + flag('AL', 11)]];
+    $('#mapViews').innerHTML = regions.map(([key, label]) => {
+      const selected = state.mapView === key;
+      return `<button type="button" data-mv="${key}" aria-pressed="${selected}" class="seg inline-flex items-center gap-1.5 ${selected ? 'seg-on' : ''}">${label}</button>`;
+    }).join('');
   }
-  function setStage(mode) {
-    state.stage = mode; renderStageModes();
-    $('#globeWrap').classList.toggle('hidden', mode !== '3d');
-    if (mode === '3d') { Globe.view(); Globe.start(); $('#mapHint').textContent = 'Drag to rotate · scroll to zoom · tap a node or UAS to inspect'; }
-    else { Globe.stop(); if (LMAP) setTimeout(() => LMAP.invalidateSize(), 30); $('#mapHint').textContent = 'Drag to pan · scroll or pinch to zoom · tap a node to inspect'; }
+  $('#mapViews').addEventListener('click', (event) => {
+    const button = event.target.closest('[data-mv]');
+    if (!button || state.mapView === button.dataset.mv) return;
+    state.mapView = button.dataset.mv;
+    renderGlobeRegions();
+    $('#mapViews').querySelector('[aria-pressed="true"]').focus();
+    Globe.view();
+  });
+
+  function setUasLayer(enabled) {
+    state.uasOn = enabled;
+    const toggle = $('#uasToggle');
+    toggle.classList.toggle('seg-on', enabled);
+    toggle.setAttribute('aria-pressed', String(enabled));
   }
-  $('#mapViews').addEventListener('click', (e) => { if (e.target.closest('[data-mv]')) Globe.view(); });
-  $('#uasToggle').addEventListener('click', () => { state.uasOn = !state.uasOn; $('#uasToggle').classList.toggle('seg-on', state.uasOn); renderMap(); });
-  renderStageModes();
+  $('#uasToggle').addEventListener('click', () => setUasLayer(!state.uasOn));
 
   function renderExtras() { renderUasChip(); renderUAS(); renderFusion(); renderPlaybook(); renderTicker(); renderHero(); }
 
@@ -2842,12 +2591,12 @@ if (typeof module !== "undefined") module.exports = Engine;
     g += `<path d="M${ox1} ${oy1} A140 140 0 0 1 ${ox2} ${oy2}" fill="none" stroke="#1b2627" stroke-width="1" stroke-dasharray="2 4"/>`;
     [0.25, 0.5, 0.75].forEach((f) => { const [x1, y1] = pt(a0 + (a1 - a0) * f, 134), [x2, y2] = pt(a0 + (a1 - a0) * f, 146); g += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#3b4c4b" stroke-width="1.2"/>`; });
     const dm = a0 + (a1 - a0) * frac, [mx, my] = pt(dm, 104), [bx1, by1] = pt(dm - 3, 96), [bx2, by2] = pt(dm + 3, 96);
-    g += `<path d="M${mx} ${my}L${bx1} ${by1}L${bx2} ${by2}Z" fill="${TEAL}" style="filter:drop-shadow(0 0 4px ${TEAL})"/>`;
+    g += `<path d="M${mx} ${my}L${bx1} ${by1}L${bx2} ${by2}Z" fill="${TEAL}"/>`;
     const [lx0, ly0] = pt(a0, 128), [lx1, ly1] = pt(a1, 128);
-    g += `<text x="${lx0}" y="${ly0 + 16}" fill="#5b6f6e" font-size="10" text-anchor="middle" font-family="Inter">0%</text><text x="${lx1}" y="${ly1 + 16}" fill="#5b6f6e" font-size="10" text-anchor="middle" font-family="Inter">100%</text>`;
+    g += `<text x="${lx0}" y="${ly0 + 16}" fill="#5b6f6e" font-size="10" text-anchor="middle" font-family="IBM Plex Sans">0%</text><text x="${lx1}" y="${ly1 + 16}" fill="#5b6f6e" font-size="10" text-anchor="middle" font-family="IBM Plex Sans">100%</text>`;
     $('#radar').innerHTML = `<div class="relative"><svg viewBox="0 0 ${W} ${H}" class="w-full h-auto block">${g}</svg>
       <div class="absolute inset-x-0 bottom-3 text-center"><div class="big-num !text-[42px]">${flaggedAcc}</div><div class="text-[12.5px] text-slate-400 mt-1.5">Flagged accounts · ${Math.round(frac * 100)}% coordinated</div></div></div>
-      <div class="flex items-center justify-center gap-2 mt-1"><span class="w-2 h-2 rounded-full ${lv[3]} pulse-dot"></span><span class="text-[11px] font-mono ${lv[2]}">${lv[0]} · ${lv[1].toUpperCase()}</span></div>`;
+      <div class="flex items-center justify-center gap-2 mt-1"><span class="w-2 h-2 rounded-full ${lv[3]}"></span><span class="text-[11px] font-mono ${lv[2]}">${lv[0]} · ${lv[1].toUpperCase()}</span></div>`;
   }
   function renderVolume() {
     const r = state.res, th = r.thread, it = r.items.filter((i) => !isNaN(i.t));
@@ -2858,24 +2607,25 @@ if (typeof module !== "undefined") module.exports = Engine;
     it.forEach((i) => { const k = Math.min(NB - 1, Math.floor((i.t - t0) / span * NB)); bins[k][0]++; if (i.tier !== 'organic') bins[k][1]++; });
     const max = Math.max(2, ...bins.map((b) => b[0])), W = 300, H = 128, L = 30, B = 18, iw = W - L - 4, ih = H - B - 8, bw = iw / NB, pk = th.peak;
     let g = '';
-    [0, 0.5, 1].forEach((f) => { const y = 8 + ih - f * ih; g += `<text x="0" y="${y + 3}" fill="#4f6463" font-size="9" font-family="Inter">${Math.round(max * f * f)}</text>`; }); // sqrt scale so the quiet tail stays visible
+    [0, 0.5, 1].forEach((f) => { const y = 8 + ih - f * ih; g += `<text x="0" y="${y + 3}" fill="#4f6463" font-size="9" font-family="IBM Plex Sans">${Math.round(max * f * f)}</text>`; }); // sqrt scale so the quiet tail stays visible
     g += `<line x1="${L}" x2="${W}" y1="${8 + ih * 0.06}" y2="${8 + ih * 0.06}" stroke="${TEAL}" stroke-opacity=".35"/>`;
     bins.forEach(([n, f], k) => {
       const sq = Math.sqrt(n / max), x = L + k * bw + bw * 0.25, w = Math.max(1, bw * 0.5), mid = t0 + (k + 0.5) / NB * span, inPk = pk && mid >= pk.start - span / NB && mid <= pk.end + span / NB;
       if (n) g += `<rect x="${x.toFixed(1)}" y="${(8 + ih - sq * ih).toFixed(1)}" width="${w.toFixed(1)}" height="${(sq * ih).toFixed(1)}" rx="1" fill="${inPk ? '#5ff5e6' : TEAL}" fill-opacity="${inPk ? 1 : 0.45}"><title>${hhmm(t0 + k / NB * span)} · ${n} comments (${f} flagged)</title></rect>`;
       else g += `<rect x="${x.toFixed(1)}" y="${8 + ih - 2}" width="${w.toFixed(1)}" height="2" fill="#1d2a2a"/>`;
     });
-    for (let q = 0; q <= 3; q++) g += `<text x="${L + iw * q / 3}" y="${H - 3}" fill="#5b6f6e" font-size="9" text-anchor="${q === 0 ? 'start' : q === 3 ? 'end' : 'middle'}" font-family="Inter">${hhmm(t0 + span * q / 3)}</text>`;
+    for (let q = 0; q <= 3; q++) g += `<text x="${L + iw * q / 3}" y="${H - 3}" fill="#5b6f6e" font-size="9" text-anchor="${q === 0 ? 'start' : q === 3 ? 'end' : 'middle'}" font-family="IBM Plex Sans">${hhmm(t0 + span * q / 3)}</text>`;
     g += `<path d="M${L - 2} ${8 + ih * 0.06 - 4}l5 4-5 4z" fill="${TEAL}"/>`;
     $('#volume').innerHTML = `<div class="flex items-baseline gap-1.5"><span class="big-num !text-[24px]">${th.n.toLocaleString()}</span><span class="text-[12px] text-slate-400">events · ${flagged} flagged</span></div>
       <svg viewBox="0 0 ${W} ${H}" class="w-full h-auto block mt-3">${g}</svg>`;
   }
   function renderDetect() {
     const th = state.res.thread, A = uasAnalysis();
-    const tiles = [['high', 'High risk', th.high, 'Critical', 'tag-rose'], ['medium', 'Medium', th.medium, 'Monitoring', 'tag-amber'], ['organic', 'Organic', th.organic, 'Stable', 'tag-green'], ['uas', 'Hostile UAS', A.hostile.length, 'Physical', '']];
-    $('#detect').innerHTML = tiles.map(([k, l, n, tag, cls]) => `<button type="button" data-det="${k}" class="tile" title="${k === 'uas' ? 'Open counter-UAS detection' : 'Show ' + l.toLowerCase() + ' comments in the inspector'}">
-      <div class="flex items-center justify-between gap-1"><span class="text-[12px] text-slate-400">${l}</span><span class="tag ${cls}">${tag}</span></div>
-      <div class="big-num !text-[28px] mt-4">${n.toLocaleString()}</div></button>`).join('');
+    const rows = [['high', 'High-risk comments', th.high], ['medium', 'Medium-risk comments', th.medium],
+      ['organic', 'Organic comments', th.organic], ['uas', 'Hostile UAS tracks', A.hostile.length]];
+    $('#detect').innerHTML = rows.map(([key, label, count]) => `<button type="button" data-det="${key}" class="flex w-full items-center justify-between gap-3 px-1 py-2 text-left hover:text-white">
+      <span class="text-[13px]">${label}</span><span class="font-mono text-[12px] text-slate-400">${count.toLocaleString()}</span>
+    </button>`).join('');
     $('#detect').querySelectorAll('[data-det]').forEach((b) => b.addEventListener('click', () => {
       if (b.dataset.det === 'uas') { go('#sec-uas'); return; }
       state.filter = b.dataset.det; state.sel = null; inspectorPage = 0; renderInspector(); go('#sec-inspector');
@@ -2897,7 +2647,7 @@ if (typeof module !== "undefined") module.exports = Engine;
   function renderActivity() {
     const r = state.res, it = r.items.filter((i) => !isNaN(i.t)), pk = r.thread.peak;
     if (!it.length) { $('#activity').innerHTML = '<div class="text-xs text-slate-500 py-6 text-center">No timestamps</div>'; return; }
-    const W = 280, H = 92, mono = 'font-family="Inter, system-ui, sans-serif"';
+    const W = 280, H = 92, mono = 'font-family="IBM Plex Sans, system-ui, sans-serif"';
     // (1) per-minute comment rate around the swarm window
     const c0 = pk ? pk.start - 18 * 60000 : Math.min(...it.map((i) => i.t)), c1 = pk ? pk.end + 18 * 60000 : Math.max(...it.map((i) => i.t)) + 60000;
     const nb = 70, bins = new Array(nb).fill(0), span = Math.max(60000, c1 - c0);
@@ -2929,7 +2679,7 @@ if (typeof module !== "undefined") module.exports = Engine;
     if (hostile.length) out.push(['#f43f5e', `${hostile.length} hostile infrastructure node(s)`, hostile.map((g) => g.node).join(', '), '#sec-infra']);
     if (k1) out.push([TEAL, `Cluster ${k1.id} · ${k1.size} accounts`, `linked by ${k1.edgeTypes.join(' + ')}`, '#sec-network']);
     const pm = PSY.events.filter((e) => Date.now() - e.t < 60000).length;
-    out.push(['#f43f5e', `Live PSYOP feed · ${pm} events / min`, `${PSY_FARMS.length} account farms tracked · exercise scenario`, '#sec-psyop']);
+    out.push(['#f43f5e', `Influence exercise · ${pm} events / min`, `${PSY_FARMS.length} account farms tracked · exercise scenario`, '#sec-psyop']);
     out.push(['#64748b', state.live ? 'Live feed · ' + API_HOST : 'Demo thread (simulated)', 'Exercise data — review before circulation', '#sec-overview']);
     return out;
   }
@@ -2937,14 +2687,12 @@ if (typeof module !== "undefined") module.exports = Engine;
     const items = notifItems(), lvl = state.res.thread.level;
     $('#bellDot').classList.toggle('hidden', lvl > 2);
     $('#notif').innerHTML = `<div class="px-2.5 pt-1.5 pb-2 text-[11px] uppercase tracking-wider text-slate-500">Alerts &amp; status</div>` + items.map(([c, t, s, href]) => `<a href="${href}" data-nclose>
-      <span class="w-2 h-2 rounded-full mt-1.5 shrink-0" style="background:${c};box-shadow:0 0 8px ${c}"></span>
+      <span class="w-2 h-2 rounded-full mt-1.5 shrink-0" style="background:${c}"></span>
       <span class="min-w-0"><span class="block text-[12.5px] text-slate-100">${esc(t)}</span>${s ? `<span class="block text-[11px] text-slate-500 truncate">${esc(s)}</span>` : ''}</span></a>`).join('');
   }
   function renderHero() { renderRadar(); renderVolume(); renderDetect(); renderConfidence(); renderActivity(); renderNotif(); }
 
   // ---- top-bar controls ----
-  $('#pillRegion').addEventListener('change', (e) => { state.mapView = e.target.value; Globe.view(); renderMap(); if (LMAP) LMAP.flyToBounds(VIEW_BOUNDS[state.mapView], { padding: [10, 10], duration: 1.3 }); });
-  $('#pillStage').addEventListener('change', (e) => setStage(e.target.value));
   $('#pillTier').addEventListener('change', (e) => { state.filter = e.target.value; state.sel = null; inspectorPage = 0; renderInspector(); go('#sec-inspector'); });
   $('#search').addEventListener('keydown', (e) => { if (e.key === 'Enter') go('#sec-inspector'); });
   const notif = $('#notif'), bell = $('#btnBell');
@@ -2954,7 +2702,7 @@ if (typeof module !== "undefined") module.exports = Engine;
   document.addEventListener('click', (e) => { if (!notif.contains(e.target) && e.target !== bell) closeNotif(); });
   document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeNotif(); });
 
-  // ---- "Ask threat intelligence": routes a question to the right panel, else full-text search ----
+  // ---- Open a panel or search the current batch ----
   function ask(raw) {
     const q = raw.trim(); if (!q) return; const lq = q.toLowerCase();
     if (q.startsWith('@')) {
@@ -2964,7 +2712,7 @@ if (typeof module !== "undefined") module.exports = Engine;
     }
     if (/\b(sitrep|brief|briefing|report)\b/.test(lq)) { $('#btnSitrep').click(); return; }
     if (/^(high|medium|organic|all)( risk)?$/.test(lq)) { state.filter = lq.split(' ')[0]; state.sel = null; inspectorPage = 0; renderInspector(); go('#sec-inspector'); return; }
-    const routes = [[/\b(psyops?|farms?|influence|russia|serbia|greece|hungary|bulgaria|turkey|t[üu]rkiye)\b/, '#sec-psyop', 'Live PSYOP feed'], [/\b(drones?|uas|uav|c-uas|counter[- ]?uas|remote id)\b/, '#sec-uas', 'Counter-UAS detection'], [/\b(clusters?|network|bots?|accounts?|sockpuppets?)\b/, '#sec-network', 'Account network & clusters'],
+    const routes = [[/\b(psyops?|farms?|influence|russia|serbia|greece|hungary|bulgaria|turkey|t[üu]rkiye)\b/, '#sec-psyop', 'Influence exercise'], [/\b(drones?|uas|uav|c-uas|counter[- ]?uas|remote id)\b/, '#sec-uas', 'Counter-UAS detection'], [/\b(clusters?|network|bots?|accounts?|sockpuppets?)\b/, '#sec-network', 'Account network & clusters'],
       [/\b(infra|infrastructure|asn|ip|hosting|vps|proxy|nodes?)\b/, '#sec-infra', 'Infrastructure node inspector'], [/\b(fusion|correlat\w*|alerts?)\b/, '#sec-alerts', 'Forensic fusion timeline'],
       [/\b(playbook|mitigat\w*|actions?|respond|response)\b/, '#sec-playbook', 'Mitigation playbook'], [/\b(impact|audience|portals?|surfaces?)\b/, '#sec-impact', 'Impact zone'],
       [/\b(timeline|burst|swarm|peak)\b/, '#sec-timeline', 'Temporal burst timeline'], [/\b(vectors?|narratives?|tropes?)\b/, '#vectors', 'Threat vectors']];
@@ -2995,7 +2743,8 @@ if (typeof module !== "undefined") module.exports = Engine;
   let tt; function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(tt); tt = setTimeout(() => t.classList.add('hidden'), 3200); }
 
   load(SEED_COMMENTS.map((c) => ({ ...c, source: 'seed' })), ARTICLE.published, false);
-  setStage(state.stage); // hero opens on the 3D globe; the Leaflet map stays initialised underneath
+  renderGlobeRegions();
+  Globe.start();
   { const t0 = Date.now(); for (let k = 8; k >= 1; k--) psyEvent(t0 - k * 3500, false); renderPsy(true); PSY.timer = setTimeout(psyTick, 900); } // seed the feed, then stream
   initLive();
   if (location.hash === '#batch') openModal();
