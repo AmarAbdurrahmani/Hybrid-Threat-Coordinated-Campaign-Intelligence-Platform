@@ -11,7 +11,8 @@
 <script>
 tailwind.config = { darkMode: 'class', theme: { extend: {
   fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], mono: ['JetBrains Mono', 'ui-monospace', 'monospace'] },
-  colors: { ink: { 950: '#05070b', 900: '#090d13', 850: '#0c1118', 800: '#111922', 700: '#1a2532', 600: '#26364a' } }
+  colors: { ink: { 950: '#040707', 900: '#080c0d', 850: '#0b1112', 800: '#101718', 700: '#182123', 600: '#243032' },
+    cyan: { 50: '#effffd', 100: '#dcfffb', 200: '#b5fff5', 300: '#6ff7e6', 400: '#2ee6d3', 500: '#14c9b8', 600: '#0ea596', 700: '#0f7c73', 800: '#115e58', 900: '#134e4a' } }
 } } };
 </script>
 <style>
@@ -27,7 +28,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
   .leaflet-container.leaflet-touch-drag{touch-action:none}
   .leaflet-container.leaflet-touch-drag.leaflet-touch-zoom{touch-action:none}
   .leaflet-tile{filter:inherit;visibility:hidden}.leaflet-tile-loaded{visibility:inherit}
-  .leaflet-zoom-box{width:0;height:0;box-sizing:border-box;z-index:800;border:2px dotted #22d3ee;background:#22d3ee22}
+  .leaflet-zoom-box{width:0;height:0;box-sizing:border-box;z-index:800;border:2px dotted #2ee6d3;background:#2ee6d322}
   .leaflet-pane{z-index:400}.leaflet-tile-pane{z-index:200}.leaflet-overlay-pane{z-index:400}.leaflet-shadow-pane{z-index:500}.leaflet-marker-pane{z-index:600}.leaflet-tooltip-pane{z-index:650}.leaflet-popup-pane{z-index:700}
   .leaflet-map-pane canvas{z-index:100}.leaflet-map-pane svg{z-index:200}
   .leaflet-control{position:relative;z-index:800;pointer-events:auto;float:left;clear:both}
@@ -88,46 +89,80 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
   mark.trope   { background: #f43f5e33; box-shadow: inset 0 -2px 0 #f43f5e; }
   mark.calque  { background: #a78bfa33; box-shadow: inset 0 -2px 0 #a78bfa; }
   mark.dialect { background: #f59e0b33; box-shadow: inset 0 -2px 0 #f59e0b; }
-  mark.ngram   { background: #22d3ee26; box-shadow: inset 0 -2px 0 #22d3ee; }
+  mark.ngram   { background: #2ee6d326; box-shadow: inset 0 -2px 0 #2ee6d3; }
   .scan { position: relative; overflow: hidden; }
-  .scan::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, #22d3ee14, transparent); transform: translateX(-100%); animation: scan 3.5s ease-in-out infinite; pointer-events: none; }
+  .scan::after { content: ''; position: absolute; inset: 0; background: linear-gradient(90deg, transparent, #2ee6d314, transparent); transform: translateX(-100%); animation: scan 3.5s ease-in-out infinite; pointer-events: none; }
   @keyframes scan { to { transform: translateX(100%); } }
   .pulse-dot { animation: pulse 1.6s ease-in-out infinite; }
   @keyframes pulse { 50% { opacity: .35; } }
   ::-webkit-scrollbar { width: 8px; height: 8px; } ::-webkit-scrollbar-thumb { background: #1e2a38; border-radius: 8px; }
   .node { cursor: pointer; transition: r .15s; }
   .fade-in { animation: fade .25s ease-out; } @keyframes fade { from { opacity: 0; transform: translateY(4px); } }
-  /* ===================== COMMAND-CENTER THEME extra koment ===================== */
-  :root { --hud-cyan: #22d3ee; --hud-amber: #f59e0b; --hud-crimson: #f43f5e; --hud-bracket: #3d566c; }
-  .grid-bg { background-color: #04060a; background-image: radial-gradient(1100px 520px at 50% -8%, #0d1c27 0%, transparent 62%), linear-gradient(#15202b26 1px, transparent 1px), linear-gradient(90deg, #15202b26 1px, transparent 1px); background-size: auto, 32px 32px, 32px 32px; }
-  .rounded-xl { border-radius: 4px !important; } .rounded-lg { border-radius: 3px !important; } .rounded-md { border-radius: 2px !important; }
-  .hud-title { font: 600 11px/1.3 'JetBrains Mono', ui-monospace, monospace; letter-spacing: .16em; text-transform: uppercase; color: #d6dfe9; display: flex; align-items: center; gap: 8px; }
-  .hud-title::before { content: ''; flex: none; width: 3px; height: 11px; background: var(--hud-cyan); box-shadow: 0 0 8px var(--hud-cyan); }
-  .hud-sub { font-size: 11px; line-height: 1.4; color: #64748b; margin-top: 3px; }
-  .cmdbar { position: relative; border: 1px solid #17212c; background: linear-gradient(90deg, #0a131b 0%, #070b10 45%, #0a131b 100%); }
-  .cmdbar::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: linear-gradient(90deg, transparent, #22d3ee99, transparent); }
-  .hud-logo { border: 1px solid #22d3ee55; background: #22d3ee0d; clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); }
-  .btn-hud { font: 600 10.5px/1 'JetBrains Mono', ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; padding: 8px 11px; border: 1px solid #26364a; background: #0a1017; color: #cbd5e1; transition: background .15s, border-color .15s, color .15s; }
-  .btn-hud:hover { border-color: #3d566c; background: #101923; color: #fff; }
-  .btn-hud:disabled { opacity: .6; cursor: wait; }
-  .btn-cyan { border-color: #22d3ee66; color: #67e8f9; } .btn-cyan:hover { background: #22d3ee14; border-color: #22d3ee; color: #cffafe; }
+  /* ===================== SOC THEME (black glass · teal accent) ===================== */
+  :root { --teal: #2ee6d3; --teal-2: #5ff5e6; --line: #172123; --line-2: #22302f; --txt: #e8f3f2; color-scheme: dark; }
+  html { scroll-behavior: smooth; }
+  body { background: #031012; }
+  .grid-bg { background-color: #020809; background-image: radial-gradient(1100px 700px at 88% -12%, #0f3a3c 0%, transparent 62%), radial-gradient(900px 620px at -12% 112%, #0b3033 0%, transparent 60%), linear-gradient(160deg, #06191b 0%, #020707 55%, #041517 100%); background-attachment: fixed; }
+  .soc-frame { background: #000; border: 1px solid #ffffff10; box-shadow: 0 0 0 6px #ffffff05, 0 40px 120px -24px #000, inset 0 1px 0 #ffffff0a; }
+  @media (max-width: 639px) { .soc-frame { border-left: 0; border-right: 0; box-shadow: none; } }
+  .panel { min-width: 0; position: relative; border: 1px solid var(--line); border-radius: 16px; background: linear-gradient(180deg, #0c1213 0%, #080c0d 100%); box-shadow: inset 0 1px 0 #ffffff07; }
+  .glass { background: linear-gradient(180deg, #0f1718d9, #080c0dd9); -webkit-backdrop-filter: blur(12px); backdrop-filter: blur(12px); border: 1px solid #ffffff14; border-radius: 16px; }
+  .hud-title { font: 500 15px/1.3 Inter, system-ui, sans-serif; letter-spacing: -.005em; color: var(--txt); display: flex; align-items: center; gap: 8px; }
+  .hud-sub { font-size: 11.5px; line-height: 1.45; color: #6f8584; margin-top: 3px; }
+  .card-ico { width: 28px; height: 28px; display: grid; place-items: center; flex: none; border-radius: 8px; color: #9db1b0; border: 1px solid transparent; transition: color .15s, border-color .15s, background .15s; }
+  .card-ico:hover { color: var(--teal); border-color: #2ee6d340; background: #2ee6d30d; }
+  .btn-hud { font: 500 12px/1 Inter, system-ui, sans-serif; padding: 9px 13px; border-radius: 11px; border: 1px solid var(--line-2); background: #0d1415; color: #cfdede; transition: background .15s, border-color .15s, color .15s; }
+  .btn-hud:hover { border-color: #2f4442; background: #121c1d; color: #fff; }
+  .btn-hud:disabled, .chip:disabled { opacity: .6; cursor: wait; }
+  .btn-cyan { border-color: #2ee6d355; color: #7ff5e9; } .btn-cyan:hover { background: #2ee6d314; border-color: var(--teal); color: #d7fffa; }
   .btn-amber { background: #f59e0b; border-color: #f59e0b; color: #0a0d12; } .btn-amber:hover { background: #fbbf24; border-color: #fbbf24; color: #000; }
   .btn-crimson { background: #e11d48; border-color: #f43f5e; color: #fff; } .btn-crimson:hover { background: #f43f5e; color: #fff; }
-  .seg { font: 600 10px/1 'JetBrains Mono', ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; padding: 6px 9px; border: 1px solid #26364a; color: #94a3b8; background: #0a1017; white-space: nowrap; }
-  .seg:hover { background: #101923; color: #e2e8f0; }
-  .seg-on { border-color: #22d3ee88; color: #a5f3fc; background: #22d3ee14; box-shadow: inset 0 0 0 1px #22d3ee22; }
-  .seg-amber.seg-on, #uasToggle.seg-on { border-color: #f59e0b88; color: #fde68a; background: #f59e0b14; box-shadow: inset 0 0 0 1px #f59e0b22; }
-  .stage-frame .hud-corner { position: absolute; width: 18px; height: 18px; color: #22d3ee; pointer-events: none; z-index: 1060; }
-  .hud-corner.tl { left: -2px; top: -2px; border-left: 2px solid; border-top: 2px solid; } .hud-corner.tr { right: -2px; top: -2px; border-right: 2px solid; border-top: 2px solid; }
-  .hud-corner.bl { left: -2px; bottom: -2px; border-left: 2px solid; border-bottom: 2px solid; } .hud-corner.br { right: -2px; bottom: -2px; border-right: 2px solid; border-bottom: 2px solid; }
-  .ticker { border: 1px solid #17212c; background: #070b10; }
-  .ticker b { color: #cbd5e1; font-weight: 600; }
+  .seg { font: 500 11px/1 Inter, system-ui, sans-serif; padding: 7px 10px; border-radius: 9px; border: 1px solid var(--line-2); color: #9ab0af; background: #0b1112e6; white-space: nowrap; transition: background .15s, color .15s; }
+  .seg:hover { background: #111a1b; color: #e2eeee; }
+  .seg-on { border-color: #2ee6d366; color: #a9fff6; background: #0f2b2a; box-shadow: inset 0 0 0 1px #2ee6d31f; }
+  .seg-amber.seg-on, #uasToggle.seg-on { border-color: #f59e0b77; color: #fde68a; background: #2a1f0a; box-shadow: inset 0 0 0 1px #f59e0b1f; }
+  .pill { display: inline-flex; align-items: center; gap: 7px; height: 40px; padding: 0 12px 0 14px; border-radius: 12px; background: #0c1213; border: 1px solid var(--line); color: #7f9392; font-size: 12.5px; white-space: nowrap; transition: border-color .15s; }
+  .pill:focus-within, .pill:hover { border-color: #2ee6d340; }
+  .pill select { background: transparent url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%23cbd5e1' stroke-width='2.2' stroke-linecap='round'%3E%3Cpath d='m6 9 6 6 6-6'/%3E%3C/svg%3E") no-repeat right center; color: #e6f1f0; font: 500 12.5px Inter, system-ui, sans-serif; border: 0; outline: 0; -webkit-appearance: none; appearance: none; padding-right: 18px; cursor: pointer; max-width: 170px; }
+  .pill select option { background: #0c1213; color: #e6f1f0; }
+  .pill input[type=search]::-webkit-search-cancel-button { filter: invert(.7); }
+  .icon-btn { width: 40px; height: 40px; display: grid; place-items: center; border-radius: 12px; background: #0c1213; border: 1px solid var(--line); color: #b8c9c8; position: relative; transition: color .15s, border-color .15s; }
+  button.icon-btn:hover { color: #fff; border-color: #2a3a3a; }
+  .avatar { background: linear-gradient(135deg, #14514d, #0b2323); color: #b5fff5; border-color: #2ee6d333; cursor: default; }
+  .rail-btn { width: 44px; height: 44px; display: grid; place-items: center; border-radius: 13px; color: #8aa09f; background: #0b1011; border: 1px solid #141c1e; transition: color .15s, border-color .15s, background .15s; }
+  .rail-btn:hover { color: #e6f6f4; border-color: #24403e; }
+  .rail-btn.on { color: #eafffc; background: linear-gradient(180deg, #133332, #0a1a1a); border-color: #2ee6d355; box-shadow: inset 0 0 14px #2ee6d322; }
+  .logo-grid i { display: block; width: 9px; height: 9px; border-radius: 2.5px; background: var(--teal); box-shadow: 0 0 6px #2ee6d366; }
+  .hero-stage { background: radial-gradient(ellipse 70% 85% at 55% 55%, #05292a 0%, #021112 45%, #000 82%); }
+  .hero-title { font: 500 clamp(24px, 2.5vw, 38px)/1.1 Inter, system-ui, sans-serif; letter-spacing: -.02em; color: #f4fbfa; text-shadow: 0 2px 18px #000; }
+  .big-num { font: 300 34px/1 Inter, system-ui, sans-serif; letter-spacing: -.02em; color: #f2faf9; font-variant-numeric: tabular-nums; }
+  .delta { font: 500 11px/1 Inter, system-ui, sans-serif; padding: 5px 8px; border-radius: 8px; background: #2ee6d312; color: #5ff5e6; white-space: nowrap; }
+  .delta.bad { background: #f43f5e14; color: #fda4af; } .delta.warn { background: #f59e0b14; color: #fcd34d; } .delta.mute { background: #ffffff08; color: #94a3b8; }
+  .tile { border-radius: 12px; background: #0e1415; border: 1px solid #172022; padding: 10px 12px 12px; text-align: left; transition: border-color .15s, background .15s; }
+  button.tile:hover { border-color: #2ee6d340; background: #101a1b; }
+  .tag { font: 500 9.5px/1 Inter, system-ui, sans-serif; padding: 3px 6px; border-radius: 6px; background: #2ee6d310; color: #5ff5e6; white-space: nowrap; }
+  .tag-rose { background: #f43f5e14; color: #fda4af; } .tag-amber { background: #f59e0b14; color: #fcd34d; } .tag-green { background: #34d39914; color: #6ee7b7; }
+  .conf-track { height: 7px; border-radius: 99px; background: repeating-linear-gradient(90deg, #1c2728 0 3px, transparent 3px 5px); overflow: hidden; }
+  .conf-fill { height: 100%; border-radius: 99px; background: repeating-linear-gradient(90deg, var(--c, #2ee6d3) 0 3px, transparent 3px 4.5px); box-shadow: 0 0 10px color-mix(in srgb, var(--c, #2ee6d3) 55%, transparent); transition: width .5s ease; }
+  .ask { border-radius: 14px; background: linear-gradient(90deg, #0d1718, #0a1011); border: 1px solid #1a2527; transition: border-color .15s, box-shadow .15s; }
+  .ask input { background: transparent; outline: 0; border: 0; }
+  .ask:focus-within { border-color: #2ee6d355; box-shadow: 0 0 0 3px #2ee6d312; }
+  .chip { display: inline-flex; align-items: center; gap: 7px; height: 36px; padding: 0 12px; border-radius: 11px; background: #0d1415; border: 1px solid var(--line); color: #d6e4e3; font: 500 12.5px Inter, system-ui, sans-serif; white-space: nowrap; transition: border-color .15s, color .15s, background .15s; }
+  .chip:hover { border-color: #2a3d3c; color: #fff; background: #111b1c; }
+  .chip-teal { background: #2ee6d314; border-color: #2ee6d355; color: #a9fff6; } .chip-teal:hover { background: #2ee6d322; border-color: var(--teal); color: #eafffc; }
+  .notif { position: absolute; right: 0; top: 48px; width: min(92vw, 340px); z-index: 1300; }
+  .notif a { display: flex; gap: 10px; align-items: flex-start; padding: 9px 10px; border-radius: 10px; }
+  .notif a:hover { background: #ffffff08; }
+  .ticker { border: 1px solid var(--line); background: #070b0c; border-radius: 12px; }
+  .ticker b { color: #cfe0df; font-weight: 600; }
   .uas-icon svg { filter: drop-shadow(0 0 4px #f59e0b) drop-shadow(0 0 10px #f59e0b88); }
   .uas-line { filter: drop-shadow(0 0 3px #f59e0b); }
   .tip-uas { border-color: #f59e0b99; color: #fde68a; } .tip-uas.leaflet-tooltip-top:before { border-top-color: #f59e0b99; }
-  .tip-site { border-color: #22d3ee66; color: #a5f3fc; font-size: 9.5px; }
+  .tip-site { border-color: #2ee6d366; color: #b5fff5; font-size: 9.5px; }
   .corr-bar { background: linear-gradient(90deg, #34d399, #f59e0b 55%, #f43f5e); }
+  .leaflet-container { background: #000 !important; }
   #globe:active { cursor: grabbing; }
+  :focus-visible { outline: 2px solid #2ee6d3aa; outline-offset: 2px; }
   /* --- SitRep PDF export (window.print): print only #printArea, black on white --- */
   @media print {
     @page { size: A4; margin: 14mm 14mm 16mm; }
@@ -145,97 +180,227 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
 </style>
 </head>
 <body class="text-slate-200 font-sans antialiased grid-bg min-h-screen">
-<div class="cc-shell max-w-[1880px] mx-auto px-3 sm:px-4 pb-4 space-y-3">
+<div class="sm:p-4 xl:p-6">
+<div class="soc-frame cc-shell max-w-[1880px] mx-auto sm:rounded-[30px] p-3 sm:p-4 lg:p-5">
+ <div class="flex gap-4 lg:gap-5">
 
-  <!-- CLASSIFICATION BANNER -->
-  <div class="-mx-3 sm:-mx-4 bg-emerald-600/90 text-ink-950 text-center text-[10px] sm:text-[11px] font-mono font-semibold tracking-[0.2em] py-1">UNCLASSIFIED // EXERCISE — SIMULATED DATA // PROTOTYPE</div>
+  <!-- LEFT RAIL: section navigation -->
+  <nav id="rail" class="hidden lg:flex flex-col items-center gap-3 w-[46px] shrink-0 sticky top-6 self-start h-[calc(100vh-48px)] max-h-[960px]" aria-label="Sections">
+    <a href="#sec-overview" class="logo-grid grid grid-cols-3 gap-[3px] mb-5 mt-1" title="HTCCIP — Hybrid Threat &amp; Coordinated Campaign Intelligence Platform">
+      <i></i><i style="opacity:.55"></i><i></i><i style="opacity:.55"></i><i></i><i style="opacity:.3"></i><i></i><i style="opacity:.3"></i><i></i>
+    </a>
+    <a class="rail-btn on" href="#sec-overview" data-rail="sec-overview" title="Overview"><svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg></a>
+    <a class="rail-btn" href="#sec-alerts" data-rail="sec-alerts" title="Alerts · forensic fusion timeline"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3.5 21 19.5H3z"/><path d="M12 10v4.5M12 17.3v.2" stroke-linecap="round"/></svg></a>
+    <a class="rail-btn" href="#sec-infra" data-rail="sec-infra" title="Source infrastructure"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="16" height="6.5" rx="2"/><rect x="4" y="13.5" width="16" height="6.5" rx="2"/><path d="M8 7.2h.01M8 16.7h.01" stroke-linecap="round" stroke-width="2.4"/></svg></a>
+    <a class="rail-btn" href="#sec-uas" data-rail="sec-uas" title="Counter-UAS detection"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3 19.5 6v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z"/><path d="m8.8 12 2.2 2.2 4.4-4.4" stroke-linecap="round"/></svg></a>
+    <a class="rail-btn" href="#sec-network" data-rail="sec-network" title="Account network · clusters"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="9" cy="8.5" r="3.3"/><path d="M3.5 19.5c.6-3.3 2.8-5 5.5-5s4.9 1.7 5.5 5"/><circle cx="16.5" cy="9.5" r="2.6"/><path d="M16.2 14.6c2.3.1 3.9 1.6 4.3 4.4"/></svg></a>
+    <a class="rail-btn" href="#sec-impact" data-rail="sec-impact" title="Target audience / impact zone"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M7 18.5h10.5a4 4 0 0 0 .6-7.95A5.5 5.5 0 0 0 7.4 9.2 4.7 4.7 0 0 0 7 18.5z"/></svg></a>
+    <a class="rail-btn" href="#sec-inspector" data-rail="sec-inspector" title="Comment inspector"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><rect x="5" y="4.5" width="14" height="16" rx="2.5"/><path d="M9 3.5h6v2.5H9zM8.5 11h7M8.5 14.5h5"/></svg></a>
+    <div class="flex-1"></div>
+    <button type="button" class="rail-btn" id="railBrief" title="Generate operational briefing / SitRep"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round"><path d="M12 3c.6 4.3 2.7 6.4 7 7-4.3.6-6.4 2.7-7 7-.6-4.3-2.7-6.4-7-7 4.3-.6 6.4-2.7 7-7z"/><path d="M18.5 15.5c.25 1.6 1 2.35 2.5 2.5-1.5.25-2.25 1-2.5 2.5-.25-1.5-1-2.25-2.5-2.5 1.5-.15 2.25-.9 2.5-2.5z"/></svg></button>
+    <button type="button" class="rail-btn" id="railSettings" title="Backend connection / API key"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.6"><circle cx="12" cy="12" r="3"/><path d="M12 2.8v2.4M12 18.8v2.4M21.2 12h-2.4M5.2 12H2.8M18.5 5.5l-1.7 1.7M7.2 16.8l-1.7 1.7M18.5 18.5l-1.7-1.7M7.2 7.2 5.5 5.5" stroke-linecap="round"/></svg></button>
+  </nav>
 
-  <!-- COMMAND BAR -->
-  <header class="cmdbar flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3 px-3 sm:px-4 py-3">
-    <div class="flex items-start sm:items-center gap-3 min-w-0">
-      <div class="w-11 h-11 shrink-0 grid place-items-center hud-logo">
-        <svg viewBox="0 0 24 24" class="w-6 h-6 text-cyan-300" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l8 3.5v6c0 5-3.4 8.8-8 10.5-4.6-1.7-8-5.5-8-10.5v-6L12 2z"/><circle cx="12" cy="11" r="3"/><path d="M12 5v3M12 14v3M6.5 11h2.5M15 11h2.5"/></svg>
-      </div>
-      <div class="min-w-0">
-        <div class="flex flex-wrap items-center gap-2">
-          <span class="font-mono text-[10px] tracking-[0.3em] text-cyan-400/80">HTCCIP // C2-ISR</span>
-          <span class="text-[10px] font-mono px-2 py-0.5 border border-amber-500/40 text-amber-300 bg-amber-500/10 whitespace-nowrap">PROTOTYPE · SIMULATED DATA</span>
+  <div class="flex-1 min-w-0 space-y-4">
+
+    <!-- TOP BAR -->
+    <header class="flex flex-wrap items-center gap-2.5">
+      <a href="#sec-overview" class="lg:hidden logo-grid grid grid-cols-3 gap-[3px] mr-1" aria-label="Overview"><i></i><i style="opacity:.55"></i><i></i><i style="opacity:.55"></i><i></i><i style="opacity:.3"></i><i></i><i style="opacity:.3"></i><i></i></a>
+      <div class="min-w-0 mr-auto">
+        <div class="flex items-center gap-2 flex-wrap">
+          <span class="text-[13px] font-semibold tracking-tight text-slate-100">HTCCIP</span>
+          <span class="text-[10px] font-medium px-2 py-0.5 rounded-md bg-cyan-400/10 text-cyan-300 border border-cyan-400/20 whitespace-nowrap">UNCLASSIFIED // EXERCISE · SIMULATED DATA</span>
         </div>
-        <h1 class="font-semibold tracking-tight text-base sm:text-lg leading-snug">Hybrid Threat &amp; Coordinated Campaign Intelligence Platform</h1>
-        <p class="text-[11px] sm:text-xs text-slate-400 leading-snug">Situational-awareness console · information + physical domain <span class="text-slate-500">(MoD / Cyber-Defense Division)</span></p>
+        <div class="flex items-center gap-3 font-mono text-[10.5px] text-slate-500 mt-1">
+          <span>ZULU <span id="clkZ" class="text-cyan-300">--:--:--Z</span></span>
+          <span class="hidden sm:inline">LOCAL <span id="clkL" class="text-slate-300">--:--:--</span></span>
+          <span class="hidden md:inline">DTG <span id="clkD" class="text-slate-400">------</span></span>
+        </div>
       </div>
-    </div>
-    <div class="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
-      <div class="flex items-center gap-4 font-mono text-[11px] text-slate-400">
-        <div><div class="text-[9px] tracking-[0.2em] text-slate-500">ZULU</div><div id="clkZ" class="text-cyan-300 text-sm">--:--:--Z</div></div>
-        <div><div class="text-[9px] tracking-[0.2em] text-slate-500">LOCAL</div><div id="clkL" class="text-slate-200 text-sm">--:--:--</div></div>
-        <div><div class="text-[9px] tracking-[0.2em] text-slate-500">DTG</div><div id="clkD" class="text-slate-300 text-sm">------</div></div>
+      <label class="pill"><span>Region:</span><select id="pillRegion" aria-label="Map region"><option value="strategic">Europe (strategic)</option><option value="theatre">Kosovo / Albania</option></select></label>
+      <label class="pill"><span>View:</span><select id="pillStage" aria-label="Map mode"><option value="3d">3D globe</option><option value="2d">2D map</option></select></label>
+      <label class="pill"><span>Tier:</span><select id="pillTier" aria-label="Comment filter"><option value="all">All</option></select></label>
+      <label class="pill w-full sm:w-auto sm:min-w-[230px] 2xl:min-w-[270px]">
+        <input id="search" type="search" autocomplete="off" placeholder="Search comments or @user…" class="flex-1 min-w-0 bg-transparent text-[12.5px] text-slate-100 placeholder:text-slate-500 outline-none">
+        <svg viewBox="0 0 24 24" width="17" height="17" fill="none" stroke="currentColor" stroke-width="1.7" class="shrink-0"><circle cx="11" cy="11" r="6.5"/><path d="m16 16 4 4" stroke-linecap="round"/></svg>
+      </label>
+      <div class="relative">
+        <button type="button" id="btnBell" class="icon-btn" aria-label="Notifications" aria-expanded="false" aria-controls="notif">
+          <svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M6 16.5V11a6 6 0 0 1 12 0v5.5l1.5 1.8h-15z"/><path d="M10 20.5a2.2 2.2 0 0 0 4 0"/></svg>
+          <span id="bellDot" class="hidden absolute top-[9px] right-[10px] w-2 h-2 rounded-full bg-rose-500 ring-2 ring-black"></span>
+        </button>
+        <div id="notif" class="notif hidden glass p-2 shadow-2xl" role="dialog" aria-label="Notifications"></div>
       </div>
-      <div class="flex flex-wrap gap-2">
-        <button id="btnReset" class="btn-hud">Reset demo</button>
-        <button id="btnCopy" class="btn-hud">Copy JSON</button>
-        <button id="btnPdf" class="btn-hud" title="Opens the print dialog — choose “Save as PDF”">Export SitRep PDF</button>
-        <button id="btnLive" class="btn-hud btn-cyan inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-cyan-300 pulse-dot"></span>Live Test</button>
-        <button id="btnSitrep" class="btn-hud btn-amber">Generate Operational Briefing / SitRep</button>
+      <div class="icon-btn avatar text-[12px] font-semibold" title="Analyst session (local)">AN</div>
+    </header>
+
+    <!-- LIVE BACKEND (shown when the API at API_BASE answers /api/health) -->
+    <section id="livePanel" class="hidden panel px-4 py-3 flex flex-col lg:flex-row lg:items-center gap-3">
+      <div class="flex items-center gap-2 shrink-0"><span id="liveDot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span><span id="liveStatus" class="text-xs font-mono text-slate-300">Connecting…</span></div>
+      <select id="liveThreads" class="flex-1 min-w-0 text-xs bg-ink-950 border border-ink-600 rounded-[10px] px-2.5 py-2 focus:outline-none focus:border-cyan-500"></select>
+      <div class="flex flex-wrap gap-2 shrink-0">
+        <input id="liveKey" type="password" placeholder="API key" class="hidden w-28 text-xs bg-ink-950 border border-ink-600 rounded-[10px] px-2.5 py-2">
+        <select id="liveScenario" title="Attack simulation scenario" class="text-xs bg-ink-950 border border-ink-600 rounded-[10px] px-2 py-2 focus:outline-none focus:border-rose-500">
+          <option value="kfor">Scenario: NATO / KFOR disinformation</option>
+          <option value="energy">Scenario: Energy infrastructure cyber-panic</option>
+        </select>
+        <button id="liveSim" class="btn-hud btn-crimson">Simulate attack</button>
+        <button id="liveOperations" type="button" class="btn-hud btn-cyan">Operations</button>
+        <button id="liveDemo" class="btn-hud">Demo data</button>
       </div>
-    </div>
-  </header>
+    </section>
 
-  <!-- LIVE BACKEND (shown when the API at API_BASE answers /api/health) -->
-  <section id="livePanel" class="hidden panel px-4 py-3 flex flex-col lg:flex-row lg:items-center gap-3 border-emerald-500/30">
-    <div class="flex items-center gap-2 shrink-0"><span id="liveDot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span><span id="liveStatus" class="text-xs font-mono text-slate-300">Connecting…</span></div>
-    <select id="liveThreads" class="flex-1 min-w-0 text-xs bg-ink-950 border border-ink-600 px-2.5 py-1.5 focus:outline-none focus:border-cyan-500"></select>
-    <div class="flex flex-wrap gap-2 shrink-0">
-      <input id="liveKey" type="password" placeholder="API key" class="hidden w-28 text-xs bg-ink-950 border border-ink-600 px-2.5 py-1.5">
-      <select id="liveScenario" title="Attack simulation scenario" class="text-xs bg-ink-950 border border-ink-600 px-2 py-1.5 focus:outline-none focus:border-rose-500">
-        <option value="kfor">Scenario: NATO / KFOR disinformation</option>
-        <option value="energy">Scenario: Energy infrastructure cyber-panic</option>
-      </select>
-      <button id="liveSim" class="btn-hud btn-crimson">Simulate attack</button>
-      <button id="liveOperations" type="button" class="btn-hud btn-cyan">Operations</button>
-      <button id="liveDemo" class="btn-hud">Demo data</button>
-    </div>
-  </section>
+    <!-- OPERATIONS (campaign cases / sources / alerts — driven by operations.js) -->
+    <dialog id="operations" class="ops-dialog bg-ink-950 text-slate-200 border border-ink-600 rounded-2xl p-5 w-[min(94vw,48rem)] max-h-[85vh] backdrop:bg-black/70">
+      <form method="dialog"><button class="btn-hud float-right" aria-label="Close operations">Close</button></form>
+      <h2 class="hud-title mb-3">Operations</h2>
+      <div class="flex flex-wrap items-center gap-2 mb-3 text-sm">
+        <button type="button" class="seg" data-ops="cases">Campaign cases</button>
+        <button type="button" class="seg" data-ops="sources">Sources</button>
+        <button type="button" class="seg" data-ops="alerts">Alerts</button>
+        <label class="text-xs text-slate-400 inline-flex items-center gap-1.5 ml-1"><input id="exerciseCases" type="checkbox" class="accent-cyan-400"> Exercise cases</label>
+      </div>
+      <p id="operationsStatus" role="status" class="text-xs text-slate-400 mb-2"></p>
+      <div id="operationsBody" class="text-sm space-y-3"></div>
+    </dialog>
 
-  <!-- OPERATIONS (campaign cases / sources / alerts — driven by operations.js) -->
-  <dialog id="operations" class="ops-dialog bg-ink-950 text-slate-200 border border-ink-600 p-5 w-[min(94vw,48rem)] max-h-[85vh] backdrop:bg-black/70">
-    <form method="dialog"><button class="btn-hud float-right" aria-label="Close operations">Close</button></form>
-    <h2 class="hud-title mb-3">Operations</h2>
-    <div class="flex flex-wrap items-center gap-2 mb-3 text-sm">
-      <button type="button" class="seg" data-ops="cases">Campaign cases</button>
-      <button type="button" class="seg" data-ops="sources">Sources</button>
-      <button type="button" class="seg" data-ops="alerts">Alerts</button>
-      <label class="text-xs text-slate-400 inline-flex items-center gap-1.5 ml-1"><input id="exerciseCases" type="checkbox" class="accent-cyan-400"> Exercise cases</label>
-    </div>
-    <p id="operationsStatus" role="status" class="text-xs text-slate-400 mb-2"></p>
-    <div id="operationsBody" class="text-sm space-y-3"></div>
-  </dialog>
+    <!-- OVERVIEW: globe/map stage + telemetry column -->
+    <section id="sec-overview" class="grid gap-4 xl:grid-cols-[minmax(0,1fr)_350px] 2xl:grid-cols-[minmax(0,1fr)_380px] items-start scroll-mt-6">
+      <div class="min-w-0 space-y-4">
+        <div class="panel hero-stage overflow-hidden">
+          <div class="relative stage-frame">
+           <div class="relative">
+            <div id="map" class="w-full h-[460px] sm:h-[560px] xl:h-[640px] 2xl:h-[680px] bg-black overflow-hidden"></div>
+            <div id="globeWrap" class="hidden absolute inset-0 z-[1050] hero-stage overflow-hidden">
+              <canvas id="globe" class="w-full h-full block cursor-grab" aria-label="3D globe: hostile infrastructure, attack arcs and counter-UAS activity"></canvas>
+              <div id="threatPanel" class="hidden sm:block absolute right-4 top-16 z-10 w-[236px] glass p-3.5">
+                <div class="flex items-center justify-between gap-2"><span class="text-[12.5px] font-medium text-slate-100">Threat replay</span><span id="tpClock" class="font-mono text-[10.5px] text-cyan-300">T+0 min</span></div>
+                <div class="text-[10.5px] text-slate-500 mt-0.5 leading-snug">Every comment in the thread, re-played from its source infrastructure · simulated data</div>
+                <div id="tpTypes" class="mt-2.5 space-y-0.5"></div>
+                <div class="flex items-center gap-1 mt-2.5"><button type="button" id="tpPlay" class="seg">Pause</button><div id="tpSpeed" class="flex gap-1"></div></div>
+                <div class="text-[10px] uppercase tracking-wider text-slate-500 mt-3 mb-1.5">Latest events</div>
+                <div id="tpFeed" class="space-y-1 font-mono text-[10px] min-h-[70px]"></div>
+              </div>
+              <div id="globeHud" class="hidden sm:block pointer-events-none absolute right-4 bottom-11 text-right font-mono text-[10px] leading-relaxed text-cyan-300/75"></div>
+              <div class="hidden sm:block pointer-events-none absolute right-4 bottom-4 font-mono text-[10px] text-slate-500 text-right">ORTHOGRAPHIC · WGS84 · drag to rotate · scroll to zoom</div>
+            </div>
 
-  <!-- ARTICLE / MONITORED SURFACE -->
-  <section class="panel px-4 py-2.5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-    <span class="text-[10px] font-mono uppercase tracking-widest text-rose-300 bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 self-start sm:self-auto">Breaking</span>
-    <div class="min-w-0 flex-1">
-      <div class="text-sm font-medium truncate" id="artTitle"></div>
-      <div class="text-xs text-slate-500 truncate" id="artMeta"></div>
-    </div>
-    <div id="uasChip" class="hidden sm:flex"></div>
-    <div class="text-xs font-mono text-slate-400" id="artCount"></div>
-  </section>
+            <!-- hero title + monitored surface -->
+            <div class="pointer-events-none absolute left-0 top-0 z-[1080] p-4 sm:p-7 w-full sm:w-auto sm:max-w-[min(700px,62%)]">
+              <h1 class="hero-title">Hybrid Threat Operations Center</h1>
+              <p class="text-[13px] sm:text-[15px] text-slate-300/85 mt-1.5 sm:mt-2.5">Real-time coordinated-campaign &amp; counter-UAS monitoring</p>
+              <div class="pointer-events-auto mt-3 sm:mt-4 glass px-3 py-2.5 flex items-center gap-3 max-w-[540px]">
+                <span class="text-[10px] font-semibold uppercase tracking-wider text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded-md px-2 py-0.5 shrink-0">Breaking</span>
+                <div class="min-w-0 flex-1"><div class="text-[13px] font-medium truncate text-slate-100" id="artTitle"></div><div class="text-[11px] text-slate-500 truncate" id="artMeta"></div></div>
+                <div class="hidden md:block text-[11px] font-mono text-slate-400 shrink-0" id="artCount"></div>
+              </div>
+              <div id="uasChip" class="pointer-events-auto mt-2 hidden sm:flex"></div>
+            </div>
 
-  <!-- KPIs -->
-  <section id="kpis" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></section>
+            <!-- stage controls -->
+            <div class="absolute z-[1090] left-3 bottom-3 sm:left-auto sm:bottom-auto sm:right-4 sm:top-4 flex flex-wrap sm:justify-end items-center gap-1.5 max-w-[calc(100%-24px)] sm:max-w-[46%]">
+              <div id="stageModes" class="flex gap-1.5"></div>
+              <div id="mapViews" class="flex gap-1.5"></div>
+              <button id="uasToggle" class="seg seg-on" title="Show / hide the counter-UAS layer">UAS layer</button>
+            </div>
+            <div id="mapNotice" class="hidden absolute left-3 right-3 sm:right-auto bottom-14 sm:bottom-4 xl:left-[350px] z-[1100] max-w-sm text-[10.5px] leading-snug px-3 py-2 rounded-xl bg-ink-900/95 border border-amber-500/40 text-amber-200"></div>
 
-  <!-- COMMAND ROOM: left intel · centre stage · right telemetry -->
-  <main class="grid gap-3 xl:grid-cols-[300px_minmax(0,1fr)_340px] 2xl:grid-cols-[340px_minmax(0,1fr)_380px] items-start">
+           </div>
+            <!-- floating threat-activity card (inline below the map on smaller screens) -->
+            <div class="m-3 xl:m-0 xl:absolute xl:left-4 xl:bottom-4 xl:z-[1085] xl:w-[310px] glass p-4">
+              <div class="flex items-center justify-between gap-2"><h2 class="hud-title">Threat activity timeline</h2>
+                <a href="#sec-alerts" class="card-ico" title="Open the forensic fusion timeline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8 8M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></svg></a></div>
+              <div id="activity" class="mt-2"></div>
+            </div>
+          </div>
+          <div class="flex flex-wrap gap-x-4 gap-y-1.5 px-4 sm:px-5 py-3 border-t border-ink-700 text-[11px] text-slate-400">
+            <span class="inline-flex items-center gap-1.5"><svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="#f43f5e"/></svg>Hostile infrastructure</span>
+            <span class="inline-flex items-center gap-1.5"><svg width="11" height="11"><circle cx="5.5" cy="5.5" r="4" fill="#34d399" fill-opacity=".7"/></svg>Residential ISP (organic)</span>
+            <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#f43f5e" stroke-width="2" stroke-dasharray="4 3"/></svg>Attack trajectory</span>
+            <span class="inline-flex items-center gap-1.5"><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="none" stroke="#e2e8f0"/><path d="M7 0v4M7 10v4M0 7h4M10 7h4" stroke="#e2e8f0"/></svg>Targeted portal</span>
+            <span class="inline-flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1L13 7L7 13L1 7Z" fill="none" stroke="#fbbf24" stroke-width="1.5"/></svg>UAS track</span>
+            <span class="inline-flex items-center gap-1.5"><svg width="14" height="14"><rect x="2" y="2" width="10" height="10" rx="2" fill="#2ee6d3" fill-opacity=".25" stroke="#2ee6d3"/></svg>Critical site / sensor</span>
+            <span id="mapHint" class="text-slate-500 sm:ml-auto">Drag to pan · scroll or pinch to zoom · tap a node to inspect</span>
+          </div>
+        </div>
 
-    <!-- LEFT: INTELLIGENCE -->
-    <aside class="space-y-3 min-w-0 order-2 xl:order-1">
-      <div class="panel p-4">
+        <!-- ASK BAR + ACTIONS -->
+        <div class="space-y-2.5">
+          <form id="askForm" class="ask flex items-center gap-2.5 pl-4 pr-1.5 py-1.5" autocomplete="off">
+            <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="#5ff5e6" stroke-width="1.6" stroke-linejoin="round" class="shrink-0"><path d="M12 3c.6 4.3 2.7 6.4 7 7-4.3.6-6.4 2.7-7 7-.6-4.3-2.7-6.4-7-7 4.3-.6 6.4-2.7 7-7z"/></svg>
+            <input id="askInput" class="flex-1 min-w-0 text-[13.5px] text-slate-100 placeholder:text-slate-500 py-2" placeholder="Ask threat intelligence… try “drones”, “clusters”, “@korab”, “high”, “NATO” or “sitrep”" aria-label="Ask threat intelligence">
+            <button type="submit" class="w-10 h-10 grid place-items-center rounded-[11px] bg-cyan-400 text-black hover:bg-cyan-300 shrink-0" aria-label="Ask"><svg viewBox="0 0 24 24" width="17" height="17" fill="currentColor"><path d="M20.6 3.4 3.8 10.2c-.8.3-.7 1.4.1 1.6l6.6 1.7 1.7 6.6c.2.8 1.3.9 1.6.1z"/></svg></button>
+          </form>
+          <div class="flex flex-wrap items-center gap-2">
+            <button id="btnLive" class="chip"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"><rect x="3.5" y="3.5" width="17" height="17" rx="4.5"/><path d="M12 8.5v7M8.5 12h7"/></svg>Live test</button>
+            <button id="btnCopy" class="chip"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="8" y="8" width="12" height="12" rx="2.5"/><path d="M16 8V5.5A1.5 1.5 0 0 0 14.5 4h-9A1.5 1.5 0 0 0 4 5.5v9A1.5 1.5 0 0 0 5.5 16H8"/></svg>Copy JSON</button>
+            <button id="btnPdf" class="chip" title="Opens the print dialog — choose “Save as PDF”"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M6 3.5h8l4.5 4.5v12.5H6z"/><path d="M14 3.5V8h4.5M9 13h6M9 16.5h4" stroke-linecap="round"/></svg>Export SitRep PDF</button>
+            <button id="btnReset" class="chip"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4.5 12a7.5 7.5 0 1 0 2.2-5.3L4.5 9"/><path d="M4.5 4.5V9H9"/></svg>Reset demo</button>
+            <div class="flex-1"></div>
+            <button id="btnSitrep" class="chip chip-teal"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><path d="M4 19.5h16M6.5 16l4-5 3 3 4.5-6.5"/></svg>Generate briefing / SitRep</button>
+          </div>
+        </div>
+
+        <!-- KPI TILES + TEMPORAL BURST -->
+        <div class="grid gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] items-stretch">
+          <section id="kpis" class="grid grid-cols-2 gap-3"></section>
+          <div id="sec-timeline" class="panel p-4 sm:p-5 scroll-mt-6 flex flex-col">
+            <div class="flex items-start justify-between gap-2 mb-2">
+              <div><h2 class="hud-title">Temporal burst timeline</h2><p class="hud-sub">Comments per 5-min bucket after publication</p></div>
+              <div class="flex gap-3 text-[11px] text-slate-400" id="tlLegend"></div>
+            </div>
+            <div id="timeline" class="w-full my-auto pt-2"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- TELEMETRY COLUMN -->
+      <aside class="grid sm:grid-cols-2 xl:grid-cols-1 gap-4 min-w-0">
+        <div class="panel p-5">
+          <div class="flex items-center justify-between gap-2"><h2 class="hud-title">Global threat radar</h2>
+            <a href="#sec-network" class="card-ico" title="Open the account network"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8 8M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></svg></a></div>
+          <div id="radar" class="mt-1"></div>
+        </div>
+        <div class="panel p-5">
+          <div class="flex items-center justify-between gap-2"><h2 class="hud-title">Attack volume trend</h2>
+            <a href="#sec-timeline" class="card-ico" title="Open the temporal burst timeline"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8 8M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></svg></a></div>
+          <div id="volume" class="mt-3"></div>
+        </div>
+        <div class="panel p-5 sm:col-span-2 xl:col-span-1">
+          <div class="flex items-center justify-between gap-2"><h2 class="hud-title">AI threat detection</h2>
+            <a href="#sec-inspector" class="card-ico" title="Open the comment inspector"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 4h6v6M20 4l-8 8M18 14v4.5a1.5 1.5 0 0 1-1.5 1.5h-11A1.5 1.5 0 0 1 4 18.5v-11A1.5 1.5 0 0 1 5.5 6H10"/></svg></a></div>
+          <div id="detect" class="grid grid-cols-2 gap-2 mt-4"></div>
+          <h3 class="hud-title mt-6">Engine confidence</h3>
+          <p class="hud-sub">Mean sub-score of flagged comments · cross-domain correlation</p>
+          <div id="confidence" class="space-y-3.5 mt-4"></div>
+        </div>
+      </aside>
+    </section>
+
+    <!-- ANALYSIS GRID -->
+    <div class="grid gap-4 md:grid-cols-2 xl:grid-cols-12 items-start">
+      <div id="sec-alerts" class="panel p-4 sm:p-5 md:col-span-2 xl:col-span-8 scroll-mt-6">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-1 mb-3">
+          <div><h2 class="hud-title">Forensic fusion timeline</h2><p class="hud-sub">Physical-domain (UAS) and information-domain events on one clock — correlation, not attribution</p></div>
+          <span id="fusionVerdict" class="text-[11px] font-mono"></span>
+        </div>
+        <div id="fusion" class="w-full"></div>
+      </div>
+      <div id="sec-uas" class="panel p-4 sm:p-5 xl:col-span-4 scroll-mt-6">
+        <div class="flex items-center justify-between gap-2">
+          <h2 class="hud-title">Counter-UAS detection</h2>
+          <span class="tag tag-amber">SIM · SENSOR FUSION</span>
+        </div>
+        <p class="hud-sub mb-3">RF direction-finding · micro-Doppler radar · EO/IR, fused into tracks</p>
+        <div id="uas"></div>
+      </div>
+
+      <div class="panel p-4 sm:p-5 xl:col-span-4">
         <h2 class="hud-title">Threat vectors</h2>
         <p class="hud-sub mb-3">National-security narrative categories in flagged comments</p>
-        <div id="vectors" class="space-y-2"></div>
+        <div id="vectors" class="space-y-2.5"></div>
       </div>
-      <div class="panel p-4">
+      <div class="panel p-4 sm:p-5 xl:col-span-4">
         <h2 class="hud-title">Signal separation</h2>
         <p class="hud-sub mb-3">Mean sub-score: flagged vs organic comments</p>
         <div id="signals" class="space-y-3"></div>
@@ -243,147 +408,79 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
           risk = 0.30·T + 0.25·L + 0.25·N + 0.20·G<br>High ≥ 60 · Medium ≥ 35 · Organic &lt; 35
         </div>
       </div>
-      <div class="panel p-4">
-        <h2 class="hud-title">Detected clusters</h2>
-        <p class="hud-sub mb-3">Connected components with ≥ 3 accounts</p>
-        <div id="clusters" class="space-y-3 xl:max-h-[560px] xl:overflow-auto xl:pr-1"></div>
-      </div>
-    </aside>
-
-    <!-- CENTRE: GEOSPATIAL STAGE -->
-    <section class="space-y-3 min-w-0 order-1 xl:order-2">
-      <div class="panel stage p-3 sm:p-4">
-        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-2 mb-2">
-          <div><h2 class="hud-title">Geospatial threat &amp; infrastructure map</h2>
-            <p class="hud-sub">Source infrastructure by IP geolocation / ASN (not user location) · counter-UAS sensor picture. Tap a node.</p></div>
-          <div class="flex flex-wrap items-center gap-1.5 shrink-0">
-            <div id="stageModes" class="flex gap-1.5"></div>
-            <span class="w-px h-5 bg-ink-600 mx-0.5 hidden sm:block"></span>
-            <div id="mapViews" class="flex gap-1.5"></div>
-            <button id="uasToggle" class="seg seg-on" title="Show / hide the counter-UAS layer">UAS layer</button>
-          </div>
-        </div>
-        <div class="relative stage-frame">
-          <div id="map" class="w-full h-[400px] sm:h-[520px] 2xl:h-[600px] bg-ink-950/70 border border-ink-700 overflow-hidden"></div>
-          <div id="globeWrap" class="hidden absolute inset-0 z-[1050] bg-ink-950 border border-ink-700 overflow-hidden">
-            <canvas id="globe" class="w-full h-full block cursor-grab"></canvas>
-            <div id="globeHud" class="pointer-events-none absolute left-3 top-3 font-mono text-[10px] leading-relaxed text-cyan-300/80"></div>
-            <div class="pointer-events-none absolute right-3 top-3 font-mono text-[10px] text-slate-500 text-right">ORTHOGRAPHIC · WGS84<br>drag to rotate · scroll to zoom</div>
-          </div>
-          <span class="hud-corner tl"></span><span class="hud-corner tr"></span><span class="hud-corner bl"></span><span class="hud-corner br"></span>
-          <div id="mapNotice" class="hidden absolute left-2 right-2 sm:right-auto bottom-7 z-[1100] max-w-sm text-[10.5px] leading-snug px-2.5 py-1.5 bg-ink-900/95 border border-amber-500/40 text-amber-200"></div>
-        </div>
-        <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-[11px] text-slate-400">
-          <span class="inline-flex items-center gap-1.5"><svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="#f43f5e"/></svg>Hostile infrastructure</span>
-          <span class="inline-flex items-center gap-1.5"><svg width="11" height="11"><circle cx="5.5" cy="5.5" r="4" fill="#34d399" fill-opacity=".7"/></svg>Residential ISP (organic)</span>
-          <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#f43f5e" stroke-width="2" stroke-dasharray="4 3"/></svg>Attack trajectory</span>
-          <span class="inline-flex items-center gap-1.5"><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="none" stroke="#e2e8f0"/><path d="M7 0v4M7 10v4M0 7h4M10 7h4" stroke="#e2e8f0"/></svg>Targeted portal</span>
-          <span class="inline-flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1L13 7L7 13L1 7Z" fill="none" stroke="#fbbf24" stroke-width="1.5"/></svg>UAS track</span>
-          <span class="inline-flex items-center gap-1.5"><svg width="14" height="14"><rect x="2" y="2" width="10" height="10" fill="#22d3ee" fill-opacity=".25" stroke="#22d3ee"/></svg>Critical site / sensor</span>
-          <span id="mapHint" class="text-slate-500">Drag to pan · scroll or pinch to zoom · tap a node to inspect</span>
-        </div>
-      </div>
-
-      <div class="panel p-4">
-        <div class="flex items-center justify-between mb-2">
-          <div><h2 class="hud-title">Temporal burst timeline</h2><p class="hud-sub">Comments per 5-min bucket after publication</p></div>
-          <div class="flex gap-3 text-[11px] text-slate-400" id="tlLegend"></div>
-        </div>
-        <div id="timeline" class="w-full"></div>
-      </div>
-
-      <div class="panel p-4">
-        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-1 mb-2">
-          <div><h2 class="hud-title">Forensic fusion timeline</h2><p class="hud-sub">Physical-domain (UAS) and information-domain events on one clock — correlation, not attribution</p></div>
-          <span id="fusionVerdict" class="text-[11px] font-mono"></span>
-        </div>
-        <div id="fusion" class="w-full"></div>
-      </div>
-    </section>
-
-    <!-- RIGHT: TELEMETRY -->
-    <aside class="space-y-3 min-w-0 order-3">
-      <div class="panel p-4">
+      <div id="sec-infra" class="panel p-4 sm:p-5 md:col-span-2 xl:col-span-4 scroll-mt-6">
         <h2 class="hud-title">Infrastructure node inspector</h2>
         <p class="hud-sub mb-3">Simulated: documentation-range ASNs and IPs, fictional providers</p>
         <div id="infraDetail"></div>
         <div id="infraList" class="mt-3 pt-3 border-t border-ink-700 space-y-1 max-h-60 overflow-auto"></div>
       </div>
-      <div class="panel p-4">
-        <div class="flex items-center justify-between gap-2">
-          <h2 class="hud-title">Counter-UAS detection</h2>
-          <span class="text-[9px] font-mono px-1.5 py-px border border-amber-500/40 text-amber-300">SIM · SENSOR FUSION</span>
+
+      <section id="sec-network" class="panel p-4 sm:p-5 md:col-span-2 xl:col-span-8 scroll-mt-6">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-3 gap-2">
+          <div><h2 class="hud-title">Account network</h2><p class="hud-sub">Edges = friend-list overlap ≥ 50%, near-duplicate talking point, shared hosting or cross-thread co-activity. Tap a node.</p></div>
+          <div class="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-slate-400 shrink-0">
+            <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#f43f5e" stroke-opacity=".7" stroke-width="1.5"/></svg>friends</span>
+            <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#2ee6d3" stroke-width="1.5" stroke-dasharray="3 2"/></svg>content</span>
+            <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="1 2"/></svg>infra</span>
+            <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#facc15" stroke-width="1.5"/></svg>co-activity</span>
+          </div>
         </div>
-        <p class="hud-sub mb-3">RF direction-finding · micro-Doppler radar · EO/IR, fused into tracks</p>
-        <div id="uas"></div>
+        <div id="network" class="w-full bg-ink-950/60 border border-ink-700 rounded-xl overflow-hidden"></div>
+      </section>
+      <div class="panel p-4 sm:p-5 md:col-span-2 xl:col-span-4">
+        <h2 class="hud-title">Detected clusters</h2>
+        <p class="hud-sub mb-3">Connected components with ≥ 3 accounts</p>
+        <div id="clusters" class="space-y-3 xl:max-h-[520px] xl:overflow-auto xl:pr-1"></div>
       </div>
-      <div class="panel p-4">
+
+      <section id="sec-impact" class="panel p-4 sm:p-5 md:col-span-2 xl:col-span-12 scroll-mt-6">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-1 mb-3">
+          <div><h2 class="hud-title">Target audience / impact zone</h2><p class="hud-sub">Institutional portals and discourse areas where the same fingerprints were seen</p></div>
+          <span class="text-[11px] font-mono text-slate-500">cross-surface sightings feed · simulated</span>
+        </div>
+        <div id="impact" class="grid sm:grid-cols-2 lg:grid-cols-5 gap-2.5"></div>
+      </section>
+
+      <section id="sec-inspector" class="panel p-4 sm:p-5 md:col-span-2 xl:col-span-8 scroll-mt-6">
+        <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
+          <div><h2 class="hud-title">Comment inspector</h2><p class="hud-sub">Tap a row to see the evidence behind its score · search from the top bar</p></div>
+          <div id="filters" class="flex flex-wrap gap-1.5"></div>
+        </div>
+        <div class="flex flex-wrap gap-3 text-[11px] text-slate-400 mb-3">
+          <span><mark class="trope">trope</mark> narrative fingerprint</span>
+          <span><mark class="calque">calque</mark> Serbian syntax transfer</span>
+          <span><mark class="dialect">doublet</mark> Geg/Standard same-word mixing</span>
+          <span><mark class="ngram">n-gram</mark> reused by other accounts</span>
+        </div>
+        <div id="rows" class="divide-y divide-ink-700 border border-ink-700 rounded-xl overflow-hidden"></div>
+      </section>
+      <div id="sec-playbook" class="panel p-4 sm:p-5 md:col-span-2 xl:col-span-4 scroll-mt-6">
         <h2 class="hud-title">Mitigation playbook</h2>
         <p class="hud-sub mb-3">Defensive actions, generated from the active vectors and tracks</p>
         <div id="playbook"></div>
       </div>
-    </aside>
-  </main>
 
-  <!-- IMPACT ZONE -->
-  <section class="panel p-4">
-    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-1 mb-3">
-      <div><h2 class="hud-title">Target audience / impact zone</h2><p class="hud-sub">Institutional portals and discourse areas where the same fingerprints were seen</p></div>
-      <span class="text-[11px] font-mono text-slate-500">cross-surface sightings feed · simulated</span>
+      <section class="panel p-4 sm:p-5 md:col-span-2 xl:col-span-12 text-xs text-slate-400 leading-relaxed grid md:grid-cols-3 gap-5">
+        <div>
+          <h3 class="hud-title mb-1.5">What this measures</h3>
+          <p>The score measures <b class="text-slate-200">coordination</b>, not who is behind it. Infrastructure shows where traffic exits, which for VPNs and proxies is not where the operator sits; state nexus is always "not established" until corroborated by all-source intelligence. No single signal flags an account: in the seed thread, <span class="font-mono">@arben_prishtina</span> posts inside the swarm window and gets a maximum temporal score, but stays Organic because the text, narrative and account history are clean.</p>
+        </div>
+        <div>
+          <h3 class="hud-title mb-1.5">Counter-UAS fusion</h3>
+          <p>Drone tracks are a <b class="text-slate-200">simulated sensor feed</b> (RF, radar, EO/IR). The fusion timeline only tests whether physical-domain activity near critical sites lines up in time and theme with the online swarm. A match is a lead for investigators and the civil-aviation / police C-UAS authority, never proof that the same actor ran both.</p>
+        </div>
+        <div>
+          <h3 class="hud-title mb-1.5">Limits</h3>
+          <p>Dialect mixing is normal for diaspora and cross-border writers, so only <i>same-word</i> doublets count. The trope and calque lexicons are hand-written seeds and need extending with fact-checker data. Any score is a lead for human review, not a verdict. All data on this page is simulated.</p>
+        </div>
+      </section>
     </div>
-    <div id="impact" class="grid sm:grid-cols-2 lg:grid-cols-5 gap-2"></div>
-  </section>
 
-  <!-- NETWORK -->
-  <section class="panel p-4">
-    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
-      <div><h2 class="hud-title">Account network</h2><p class="hud-sub">Edges = friend-list overlap ≥ 50%, near-duplicate talking point, shared hosting or cross-thread co-activity. Tap a node.</p></div>
-      <div class="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-slate-400 shrink-0">
-        <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#f43f5e" stroke-opacity=".7" stroke-width="1.5"/></svg>friends</span>
-        <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="3 2"/></svg>content</span>
-        <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="1 2"/></svg>infra</span>
-        <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#facc15" stroke-width="1.5"/></svg>co-activity</span>
-      </div>
-    </div>
-    <div id="network" class="w-full bg-ink-950/60 border border-ink-700"></div>
-  </section>
-
-  <!-- INSPECTOR -->
-  <section class="panel p-4">
-    <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
-      <div><h2 class="hud-title">Comment inspector</h2><p class="hud-sub">Tap a row to see the evidence behind its score</p></div>
-      <div class="flex flex-wrap items-center gap-2">
-        <div id="filters" class="flex flex-wrap gap-1.5"></div>
-        <input id="search" placeholder="Search text or @user…" class="text-xs bg-ink-950 border border-ink-600 px-3 py-1.5 w-full sm:w-52 focus:outline-none focus:border-cyan-500">
-      </div>
-    </div>
-    <div class="flex flex-wrap gap-3 text-[11px] text-slate-400 mb-3">
-      <span><mark class="trope">trope</mark> narrative fingerprint</span>
-      <span><mark class="calque">calque</mark> Serbian syntax transfer</span>
-      <span><mark class="dialect">doublet</mark> Geg/Standard same-word mixing</span>
-      <span><mark class="ngram">n-gram</mark> reused by other accounts</span>
-    </div>
-    <div id="rows" class="divide-y divide-ink-700 border border-ink-700 overflow-hidden"></div>
-  </section>
-
-  <!-- METHOD -->
-  <section class="panel p-4 text-xs text-slate-400 leading-relaxed grid md:grid-cols-3 gap-4">
-    <div>
-      <h3 class="hud-title mb-1">What this measures</h3>
-      <p>The score measures <b class="text-slate-200">coordination</b>, not who is behind it. Infrastructure shows where traffic exits, which for VPNs and proxies is not where the operator sits; state nexus is always "not established" until corroborated by all-source intelligence. No single signal flags an account: in the seed thread, <span class="font-mono">@arben_prishtina</span> posts inside the swarm window and gets a maximum temporal score, but stays Organic because the text, narrative and account history are clean.</p>
-    </div>
-    <div>
-      <h3 class="hud-title mb-1">Counter-UAS fusion</h3>
-      <p>Drone tracks are a <b class="text-slate-200">simulated sensor feed</b> (RF, radar, EO/IR). The fusion timeline only tests whether physical-domain activity near critical sites lines up in time and theme with the online swarm. A match is a lead for investigators and the civil-aviation / police C-UAS authority, never proof that the same actor ran both.</p>
-    </div>
-    <div>
-      <h3 class="hud-title mb-1">Limits</h3>
-      <p>Dialect mixing is normal for diaspora and cross-border writers, so only <i>same-word</i> doublets count. The trope and calque lexicons are hand-written seeds and need extending with fact-checker data. Any score is a lead for human review, not a verdict. All data on this page is simulated.</p>
-    </div>
-  </section>
-
-  <!-- STATUS TICKER -->
-  <footer id="ticker" class="ticker font-mono text-[10px] text-slate-500 px-3 py-1.5 flex flex-wrap gap-x-5 gap-y-1"></footer>
+    <!-- STATUS TICKER -->
+    <footer id="ticker" class="ticker font-mono text-[10px] text-slate-500 px-4 py-2 flex flex-wrap gap-x-5 gap-y-1"></footer>
+  </div>
+ </div>
+</div>
 </div>
 
 <!-- LIVE TEST MODAL -->
@@ -1127,21 +1224,19 @@ if (typeof module !== "undefined") module.exports = Engine;
     const th = state.res.thread; const lv = ALERT[th.level];
     const peak = th.peak; const dur = peak ? Math.round((peak.end - peak.start) / 1000) : 0;
     const hostile = state.res.infra.filter((g) => g.hostile);
+    const lvTone = th.level === 1 ? 'bad' : th.level === 2 ? 'warn' : 'mute';
+    const card = (label, value, pill, tone, sub, extra = '') => `<div class="panel p-4 sm:p-5 flex flex-col justify-between min-h-[150px] ${extra}">
+        <div class="text-[13px] text-slate-400">${label}</div>
+        <div class="mt-5"><div class="flex items-end justify-between gap-2 flex-wrap">${value}${pill ? `<span class="delta ${tone}">${pill}</span>` : ''}</div>
+        ${sub ? `<div class="text-[11px] text-slate-500 mt-2 leading-snug">${sub}</div>` : ''}</div></div>`;
     const cards = [
-      `<div class="panel p-4 scan border ${lv[4]}"><div class="text-[11px] uppercase tracking-wider text-slate-500">PSYOP / Hybrid Warfare Alert</div>
-        <div class="flex items-center gap-2 mt-1.5"><span class="w-2.5 h-2.5 rounded-full ${lv[3]} pulse-dot"></span><span class="font-mono text-xl sm:text-2xl font-semibold ${lv[2]}">${lv[0]}</span></div>
-        <div class="text-xs ${lv[2]} opacity-80 mt-0.5">(${lv[1]})</div>
-        <div class="text-[11px] text-slate-500 mt-1">Analytic indicator, not attribution</div></div>`,
-      `<div class="panel p-4"><div class="text-[11px] uppercase tracking-wider text-slate-500">Coordinated comments</div>
-        <div class="font-mono text-xl sm:text-2xl font-semibold mt-1.5">${Math.round(th.pct * 100)}<span class="text-slate-500 text-base">%</span></div>
-        <div class="flex h-1.5 rounded-full overflow-hidden mt-2 bg-ink-700"><div style="width:${th.high / th.n * 100}%" class="bg-rose-500"></div><div style="width:${th.medium / th.n * 100}%" class="bg-amber-500"></div></div>
-        <div class="text-xs text-slate-500 mt-1.5">${th.high} high · ${th.medium} medium · ${th.organic} organic${state.res.clusters[0] ? ' · cluster of ' + state.res.clusters[0].size : ''}</div></div>`,
-      `<div class="panel p-4"><div class="text-[11px] uppercase tracking-wider text-slate-500">Peak swarm window</div>
-        <div class="font-mono text-xl sm:text-2xl font-semibold mt-1.5">${peak ? hhmm(peak.start) + '<span class="text-slate-500">–</span>' + hhmm(peak.end) : '—'}</div>
-        <div class="text-xs text-slate-500 mt-1">${peak ? `${peak.count} comments in ${Math.floor(dur / 60)}m ${dur % 60}s · ${peak.coordinated} flagged · T+${Math.round((peak.start - th.published) / 60000)} min` : 'No burst detected'}</div></div>`,
-      `<div class="panel p-4"><div class="text-[11px] uppercase tracking-wider text-slate-500">Hostile infrastructure</div>
-        <div class="font-mono text-xl sm:text-2xl font-semibold mt-1.5">${hostile.length} <span class="text-slate-500 text-base">nodes</span></div>
-        <div class="text-xs text-slate-400 mt-1 truncate">${hostile.map((g) => esc(g.asn) + ' <span class="text-slate-500">' + g.type + '</span>').join(' · ') || '<span class="text-slate-500">No infrastructure telemetry</span>'}</div></div>`,
+      card('PSYOP / hybrid warfare alert', `<div class="flex items-center gap-2"><span class="w-2.5 h-2.5 rounded-full ${lv[3]} pulse-dot"></span><span class="big-num !text-[30px] ${lv[2]}">${lv[0]}</span></div>`, lv[1], lvTone, 'Analytic indicator, not attribution', `scan border ${lv[4]}`),
+      card('Coordinated comments', `<div class="big-num">${Math.round(th.pct * 100)}<span class="text-slate-500 text-xl">%</span></div>`, `${th.high} high`, th.high ? 'bad' : 'mute',
+        `<div class="flex h-1.5 rounded-full overflow-hidden mb-1.5 bg-ink-700"><div style="width:${th.high / th.n * 100}%" class="bg-rose-500"></div><div style="width:${th.medium / th.n * 100}%" class="bg-amber-500"></div></div>${th.medium} medium · ${th.organic} organic${state.res.clusters[0] ? ' · cluster of ' + state.res.clusters[0].size : ''}`),
+      card('Peak swarm window', `<div class="big-num !text-[26px]">${peak ? hhmm(peak.start) + '<span class="text-slate-500">–</span>' + hhmm(peak.end) : '—'}</div>`, peak ? `${peak.count} in ${Math.floor(dur / 60)}m ${dur % 60}s` : '', 'warn',
+        peak ? `${peak.coordinated} flagged · T+${Math.round((peak.start - th.published) / 60000)} min after publication` : 'No burst detected'),
+      card('Hostile infrastructure', `<div class="big-num">${hostile.length}<span class="text-slate-500 text-xl"> nodes</span></div>`, hostile.length ? hostile.map((g) => g.type).filter((x, i, a) => a.indexOf(x) === i).join(' · ') : '', 'bad',
+        `<span class="block truncate">${hostile.map((g) => esc(g.asn)).join(' · ') || 'No infrastructure telemetry'}</span>`),
     ];
     $('#kpis').innerHTML = cards.join('');
   }
@@ -1241,7 +1336,8 @@ if (typeof module !== "undefined") module.exports = Engine;
     if (LMAP) return true;
     if (!window.L || !L.map) return false;
     const el = $('#map'); el.innerHTML = '';
-    LMAP = L.map(el, { zoomSnap: 0.25, minZoom: 3, maxZoom: 13, worldCopyJump: false, attributionControl: true, zoomControl: true });
+    LMAP = L.map(el, { zoomSnap: 0.25, minZoom: 3, maxZoom: 13, worldCopyJump: false, attributionControl: true, zoomControl: false });
+    L.control.zoom({ position: 'bottomright' }).addTo(LMAP); // top-left is taken by the hero title overlay
     LMAP.attributionControl.setPrefix('Leaflet');
     LMAP.fitBounds(VIEW_BOUNDS[state.mapView], { padding: [10, 10] });
     const tiles = L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, className: 'osm-dark-tiles', attribution: '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noopener">OpenStreetMap</a> contributors' }).addTo(LMAP);
@@ -1296,6 +1392,7 @@ if (typeof module !== "undefined") module.exports = Engine;
   }
   function renderMap() {
     const v = state.mapView;
+    if ($('#pillRegion')) $('#pillRegion').value = v;
     $('#mapViews').innerHTML = Object.entries(MAPV).map(([k, x]) => `<button data-mv="${k}" class="seg ${v === k ? 'seg-on' : ''}">${x.label}</button>`).join('');
     if (!initLeaflet()) { $('#mapHint').textContent = 'Interactive map library unavailable offline: showing the schematic view. Tap a node to inspect.'; renderSchematic(); return; }
     $('#mapViews').querySelectorAll('[data-mv]').forEach((b) => b.addEventListener('click', () => { state.mapView = b.dataset.mv; renderMap(); LMAP.flyToBounds(VIEW_BOUNDS[state.mapView], { padding: [10, 10], duration: 1.3 }); }));
@@ -1459,7 +1556,7 @@ if (typeof module !== "undefined") module.exports = Engine;
       g += `<line x1="${xx}" x2="${xx}" y1="${m.t + ih}" y2="${m.t + ih + 4}" stroke="#475569"/><text x="${xx}" y="${H - 8}" fill="#64748b" font-size="10" text-anchor="middle" font-family="JetBrains Mono, ui-monospace, monospace">${mm === 0 ? 'pub' : (mm > 0 ? '+' : '') + mm + 'm'}</text>`;
     }
     const px = m.l + ((0 - minMin) / 5) * bw;
-    g += `<line x1="${px}" x2="${px}" y1="${m.t - 10}" y2="${m.t + ih}" stroke="#22d3ee" stroke-width="1.2"/><text x="${px + 4}" y="${m.t - 12}" fill="#67e8f9" font-size="10" font-family="JetBrains Mono, ui-monospace, monospace">article live ${hhmm(pub)}</text>`;
+    g += `<line x1="${px}" x2="${px}" y1="${m.t - 10}" y2="${m.t + ih}" stroke="#2ee6d3" stroke-width="1.2"/><text x="${px + 4}" y="${m.t - 12}" fill="#6ff7e6" font-size="10" font-family="JetBrains Mono, ui-monospace, monospace">article live ${hhmm(pub)}</text>`;
     $('#timeline').innerHTML = `<div class="overflow-x-auto -mx-1 px-1"><svg viewBox="0 0 ${W} ${H}" class="w-full min-w-[600px] h-auto">${g}</svg></div>`;
     updateTimelineSelection();
     $('#tlLegend').innerHTML = ['high', 'medium', 'organic'].map((t) => `<span class="inline-flex items-center gap-1"><span class="w-2.5 h-2.5 rounded-sm" style="background:${TIER[t].hex}"></span>${TIER[t].label}</span>`).join('');
@@ -1517,7 +1614,7 @@ if (typeof module !== "undefined") module.exports = Engine;
         ? `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#f43f5e" stroke-opacity="${on ? 0.32 : 0.06}" stroke-width="${on && selU ? 1.6 : 1}"/>`
         : e.type === 'infra' ? `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#a78bfa" stroke-opacity="${on ? 0.6 : 0.08}" stroke-width="1.2" stroke-dasharray="1 3"/>`
         : e.type === 'coactivity' ? `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#facc15" stroke-opacity="${on ? 0.55 : 0.08}" stroke-width="${0.8 + Math.min(3, e.w) * 0.5}"/>`
-        : `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#22d3ee" stroke-opacity="${on ? 0.75 : 0.1}" stroke-width="1.3" stroke-dasharray="4 3"/>`;
+        : `<line x1="${a.x}" y1="${a.y}" x2="${b.x}" y2="${b.y}" stroke="#2ee6d3" stroke-opacity="${on ? 0.75 : 0.1}" stroke-width="1.3" stroke-dasharray="4 3"/>`;
     });
     nodes.forEach((n) => {
       const t = Engine.analyze ? (n.score >= 60 ? 'high' : n.score >= 35 ? 'medium' : 'organic') : 'organic';
@@ -1614,6 +1711,7 @@ if (typeof module !== "undefined") module.exports = Engine;
       renderInspector();
       $('#filters').querySelector('[data-f="all"]')?.focus({ preventScroll: true });
     });
+    const pt = $('#pillTier'); if (pt) { pt.replaceChildren(...fl.map(([k, l]) => new Option(`${l} (${cnt[k]})`, k))); pt.value = state.filter; }
     const q = state.q.toLowerCase();
     const rows = items.filter((i) => (state.filter === 'all' || (state.filter === 'live' ? i.c.source === 'live' : state.filter === 'infra' ? (i.c.infra && i.c.infra.node === state.infraSel) : i.tier === state.filter)) && (!q || i.c.text.toLowerCase().includes(q) || i.c.user.toLowerCase().includes(q.replace(/^@/, ''))));
     const pageCount = Math.ceil(rows.length / INSPECTOR_PAGE_SIZE);
@@ -2055,7 +2153,7 @@ if (typeof module !== "undefined") module.exports = Engine;
       t.path = pts;
     });
   })();
-  Object.assign(state, { uasOn: true, uasSel: 'UAS-01', stage: '2d', playDone: new Set() });
+  Object.assign(state, { uasOn: true, uasSel: 'UAS-01', stage: '3d', playDone: new Set() });
   const fmtLL = (la, lo) => `${Math.abs(la).toFixed(3)}${la >= 0 ? 'N' : 'S'} ${String(Math.abs(lo).toFixed(3)).padStart(7, '0')}${lo >= 0 ? 'E' : 'W'}`;
   const tRel = (m) => (m === 0 ? 'T±0' : (m > 0 ? 'T+' : 'T') + m) + ' min';
 
@@ -2180,7 +2278,7 @@ if (typeof module !== "undefined") module.exports = Engine;
       g += `<line x1="${xx}" x2="${xx}" y1="${top}" y2="${top + lanes.length * lh}" stroke="#16212c"/><text x="${xx}" y="${H - 4}" fill="#64748b" font-size="9.5" text-anchor="middle" ${mono}>${m === 0 ? 'T±0' : (m > 0 ? 'T+' : 'T') + m}</text>`;
     }
     if (pk) g += `<rect x="${x(pk.start) - 2}" y="${top + 2}" width="${Math.max(4, x(pk.end) - x(pk.start) + 4)}" height="${lanes.length * lh - 4}" fill="#f43f5e" fill-opacity=".07" stroke="#f43f5e" stroke-opacity=".45" stroke-dasharray="3 3"/>`;
-    const px = x(pub); g += `<line x1="${px}" x2="${px}" y1="${top}" y2="${top + lanes.length * lh}" stroke="#22d3ee" stroke-width="1.2"/>`;
+    const px = x(pub); g += `<line x1="${px}" x2="${px}" y1="${top}" y2="${top + lanes.length * lh}" stroke="#2ee6d3" stroke-width="1.2"/>`;
     A.tracks.forEach((t) => {
       const c = t.hostile ? '#fbbf24' : '#64748b', sel = t.id === state.uasSel, x0 = x(t.start), x1 = x(t.end);
       g += `<g data-fuas="${t.id}" style="cursor:pointer"><rect x="${x0}" y="${ly(0) - 6}" width="${Math.max(3, x1 - x0)}" height="12" fill="${c}" fill-opacity="${sel ? .9 : .55}" stroke="${sel ? '#fff' : 'none'}" stroke-width="1"><title>${t.id} · ${hhmm(t.start)}–${hhmm(t.end)} · ${t.siteObj.label}</title></rect>
@@ -2190,7 +2288,7 @@ if (typeof module !== "undefined") module.exports = Engine;
     panic.forEach((i) => { g += `<circle cx="${x(i.t)}" cy="${ly(2)}" r="3.6" fill="#f43f5e"><title>${hhmm(i.t, true)} @${esc(i.c.user)} · ${esc(i.c.text.slice(0, 80))}</title></circle>`; });
     if (!panic.length) g += `<text x="${L + 8}" y="${ly(2) + 3}" fill="#475569" font-size="9.5" ${mono}>no infrastructure-panic posts in this thread</text>`;
     flagged.forEach((i) => { g += `<circle cx="${x(i.t)}" cy="${ly(3) + ((i.c.id.charCodeAt(i.c.id.length - 1) % 5) - 2) * 2}" r="2.6" fill="${TIER[i.tier].hex}" fill-opacity=".9"><title>${hhmm(i.t, true)} @${esc(i.c.user)} · risk ${i.score}</title></circle>`; });
-    g += `<text x="${px - 5}" y="${ly(4) + 3}" fill="#67e8f9" font-size="9.5" text-anchor="end" ${mono}>ARTICLE LIVE ${hhmm(pub)}</text>`; // left of the line, so the alert label can sit to the right
+    g += `<text x="${px - 5}" y="${ly(4) + 3}" fill="#6ff7e6" font-size="9.5" text-anchor="end" ${mono}>ARTICLE LIVE ${hhmm(pub)}</text>`; // left of the line, so the alert label can sit to the right
     if (pk && th.level <= 2) { const ax = x(pk.end); g += `<path d="M${ax} ${ly(4) - 6}L${ax + 6} ${ly(4) + 5}L${ax - 6} ${ly(4) + 5}Z" fill="${th.level === 1 ? '#f43f5e' : '#f59e0b'}"/><text x="${ax + 9}" y="${ly(4) + 4}" fill="${th.level === 1 ? '#fda4af' : '#fcd34d'}" font-size="9.5" ${mono}>LEVEL ${th.level} ALERT ${hhmm(pk.end)}</text>`; }
     if (A.top && pk && A.top.lead !== null && A.top.lead >= 0) {
       const ax = x(A.top.end), bx = x(pk.start), ay = ly(0) + 6, by = ly(3) - 4, mx = (ax + bx) / 2;
@@ -2267,8 +2365,8 @@ if (typeof module !== "undefined") module.exports = Engine;
   function drawUasLeaflet() {
     const A = uasAnalysis(), near = state.mapView === 'theatre';
     UAS_SENSORS.forEach((s) => {
-      L.circle([s.lat, s.lon], { radius: s.r, color: '#22d3ee', weight: 1, opacity: 0.45, dashArray: '2 6', fillColor: '#22d3ee', fillOpacity: 0.025, interactive: false }).addTo(LDATA);
-      L.marker([s.lat, s.lon], { icon: L.divIcon({ className: '', iconSize: [12, 12], iconAnchor: [6, 6], html: '<svg width="12" height="12"><rect x="1.5" y="1.5" width="9" height="9" fill="#22d3ee33" stroke="#22d3ee"/><circle cx="6" cy="6" r="1.5" fill="#a5f3fc"/></svg>' }) })
+      L.circle([s.lat, s.lon], { radius: s.r, color: '#2ee6d3', weight: 1, opacity: 0.45, dashArray: '2 6', fillColor: '#2ee6d3', fillOpacity: 0.025, interactive: false }).addTo(LDATA);
+      L.marker([s.lat, s.lon], { icon: L.divIcon({ className: '', iconSize: [12, 12], iconAnchor: [6, 6], html: '<svg width="12" height="12"><rect x="1.5" y="1.5" width="9" height="9" fill="#2ee6d333" stroke="#2ee6d3"/><circle cx="6" cy="6" r="1.5" fill="#b5fff5"/></svg>' }) })
         .addTo(LDATA).bindTooltip(`${s.id} · ${s.label} · ${s.r / 1000} km`, { direction: 'bottom', offset: [0, 6], className: 'tip-site' });
     });
     CRIT_SITES.forEach((s) => {
@@ -2292,9 +2390,53 @@ if (typeof module !== "undefined") module.exports = Engine;
     const cv = $('#globe'), wrap = $('#globeWrap'), hud = $('#globeHud'); const ctx = cv.getContext('2d');
     const VIEW3D = { strategic: { lon: 14, lat: 42, z: 1.12 }, theatre: { lon: 17.5, lat: 45.5, z: 3.6 } };
     const DETAIL_Z = 150; // individual UAS tracks + site markers only when zoomed this far in
-    let W = 0, H = 0, dpr = 1, running = false, raf = 0, dots = null, hits = [], drag = null, userLock = false, frame = 0;
+    let W = 0, H = 0, dpr = 1, running = false, raf = 0, dots = null, stars = null, mesh = null, hits = [], drag = null, userLock = false, frame = 0;
     const rot = { lon: 14, lat: 44, z: 1 }, tgt = { lon: 14, lat: 44, z: 1 };
     const D2R = Math.PI / 180;
+    // ---- threat replay: the thread's comments re-played as comets (source egress -> target), coloured by threat type ----
+    const TT = { high: ['Coordinated swarm', '#f43f5e'], medium: ['Suspicious', '#fb923c'], organic: ['Organic baseline', '#34d399'], uas: ['UAS incursion', '#facc15'] };
+    const SPEEDS = [60, 120, 300];
+    const RP = { on: true, speed: 120, t: 0, last: 0, idx: 0, res: null, evs: [], t0: 0, span: 1, comets: [], ripples: [], cnt: {}, feed: [], off: new Set(), dirty: true };
+    const hsh = (str) => { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619) >>> 0; } return h; };
+    const resetLoop = () => { RP.t = 0; RP.idx = 0; RP.cnt = { high: 0, medium: 0, organic: 0, uas: 0 }; RP.dirty = true; };
+    function buildEvents() {
+      const r = state.res; RP.res = r; const evs = [], nodes = new Map((r.infra || []).map((g) => [g.node, g]));
+      r.items.forEach((i) => {
+        const inf = i.c.infra; if (isNaN(i.t) || !inf) return;
+        const g = nodes.get(inf.node), lat = isFinite(inf.lat) ? +inf.lat : g && g.lat, lon = isFinite(inf.lon) ? +inf.lon : g && g.lon;
+        if (!isFinite(lat) || !isFinite(lon) || !TT[i.tier]) return;
+        const h = hsh(String(i.c.id) + i.c.user), cc = inf.cc || (g && g.cc) || ''; // deterministic jitter so a node fans out instead of firing from one pixel
+        evs.push({ t: i.t, cat: i.tier, from: [lat + ((h % 100) / 100 - 0.5) * 1.1, lon + (((h >> 8) % 100) / 100 - 0.5) * 1.5], who: '@' + i.c.user, via: inf.node + (cc ? ' ' + cc : '') });
+      });
+      uasAnalysis().tracks.filter((t) => t.hostile).forEach((t) => evs.push({ t: t.start, cat: 'uas', site: [t.siteObj.lat, t.siteObj.lon], who: t.id, via: t.siteObj.id }));
+      evs.sort((a, b) => a.t - b.t);
+      RP.evs = evs; RP.t0 = evs.length ? evs[0].t - 60000 : 0; RP.span = evs.length ? evs[evs.length - 1].t - RP.t0 + 5 * 60000 : 1;
+      RP.comets = []; RP.ripples = []; RP.feed = []; resetLoop(); renderTP(true);
+    }
+    const tp = { types: $('#tpTypes'), clock: $('#tpClock'), feed: $('#tpFeed'), play: $('#tpPlay'), speed: $('#tpSpeed') };
+    function renderTP(full) {
+      if (!tp.types) return;
+      if (full) {
+        tp.types.innerHTML = Object.entries(TT).map(([k, [l, c]]) => `<button type="button" data-tt="${k}" aria-pressed="${!RP.off.has(k)}" title="Show / hide ${l.toLowerCase()} events" class="w-full flex items-center gap-2 px-2 py-1.5 rounded-lg hover:bg-white/5 text-left transition-opacity ${RP.off.has(k) ? 'opacity-35' : ''}">
+          <span class="w-2.5 h-2.5 rounded-full shrink-0" style="background:${c};box-shadow:0 0 8px ${c}"></span><span class="flex-1 text-[11.5px] text-slate-200">${l}</span><span data-ttn="${k}" class="font-mono text-[11px] text-slate-300">0</span></button>`).join('');
+        tp.speed.innerHTML = SPEEDS.map((v) => `<button type="button" data-sp="${v}" class="seg ${RP.speed === v ? 'seg-on' : ''}">${v}×</button>`).join('');
+        tp.play.textContent = RP.on ? 'Pause' : 'Play';
+      }
+      Object.keys(TT).forEach((k) => { const el = tp.types.querySelector(`[data-ttn="${k}"]`); if (el) el.textContent = RP.cnt[k] || 0; });
+      const pub = state.res && isFinite(state.res.thread.published) ? state.res.thread.published : RP.t0, m = Math.round((RP.t0 + RP.t - pub) / 60000);
+      tp.clock.textContent = RP.evs.length ? `T${m >= 0 ? '+' : '−'}${Math.abs(m)} min · ${RP.speed}×` : 'no geolocated events';
+      if (RP.dirty) {
+        tp.feed.innerHTML = RP.feed.map((e) => `<div class="flex gap-1.5 items-center min-w-0 fade-in"><span class="w-1.5 h-1.5 rounded-full shrink-0" style="background:${TT[e.cat][1]}"></span><span class="text-slate-500 shrink-0">${hhmm(e.t, true)}</span><span class="text-slate-300 truncate">${esc(e.who)} <span class="text-slate-500">${e.site ? '@' : '·'}</span> ${esc(e.via)}</span></div>`).join('')
+          || `<div class="text-slate-600">${RP.evs.length ? 'waiting for the next event…' : 'This batch has no infrastructure telemetry to replay.'}</div>`;
+        RP.dirty = false;
+      }
+    }
+    if (tp.types) {
+      tp.types.addEventListener('click', (e) => { const b = e.target.closest('[data-tt]'); if (!b) return; const k = b.dataset.tt; RP.off.has(k) ? RP.off.delete(k) : RP.off.add(k); if (RP.off.has(k)) RP.comets = RP.comets.filter((c) => c.e.cat !== k); renderTP(true); });
+      tp.speed.addEventListener('click', (e) => { const b = e.target.closest('[data-sp]'); if (b) { RP.speed = +b.dataset.sp; renderTP(true); } });
+      tp.play.addEventListener('click', () => { RP.on = !RP.on; renderTP(true); });
+    }
+    const label = (t, x, y) => { ctx.save(); ctx.lineWidth = 3.2; ctx.lineJoin = 'round'; ctx.strokeStyle = 'rgba(0,6,6,.88)'; ctx.globalAlpha = 1; ctx.strokeText(t, x, y); ctx.restore(); ctx.fillText(t, x, y); }; // dark halo keeps labels readable over the dot field
     const vec = (lat, lon) => { const p = lat * D2R, l = lon * D2R; return [Math.cos(p) * Math.cos(l), Math.cos(p) * Math.sin(l), Math.sin(p)]; };
     function buildDots() {
       const bin = atob(LAND), bits = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bits[i] = bin.charCodeAt(i);
@@ -2322,23 +2464,38 @@ if (typeof module !== "undefined") module.exports = Engine;
       P = makeProj(); const { R, cx, cy } = P;
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
       // atmosphere + sphere
-      let gr = ctx.createRadialGradient(cx, cy, R * 0.92, cx, cy, R * 1.22); gr.addColorStop(0, '#22d3ee30'); gr.addColorStop(1, '#22d3ee00');
-      ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(cx, cy, R * 1.22, 0, Math.PI * 2); ctx.fill();
-      gr = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R); gr.addColorStop(0, '#102231'); gr.addColorStop(1, '#04070b');
-      ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
-      ctx.strokeStyle = '#22d3ee'; ctx.globalAlpha = 0.45; ctx.lineWidth = 1.2; ctx.stroke(); ctx.globalAlpha = 1;
-      // graticule
-      for (let la = -75; la <= 75; la += 15) { const pts = []; for (let lo = -180; lo <= 180; lo += 3) pts.push(P.f(vec(la, lo))); poly(pts.map((p) => ({ ...p, vis: p.z > 0 })), '#5b7a96', la === 0 ? 1 : 0.6, la === 0 ? 0.5 : 0.28); }
-      for (let lo = -180; lo < 180; lo += 15) { const pts = []; for (let la = -90; la <= 90; la += 3) pts.push(P.f(vec(la, lo))); poly(pts.map((p) => ({ ...p, vis: p.z > 0 })), '#5b7a96', 0.6, 0.28); }
-      // land dots
-      const ds = Math.max(1, Math.min(2.4, rot.z * 0.9)); ctx.fillStyle = '#cbd5e1';
-      for (const d of dots) { const p = P.f(d); if (p.z <= 0 || p.x < -4 || p.y < -4 || p.x > W + 4 || p.y > H + 4) continue; ctx.globalAlpha = 0.18 + 0.62 * p.z; ctx.fillRect(p.x - ds / 2, p.y - ds / 2, ds, ds); }
+      // starfield (screen-space, gentle twinkle)
+      if (!stars) { let sd = 7; const rnd = () => ((sd = (sd * 16807) % 2147483647) / 2147483647); stars = Array.from({ length: 220 }, () => [rnd(), rnd(), rnd() * 1.3 + 0.3, rnd() * 6.28]); }
+      ctx.fillStyle = '#d7fffa';
+      for (const [sx, sy, sr, ph] of stars) { ctx.globalAlpha = 0.18 + 0.35 * (0.5 + 0.5 * Math.sin(now / 1400 + ph)); ctx.fillRect(sx * W, sy * H, sr, sr); }
       ctx.globalAlpha = 1;
+      let gr = ctx.createRadialGradient(cx, cy, R * 0.9, cx, cy, R * 1.28); gr.addColorStop(0, '#2ee6d33a'); gr.addColorStop(0.45, '#2ee6d312'); gr.addColorStop(1, '#2ee6d300');
+      ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(cx, cy, R * 1.28, 0, Math.PI * 2); ctx.fill();
+      gr = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.05, cx, cy, R); gr.addColorStop(0, '#0c4344'); gr.addColorStop(0.55, '#062224'); gr.addColorStop(1, '#010707');
+      ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#5ff5e6'; ctx.globalAlpha = 0.5; ctx.lineWidth = 1.2; ctx.shadowColor = '#2ee6d3'; ctx.shadowBlur = 14; ctx.stroke(); ctx.shadowBlur = 0; ctx.globalAlpha = 1;
+      // graticule
+      for (let la = -75; la <= 75; la += 15) { const pts = []; for (let lo = -180; lo <= 180; lo += 3) pts.push(P.f(vec(la, lo))); poly(pts.map((p) => ({ ...p, vis: p.z > 0 })), '#2a7f78', la === 0 ? 1 : 0.6, la === 0 ? 0.32 : 0.14); }
+      for (let lo = -180; lo < 180; lo += 15) { const pts = []; for (let la = -90; la <= 90; la += 3) pts.push(P.f(vec(la, lo))); poly(pts.map((p) => ({ ...p, vis: p.z > 0 })), '#2a7f78', 0.6, 0.14); }
+      // land dots
+      const ds = Math.max(1.7, Math.min(3.4, R * 0.0085)); ctx.fillStyle = '#6ff7e6';
+      for (const d of dots) { const p = P.f(d); if (p.z <= 0 || p.x < -4 || p.y < -4 || p.x > W + 4 || p.y > H + 4) continue; ctx.globalAlpha = 0.22 + 0.78 * p.z; ctx.fillRect(p.x - ds / 2, p.y - ds / 2, ds, ds); }
+      ctx.globalAlpha = 1;
+      // orbital sensor mesh (decorative constellation that rotates with the globe)
+      if (rot.z < 2.2) {
+        if (!mesh) { let sd = 11; const rnd = () => ((sd = (sd * 48271) % 2147483647) / 2147483647); const pts = Array.from({ length: 22 }, () => ({ v: vec(rnd() * 140 - 70, rnd() * 360 - 180), h: 0.16 + rnd() * 0.2 }));
+          const edges = []; pts.forEach((a, i) => pts.map((b, j) => [j, a.v[0] * b.v[0] + a.v[1] * b.v[1] + a.v[2] * b.v[2]]).filter(([j]) => j !== i).sort((x, y) => y[1] - x[1]).slice(0, 2).forEach(([j]) => { if (!edges.some(([p, q]) => (p === j && q === i))) edges.push([i, j]); })); mesh = { pts, edges }; }
+        const mp = mesh.pts.map((m) => P.f(m.v, m.h)), fade = Math.max(0, Math.min(1, (2.2 - rot.z) / 0.8));
+        ctx.lineWidth = 1; ctx.strokeStyle = '#5ff5e6';
+        mesh.edges.forEach(([i, j]) => { const a = mp[i], b = mp[j]; if (!a.vis || !b.vis) return; ctx.globalAlpha = 0.28 * fade; ctx.beginPath(); ctx.moveTo(a.x, a.y); ctx.lineTo(b.x, b.y); ctx.stroke(); });
+        ctx.fillStyle = '#b5fff5'; mp.forEach((p) => { if (!p.vis) return; ctx.globalAlpha = 0.85 * fade; ctx.beginPath(); ctx.arc(p.x, p.y, 2.2, 0, Math.PI * 2); ctx.fill(); });
+        ctx.globalAlpha = 1;
+      }
       // orbital ISR track (decorative, simulated)
       const inc = 52 * D2R, orb = []; for (let a = 0; a <= 360; a += 3) { const t = a * D2R; orb.push(P.f([Math.cos(t), Math.sin(t) * Math.cos(inc), Math.sin(t) * Math.sin(inc)], 0.16)); }
-      poly(orb, '#22d3ee', 1, 0.35);
+      poly(orb, '#2ee6d3', 1, 0.35);
       const sa = (now / 26000) * Math.PI * 2, sat = P.f([Math.cos(sa), Math.sin(sa) * Math.cos(inc), Math.sin(sa) * Math.sin(inc)], 0.16);
-      if (sat.vis) { ctx.fillStyle = '#a5f3fc'; ctx.fillRect(sat.x - 3, sat.y - 3, 6, 6); ctx.font = '9px JetBrains Mono, monospace'; ctx.fillText('ISR-SAT-2 (sim)', sat.x + 7, sat.y - 5); }
+      if (sat.vis) { ctx.fillStyle = '#b5fff5'; ctx.fillRect(sat.x - 3, sat.y - 3, 6, 6); ctx.font = '9px JetBrains Mono, monospace'; label('ISR-SAT-2 (sim)', sat.x + 7, sat.y - 5); }
       // infrastructure, arcs, spikes
       hits = [];
       const T = vec(TARGET.lat, TARGET.lon), now2 = now;
@@ -2348,7 +2505,7 @@ if (typeof module !== "undefined") module.exports = Engine;
         if (n.hostile) {
           const dist = Math.acos(Math.max(-1, Math.min(1, a[0] * T[0] + a[1] * T[1] + a[2] * T[2]))), hmax = Math.min(0.35, 0.04 + dist * 1.4), pts = [];
           for (let k = 0; k <= 48; k++) pts.push(P.f(slerp(a, T, k / 48), hmax * Math.sin(Math.PI * k / 48)));
-          poly(pts, '#f43f5e', sel ? 2.2 : 1.4, sel ? 0.95 : 0.7);
+          poly(pts, '#f43f5e', sel ? 2 : 1.2, sel ? 0.8 : 0.38);
           const f = ((now2 + i * 700) % 2600) / 2600, pk = P.f(slerp(a, T, f), hmax * Math.sin(Math.PI * f));
           if (pk.vis) { ctx.fillStyle = '#ffe4e6'; ctx.shadowColor = '#f43f5e'; ctx.shadowBlur = 10; ctx.beginPath(); ctx.arc(pk.x, pk.y, 2.6, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0; }
         }
@@ -2364,14 +2521,50 @@ if (typeof module !== "undefined") module.exports = Engine;
         ctx.fillStyle = n.hostile ? '#f43f5e' : '#34d399'; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = n.hostile ? 12 : 4;
         ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
         if (sel) { ctx.strokeStyle = '#fecdd3'; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.arc(p.x, p.y, r + 5, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); }
-        if (n.hostile) { ctx.fillStyle = '#fecdd3'; ctx.font = '10px JetBrains Mono, monospace'; ctx.fillText(`${n.node} ${n.cc}`, p.x + r + 5, p.y + 3); }
+        if (n.hostile) { ctx.fillStyle = '#fecdd3'; ctx.font = '10px JetBrains Mono, monospace'; label(`${n.node} ${n.cc}`, p.x + r + 5, p.y + 3); }
         hits.push({ x: p.x, y: p.y, r: r + 6, kind: 'infra', id: n.node });
       });
+      // threat replay: spawn events whose (compressed) time has come, then draw comets + impact ripples
+      if (RP.res !== state.res) buildEvents();
+      const dt = Math.min(100, now - (RP.last || now)); RP.last = now;
+      if (RP.on && RP.evs.length) {
+        RP.t += dt * RP.speed; if (RP.t > RP.span) resetLoop();
+        const nx = RP.evs[RP.idx]; // fast-forward through quiet stretches so the globe never sits idle
+        if (nx && !RP.comets.length && !RP.ripples.length && nx.t - RP.t0 - RP.t > 90000) RP.t = nx.t - RP.t0 - 15000;
+        while (RP.idx < RP.evs.length && RP.evs[RP.idx].t - RP.t0 <= RP.t) {
+          const e = RP.evs[RP.idx++]; RP.cnt[e.cat]++; if (RP.off.has(e.cat)) continue;
+          if (e.site) RP.ripples.push({ ll: e.site, c: TT.uas[1], s: now, big: true }); else RP.comets.push({ e, s: now });
+          RP.feed.unshift(e); if (RP.feed.length > 5) RP.feed.length = 5; RP.dirty = true;
+        }
+      }
+      if (rot.z < DETAIL_Z) {
+        ctx.lineCap = 'round';
+        RP.comets = RP.comets.filter((cm) => {
+          const f = (now - cm.s) / 1700, col = TT[cm.e.cat][1], a = vec(cm.e.from[0], cm.e.from[1]);
+          if (f >= 1) { RP.ripples.push({ ll: [TARGET.lat, TARGET.lon], c: col, s: now }); return false; }
+          const dd = Math.acos(Math.max(-1, Math.min(1, a[0] * T[0] + a[1] * T[1] + a[2] * T[2]))), hm = Math.min(0.3, 0.03 + dd * 1.25), ef = 1 - (1 - f) * (1 - f);
+          const at = (q) => P.f(slerp(a, T, q), hm * Math.sin(Math.PI * q));
+          for (let k = 0; k < 14; k++) { // fading tail
+            const q0 = Math.max(0, ef - 0.3 * (1 - k / 14)), q1 = Math.max(0, ef - 0.3 * (1 - (k + 1) / 14)), p0 = at(q0), p1 = at(q1);
+            if (!p0.vis || !p1.vis) continue; ctx.strokeStyle = col; ctx.globalAlpha = (k + 1) / 14 * 0.9; ctx.lineWidth = 0.6 + 2.2 * (k + 1) / 14; ctx.beginPath(); ctx.moveTo(p0.x, p0.y); ctx.lineTo(p1.x, p1.y); ctx.stroke();
+          }
+          const hp = at(ef); if (hp.vis) { ctx.globalAlpha = 1; ctx.fillStyle = '#fff'; ctx.shadowColor = col; ctx.shadowBlur = 14; ctx.beginPath(); ctx.arc(hp.x, hp.y, 2.4, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0; }
+          if (f < 0.25) { const op = P.f(a); if (op.z > 0) { ctx.globalAlpha = 1 - f / 0.25; ctx.strokeStyle = col; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.arc(op.x, op.y, 3 + f * 40, 0, Math.PI * 2); ctx.stroke(); } } // launch flash
+          ctx.globalAlpha = 1; return true;
+        });
+        RP.ripples = RP.ripples.filter((rp) => {
+          const f = (now - rp.s) / (rp.big ? 1600 : 900); if (f >= 1) return false;
+          const p = P.f(vec(rp.ll[0], rp.ll[1])); if (p.z <= 0) return true;
+          ctx.strokeStyle = rp.c; ctx.globalAlpha = (1 - f) * 0.9; ctx.lineWidth = rp.big ? 2 : 1.4; ctx.beginPath(); ctx.arc(p.x, p.y, 4 + f * (rp.big ? 38 : 24), 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1; return true;
+        });
+        ctx.lineCap = 'butt';
+      }
+      if (frame % 10 === 0 || RP.dirty) renderTP(false);
       // target crosshair
       const tp = P.f(T);
       if (tp.z > 0) { const pr = 9 + 5 * ((now % 2000) / 2000); ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.arc(tp.x, tp.y, 8, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1 - (now % 2000) / 2000; ctx.beginPath(); ctx.arc(tp.x, tp.y, pr, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1;
         ctx.beginPath(); ctx.moveTo(tp.x - 16, tp.y); ctx.lineTo(tp.x - 10, tp.y); ctx.moveTo(tp.x + 10, tp.y); ctx.lineTo(tp.x + 16, tp.y); ctx.moveTo(tp.x, tp.y - 16); ctx.lineTo(tp.x, tp.y - 10); ctx.moveTo(tp.x, tp.y + 10); ctx.lineTo(tp.x, tp.y + 16); ctx.stroke();
-        ctx.fillStyle = '#e2e8f0'; ctx.font = '600 10px JetBrains Mono, monospace'; ctx.fillText('TARGET · ' + TARGET.label, tp.x + 14, tp.y - 12); }
+        ctx.fillStyle = '#e2e8f0'; ctx.font = '600 10px JetBrains Mono, monospace'; label('TARGET · ' + TARGET.label, tp.x + 14, tp.y - 12); }
       // counter-UAS: tracks (visible when zoomed into the theatre) + site markers
       if (state.uasOn && rot.z < DETAIL_Z) {
         // aggregated counter-UAS marker at theatre scale (tracks are only a few km across)
@@ -2380,7 +2573,7 @@ if (typeof module !== "undefined") module.exports = Engine;
           const pr = 7 + 4 * ((now % 1600) / 1600);
           ctx.save(); ctx.translate(q.x - 22, q.y + 16); ctx.rotate(Math.PI / 4); ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.6; ctx.shadowColor = '#f59e0b'; ctx.shadowBlur = 10; ctx.strokeRect(-5, -5, 10, 10);
           ctx.globalAlpha = 1 - (now % 1600) / 1600; ctx.strokeRect(-pr, -pr, pr * 2, pr * 2); ctx.restore(); ctx.globalAlpha = 1; ctx.shadowBlur = 0;
-          ctx.fillStyle = '#fde68a'; ctx.font = '600 10px JetBrains Mono, monospace'; ctx.fillText(`UAS ×${A.tracks.length} · ${A.hostile.length} UNAUTH`, q.x - 50, q.y + 40);
+          ctx.fillStyle = '#fde68a'; ctx.font = '600 10px JetBrains Mono, monospace'; label(`UAS ×${A.tracks.length} · ${A.hostile.length} UNAUTH`, q.x - 50, q.y + 40);
           hits.push({ x: q.x - 22, y: q.y + 16, r: 14, kind: 'uas', id: (A.top || A.tracks[0]).id });
         }
       }
@@ -2392,14 +2585,14 @@ if (typeof module !== "undefined") module.exports = Engine;
           const k = Math.floor(((now + t.t0 * 997 + 1e7) % 12000) / 12000 * (t.path.length - 1)), q = P.f(vec(t.path[k][0], t.path[k][1]));
           if (!q.vis) return;
           ctx.save(); ctx.translate(q.x, q.y); ctx.rotate(Math.PI / 4); ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.shadowColor = col; ctx.shadowBlur = 8; ctx.strokeRect(-4, -4, 8, 8); ctx.restore(); ctx.shadowBlur = 0;
-          { ctx.fillStyle = col; ctx.font = '9.5px JetBrains Mono, monospace'; ctx.fillText(t.id, q.x + 8, q.y + 12); }
+          { ctx.fillStyle = col; ctx.font = '9.5px JetBrains Mono, monospace'; label(t.id, q.x + 8, q.y + 12); }
           hits.push({ x: q.x, y: q.y, r: 10, kind: 'uas', id: t.id });
         });
-        CRIT_SITES.forEach((s) => { const p = P.f(vec(s.lat, s.lon)); if (p.z <= 0) return; ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1; ctx.strokeRect(p.x - 5, p.y - 5, 10, 10); ctx.fillStyle = s.kind === 'energy' ? '#fbbf24' : s.kind === 'water' ? '#38bdf8' : '#e2e8f0'; ctx.fillRect(p.x - 2, p.y - 2, 4, 4); ctx.fillStyle = '#a5f3fc'; ctx.font = '9px JetBrains Mono, monospace'; ctx.fillText(s.id, p.x + 8, p.y - 6); });
+        CRIT_SITES.forEach((s) => { const p = P.f(vec(s.lat, s.lon)); if (p.z <= 0) return; ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1; ctx.strokeRect(p.x - 5, p.y - 5, 10, 10); ctx.fillStyle = s.kind === 'energy' ? '#fbbf24' : s.kind === 'water' ? '#38bdf8' : '#e2e8f0'; ctx.fillRect(p.x - 2, p.y - 2, 4, 4); ctx.fillStyle = '#b5fff5'; ctx.font = '9px JetBrains Mono, monospace'; label(s.id, p.x + 8, p.y - 6); });
       }
       if (frame % 15 === 1) {
         const hostile = nodes.filter((n) => n.hostile).length;
-        hud.innerHTML = `CENTER ${fmtLL(rot.lat, ((rot.lon + 540) % 360) - 180)}<br>ZOOM ${rot.z.toFixed(1)}× · VIEW ${state.mapView.toUpperCase()}<br><span style="color:#fda4af">HOSTILE NODES ${hostile} · ARCS ${hostile}</span><br><span style="color:#fcd34d">UAS ${state.uasOn ? UAS_TRACKS.length + ' TRACKS' : 'LAYER OFF'}</span>`;
+        hud.innerHTML = `CENTER ${fmtLL(rot.lat, ((rot.lon + 540) % 360) - 180)}<br>ZOOM ${rot.z.toFixed(1)}× · VIEW ${state.mapView.toUpperCase()}<br><span style="color:#fda4af">HOSTILE NODES ${hostile} · ARCS ${hostile}</span><br><span style="color:#fcd34d">UAS ${state.uasOn ? UAS_TRACKS.length + ' TRACKS' : 'LAYER OFF'}</span><br>REPLAY ${RP.on ? RP.speed + '×' : 'PAUSED'} · ${RP.evs.length} EVENTS`;
       }
     }
     function resize() { const b = wrap.getBoundingClientRect(); dpr = Math.min(2, window.devicePixelRatio || 1); W = Math.max(1, b.width); H = Math.max(1, b.height); cv.width = W * dpr; cv.height = H * dpr; }
@@ -2429,6 +2622,7 @@ if (typeof module !== "undefined") module.exports = Engine;
   function renderStageModes() {
     $('#stageModes').innerHTML = [['2d', '2D map'], ['3d', '3D globe']].map(([k, l]) => `<button data-stage="${k}" class="seg ${state.stage === k ? 'seg-on' : ''}">${l}</button>`).join('');
     $('#stageModes').querySelectorAll('[data-stage]').forEach((b) => b.addEventListener('click', () => setStage(b.dataset.stage)));
+    if ($('#pillStage')) $('#pillStage').value = state.stage;
   }
   function setStage(mode) {
     state.stage = mode; renderStageModes();
@@ -2440,7 +2634,7 @@ if (typeof module !== "undefined") module.exports = Engine;
   $('#uasToggle').addEventListener('click', () => { state.uasOn = !state.uasOn; $('#uasToggle').classList.toggle('seg-on', state.uasOn); renderMap(); });
   renderStageModes();
 
-  function renderExtras() { renderUasChip(); renderUAS(); renderFusion(); renderPlaybook(); renderTicker(); }
+  function renderExtras() { renderUasChip(); renderUAS(); renderFusion(); renderPlaybook(); renderTicker(); renderHero(); }
 
   // clocks
   (function tick() {
@@ -2451,9 +2645,181 @@ if (typeof module !== "undefined") module.exports = Engine;
     setTimeout(tick, 1000 - (d.getMilliseconds()));
   })();
 
+  // =====================================================================
+  // SOC OVERVIEW WIDGETS: threat radar, volume trend, detection tiles,
+  // engine confidence, activity mini-timeline, notifications. All derived
+  // from state.res (demo or live) — no extra data sources.
+  // =====================================================================
+  const TEAL = '#2ee6d3';
+  const go = (sel) => document.querySelector(sel)?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  function renderRadar() {
+    const r = state.res, th = r.thread, lv = ALERT[th.level];
+    const flaggedAcc = [...r.scoreByUser.values()].filter((v) => v >= 35).length;
+    const frac = Math.max(0, Math.min(1, th.pct || 0));
+    const W = 300, H = 178, cx = 150, cy = 150, a0 = 200, a1 = 340, N = 64; // 200°..340° = upper arc (screen angles, y down)
+    const pt = (deg, rad) => [cx + Math.cos(deg * Math.PI / 180) * rad, cy + Math.sin(deg * Math.PI / 180) * rad];
+    let g = '';
+    for (let i = 0; i <= N; i++) {
+      const f = i / N, d = a0 + (a1 - a0) * f, on = f <= frac, major = i % 8 === 0;
+      const [x1, y1] = pt(d, major ? 112 : 116), [x2, y2] = pt(d, 128);
+      g += `<line x1="${x1.toFixed(1)}" y1="${y1.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${on ? TEAL : '#22302f'}" stroke-width="${major ? 2 : 1.4}" stroke-linecap="round" ${on ? `opacity="${(0.45 + 0.55 * f / Math.max(frac, 0.01)).toFixed(2)}"` : ''}/>`;
+    }
+    const [ox1, oy1] = pt(a0 - 6, 140), [ox2, oy2] = pt(a1 + 6, 140);
+    g += `<path d="M${ox1} ${oy1} A140 140 0 0 1 ${ox2} ${oy2}" fill="none" stroke="#1b2627" stroke-width="1" stroke-dasharray="2 4"/>`;
+    [0.25, 0.5, 0.75].forEach((f) => { const [x1, y1] = pt(a0 + (a1 - a0) * f, 134), [x2, y2] = pt(a0 + (a1 - a0) * f, 146); g += `<line x1="${x1}" y1="${y1}" x2="${x2}" y2="${y2}" stroke="#3b4c4b" stroke-width="1.2"/>`; });
+    const dm = a0 + (a1 - a0) * frac, [mx, my] = pt(dm, 104), [bx1, by1] = pt(dm - 3, 96), [bx2, by2] = pt(dm + 3, 96);
+    g += `<path d="M${mx} ${my}L${bx1} ${by1}L${bx2} ${by2}Z" fill="${TEAL}" style="filter:drop-shadow(0 0 4px ${TEAL})"/>`;
+    const [lx0, ly0] = pt(a0, 128), [lx1, ly1] = pt(a1, 128);
+    g += `<text x="${lx0}" y="${ly0 + 16}" fill="#5b6f6e" font-size="10" text-anchor="middle" font-family="Inter">0%</text><text x="${lx1}" y="${ly1 + 16}" fill="#5b6f6e" font-size="10" text-anchor="middle" font-family="Inter">100%</text>`;
+    $('#radar').innerHTML = `<div class="relative"><svg viewBox="0 0 ${W} ${H}" class="w-full h-auto block">${g}</svg>
+      <div class="absolute inset-x-0 bottom-3 text-center"><div class="big-num !text-[42px]">${flaggedAcc}</div><div class="text-[12.5px] text-slate-400 mt-1.5">Flagged accounts · ${Math.round(frac * 100)}% coordinated</div></div></div>
+      <div class="flex items-center justify-center gap-2 mt-1"><span class="w-2 h-2 rounded-full ${lv[3]} pulse-dot"></span><span class="text-[11px] font-mono ${lv[2]}">${lv[0]} · ${lv[1].toUpperCase()}</span></div>`;
+  }
+  function renderVolume() {
+    const r = state.res, th = r.thread, it = r.items.filter((i) => !isNaN(i.t));
+    const flagged = it.filter((i) => i.tier !== 'organic').length;
+    if (!it.length) { $('#volume').innerHTML = '<div class="text-xs text-slate-500 py-8 text-center">No timestamps in this batch</div>'; return; }
+    const t0 = Math.min(...it.map((i) => i.t)), t1 = Math.max(...it.map((i) => i.t)), span = Math.max(60000, t1 - t0);
+    const NB = 44, bins = Array.from({ length: NB }, () => [0, 0]);
+    it.forEach((i) => { const k = Math.min(NB - 1, Math.floor((i.t - t0) / span * NB)); bins[k][0]++; if (i.tier !== 'organic') bins[k][1]++; });
+    const max = Math.max(2, ...bins.map((b) => b[0])), W = 300, H = 128, L = 30, B = 18, iw = W - L - 4, ih = H - B - 8, bw = iw / NB, pk = th.peak;
+    let g = '';
+    [0, 0.5, 1].forEach((f) => { const y = 8 + ih - f * ih; g += `<text x="0" y="${y + 3}" fill="#4f6463" font-size="9" font-family="Inter">${Math.round(max * f * f)}</text>`; }); // sqrt scale so the quiet tail stays visible
+    g += `<line x1="${L}" x2="${W}" y1="${8 + ih * 0.06}" y2="${8 + ih * 0.06}" stroke="${TEAL}" stroke-opacity=".35"/>`;
+    bins.forEach(([n, f], k) => {
+      const sq = Math.sqrt(n / max), x = L + k * bw + bw * 0.25, w = Math.max(1, bw * 0.5), mid = t0 + (k + 0.5) / NB * span, inPk = pk && mid >= pk.start - span / NB && mid <= pk.end + span / NB;
+      if (n) g += `<rect x="${x.toFixed(1)}" y="${(8 + ih - sq * ih).toFixed(1)}" width="${w.toFixed(1)}" height="${(sq * ih).toFixed(1)}" rx="1" fill="${inPk ? '#5ff5e6' : TEAL}" fill-opacity="${inPk ? 1 : 0.45}"><title>${hhmm(t0 + k / NB * span)} · ${n} comments (${f} flagged)</title></rect>`;
+      else g += `<rect x="${x.toFixed(1)}" y="${8 + ih - 2}" width="${w.toFixed(1)}" height="2" fill="#1d2a2a"/>`;
+    });
+    for (let q = 0; q <= 3; q++) g += `<text x="${L + iw * q / 3}" y="${H - 3}" fill="#5b6f6e" font-size="9" text-anchor="${q === 0 ? 'start' : q === 3 ? 'end' : 'middle'}" font-family="Inter">${hhmm(t0 + span * q / 3)}</text>`;
+    g += `<path d="M${L - 2} ${8 + ih * 0.06 - 4}l5 4-5 4z" fill="${TEAL}"/>`;
+    $('#volume').innerHTML = `<div class="flex items-baseline gap-1.5"><span class="big-num !text-[24px]">${th.n.toLocaleString()}</span><span class="text-[12px] text-slate-400">events · ${flagged} flagged</span></div>
+      <svg viewBox="0 0 ${W} ${H}" class="w-full h-auto block mt-3">${g}</svg>`;
+  }
+  function renderDetect() {
+    const th = state.res.thread, A = uasAnalysis();
+    const tiles = [['high', 'High risk', th.high, 'Critical', 'tag-rose'], ['medium', 'Medium', th.medium, 'Monitoring', 'tag-amber'], ['organic', 'Organic', th.organic, 'Stable', 'tag-green'], ['uas', 'Hostile UAS', A.hostile.length, 'Physical', '']];
+    $('#detect').innerHTML = tiles.map(([k, l, n, tag, cls]) => `<button type="button" data-det="${k}" class="tile" title="${k === 'uas' ? 'Open counter-UAS detection' : 'Show ' + l.toLowerCase() + ' comments in the inspector'}">
+      <div class="flex items-center justify-between gap-1"><span class="text-[12px] text-slate-400">${l}</span><span class="tag ${cls}">${tag}</span></div>
+      <div class="big-num !text-[28px] mt-4">${n.toLocaleString()}</div></button>`).join('');
+    $('#detect').querySelectorAll('[data-det]').forEach((b) => b.addEventListener('click', () => {
+      if (b.dataset.det === 'uas') { go('#sec-uas'); return; }
+      state.filter = b.dataset.det; state.sel = null; inspectorPage = 0; renderInspector(); go('#sec-inspector');
+    }));
+  }
+  function renderConfidence() {
+    const sa = state.res.thread.signalAvg, A = uasAnalysis();
+    const rows = [
+      ['Temporal burst', sa.temporal.flagged, TEAL, '<path d="M4 12h3l2-6 4 12 2-6h5"/>'],
+      ['Narrative fingerprint', sa.narrative.flagged, '#f59e0b', '<path d="M5 5h14v10H9l-4 4z"/>'],
+      ['Linguistic anomaly', sa.linguistic.flagged, TEAL, '<path d="M4 18 9 6l5 12M6 14h6M15 10h5M15 14h5"/>'],
+      ['Cross-domain (UAS ↔ swarm)', A.top ? A.top.score : 0, A.top && A.top.band === 'STRONG' ? '#f43f5e' : '#f59e0b', '<circle cx="12" cy="12" r="7"/><path d="M12 3v4M12 17v4M3 12h4M17 12h4"/>'],
+    ];
+    $('#confidence').innerHTML = rows.map(([l, v, c, ico]) => `<div class="flex items-center gap-3">
+      <span class="w-9 h-9 shrink-0 grid place-items-center rounded-[10px] bg-ink-800 border border-ink-700 text-slate-300"><svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">${ico}</svg></span>
+      <div class="flex-1 min-w-0"><div class="flex justify-between text-[12px] mb-1.5"><span class="text-slate-300 truncate">${l}</span><span class="font-mono text-slate-400">${v === null ? 'n/a' : v + '%'}</span></div>
+      <div class="conf-track"><div class="conf-fill" style="width:${v || 0}%;--c:${c}"></div></div></div></div>`).join('');
+  }
+  function renderActivity() {
+    const r = state.res, it = r.items.filter((i) => !isNaN(i.t)), pk = r.thread.peak;
+    if (!it.length) { $('#activity').innerHTML = '<div class="text-xs text-slate-500 py-6 text-center">No timestamps</div>'; return; }
+    const W = 280, H = 92, mono = 'font-family="Inter, system-ui, sans-serif"';
+    // (1) per-minute comment rate around the swarm window
+    const c0 = pk ? pk.start - 18 * 60000 : Math.min(...it.map((i) => i.t)), c1 = pk ? pk.end + 18 * 60000 : Math.max(...it.map((i) => i.t)) + 60000;
+    const nb = 70, bins = new Array(nb).fill(0), span = Math.max(60000, c1 - c0);
+    it.forEach((i) => { if (i.t >= c0 && i.t < c1) bins[Math.floor((i.t - c0) / span * nb)]++; });
+    const mx = Math.max(2, ...bins), bw = W / nb, X = (t) => (t - c0) / span * W;
+    let g1 = '';
+    bins.forEach((n, k) => { const mid = c0 + (k + 0.5) / nb * span, on = pk && mid >= pk.start && mid <= pk.end, h = 3 + n / mx * 54; g1 += `<rect x="${(k * bw + bw * 0.18).toFixed(1)}" y="${(66 - h).toFixed(1)}" width="${Math.max(1, bw * 0.64).toFixed(1)}" height="${h.toFixed(1)}" fill="${on ? TEAL : '#3a4a49'}" fill-opacity="${on ? 0.95 : 0.55}"/>`; });
+    if (pk) [pk.start, pk.end].forEach((t) => { const x = X(t); g1 += `<line x1="${x}" x2="${x}" y1="8" y2="80" stroke="#cbd5e1" stroke-dasharray="2 3"/><path d="M${x - 4} 4h8l-4 6z" fill="#e2e8f0"/><text x="${x}" y="${H - 1}" fill="#7f9392" font-size="9" text-anchor="middle" ${mono}>${hhmm(t)}</text>`; });
+    // (2) risk-score distribution with the tier thresholds
+    const sb = new Array(25).fill(0); r.items.forEach((i) => sb[Math.min(24, Math.floor(i.score / 4))]++);
+    const sm = Math.max(1, ...sb); let g2 = '';
+    sb.forEach((n, k) => {
+      if (!n) { g2 += `<circle cx="${k * (W / 25) + W / 50}" cy="62" r="1.6" fill="#2b3a39"/>`; return; }
+      const x = k * (W / 25) + W / 50, h = 6 + n / sm * 50, col = k * 4 >= 60 ? '#f43f5e' : k * 4 >= 35 ? '#f59e0b' : TEAL;
+      g2 += `<path d="M${x - 5} 64 Q${x - 1.5} 64 ${x} ${64 - h} Q${x + 1.5} 64 ${x + 5} 64Z" fill="${col}" fill-opacity=".9"><title>score ${k * 4}–${k * 4 + 3}: ${n}</title></path>`;
+    });
+    [35, 60].forEach((v) => { const x = v / 100 * W; g2 += `<line x1="${x}" x2="${x}" y1="4" y2="76" stroke="#cbd5e1" stroke-dasharray="2 3"/><path d="M${x - 4} 2h8l-4 6z" fill="#e2e8f0"/><text x="${x}" y="${H - 3}" fill="#7f9392" font-size="9" text-anchor="middle" ${mono}>${v}</text>`; });
+    g2 += `<text x="0" y="${H - 3}" fill="#5b6f6e" font-size="9" ${mono}>0</text><text x="${W}" y="${H - 3}" fill="#5b6f6e" font-size="9" text-anchor="end" ${mono}>100</text>`;
+    $('#activity').innerHTML = `<div class="text-[10.5px] text-slate-500 mb-1">Comments / min · swarm window${pk ? ` · <span class="text-cyan-300 whitespace-nowrap">${pk.count} in ${Math.round((pk.end - pk.start) / 1000)}s</span>` : ''}</div>
+      <svg viewBox="0 0 ${W} ${H}" class="w-full h-auto block">${g1}</svg>
+      <div class="text-[10.5px] text-slate-500 mt-3 mb-1">Risk-score distribution · tier thresholds 35 / 60</div>
+      <svg viewBox="0 0 ${W} ${H}" class="w-full h-auto block">${g2}</svg>`;
+  }
+  function notifItems() {
+    const r = state.res, th = r.thread, lv = ALERT[th.level], A = uasAnalysis(), hostile = r.infra.filter((g) => g.hostile), k1 = r.clusters[0], pk = th.peak;
+    const out = [[th.level <= 2 ? '#f43f5e' : '#34d399', `${lv[0]} · ${lv[1]}`, `${Math.round(th.pct * 100)}% coordinated · ${th.high} high-risk comments`, '#sec-alerts']];
+    if (pk) out.push(['#f59e0b', `Swarm burst ${hhmm(pk.start)}–${hhmm(pk.end)}`, `${pk.count} comments · ${pk.coordinated} flagged`, '#sec-timeline']);
+    if (A.hostile.length) out.push(['#fbbf24', `${A.hostile.length} unauthorised UAS near critical sites`, A.top ? `Cross-domain correlation ${A.top.band} · ${A.top.score}/100` : '', '#sec-uas']);
+    if (hostile.length) out.push(['#f43f5e', `${hostile.length} hostile infrastructure node(s)`, hostile.map((g) => g.node).join(', '), '#sec-infra']);
+    if (k1) out.push([TEAL, `Cluster ${k1.id} · ${k1.size} accounts`, `linked by ${k1.edgeTypes.join(' + ')}`, '#sec-network']);
+    out.push(['#64748b', state.live ? 'Live feed · ' + API_HOST : 'Demo thread (simulated)', 'Exercise data — review before circulation', '#sec-overview']);
+    return out;
+  }
+  function renderNotif() {
+    const items = notifItems(), lvl = state.res.thread.level;
+    $('#bellDot').classList.toggle('hidden', lvl > 2);
+    $('#notif').innerHTML = `<div class="px-2.5 pt-1.5 pb-2 text-[11px] uppercase tracking-wider text-slate-500">Alerts &amp; status</div>` + items.map(([c, t, s, href]) => `<a href="${href}" data-nclose>
+      <span class="w-2 h-2 rounded-full mt-1.5 shrink-0" style="background:${c};box-shadow:0 0 8px ${c}"></span>
+      <span class="min-w-0"><span class="block text-[12.5px] text-slate-100">${esc(t)}</span>${s ? `<span class="block text-[11px] text-slate-500 truncate">${esc(s)}</span>` : ''}</span></a>`).join('');
+  }
+  function renderHero() { renderRadar(); renderVolume(); renderDetect(); renderConfidence(); renderActivity(); renderNotif(); }
+
+  // ---- top-bar controls ----
+  $('#pillRegion').addEventListener('change', (e) => { state.mapView = e.target.value; Globe.view(); renderMap(); if (LMAP) LMAP.flyToBounds(VIEW_BOUNDS[state.mapView], { padding: [10, 10], duration: 1.3 }); });
+  $('#pillStage').addEventListener('change', (e) => setStage(e.target.value));
+  $('#pillTier').addEventListener('change', (e) => { state.filter = e.target.value; state.sel = null; inspectorPage = 0; renderInspector(); go('#sec-inspector'); });
+  $('#search').addEventListener('keydown', (e) => { if (e.key === 'Enter') go('#sec-inspector'); });
+  const notif = $('#notif'), bell = $('#btnBell');
+  const closeNotif = () => { notif.classList.add('hidden'); bell.setAttribute('aria-expanded', 'false'); };
+  bell.addEventListener('click', (e) => { e.stopPropagation(); renderNotif(); const open = notif.classList.toggle('hidden'); bell.setAttribute('aria-expanded', String(!open)); });
+  notif.addEventListener('click', (e) => { if (e.target.closest('[data-nclose]')) closeNotif(); });
+  document.addEventListener('click', (e) => { if (!notif.contains(e.target) && e.target !== bell) closeNotif(); });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeNotif(); });
+
+  // ---- "Ask threat intelligence": routes a question to the right panel, else full-text search ----
+  function ask(raw) {
+    const q = raw.trim(); if (!q) return; const lq = q.toLowerCase();
+    if (q.startsWith('@')) {
+      const u = lq.slice(1), it = state.res.items.find((i) => i.c.user.toLowerCase() === u) || state.res.items.find((i) => i.c.user.toLowerCase().includes(u));
+      if (it) { jumpTo(it.c.user); toast('Showing @' + it.c.user); } else toast('No account matches ' + q);
+      return;
+    }
+    if (/\b(sitrep|brief|briefing|report)\b/.test(lq)) { $('#btnSitrep').click(); return; }
+    if (/^(high|medium|organic|all)( risk)?$/.test(lq)) { state.filter = lq.split(' ')[0]; state.sel = null; inspectorPage = 0; renderInspector(); go('#sec-inspector'); return; }
+    const routes = [[/\b(drones?|uas|uav|c-uas|counter[- ]?uas|remote id)\b/, '#sec-uas', 'Counter-UAS detection'], [/\b(clusters?|network|bots?|accounts?|sockpuppets?)\b/, '#sec-network', 'Account network & clusters'],
+      [/\b(infra|infrastructure|asn|ip|hosting|vps|proxy|nodes?)\b/, '#sec-infra', 'Infrastructure node inspector'], [/\b(fusion|correlat\w*|alerts?)\b/, '#sec-alerts', 'Forensic fusion timeline'],
+      [/\b(playbook|mitigat\w*|actions?|respond|response)\b/, '#sec-playbook', 'Mitigation playbook'], [/\b(impact|audience|portals?|surfaces?)\b/, '#sec-impact', 'Impact zone'],
+      [/\b(timeline|burst|swarm|peak)\b/, '#sec-timeline', 'Temporal burst timeline'], [/\b(vectors?|narratives?|tropes?)\b/, '#vectors', 'Threat vectors']];
+    const hit = routes.find(([rx]) => rx.test(lq));
+    if (hit) { go(hit[1]); toast('→ ' + hit[2]); return; }
+    const n = state.res.items.filter((i) => i.c.text.toLowerCase().includes(lq) || i.c.user.toLowerCase().includes(lq)).length;
+    state.q = q; $('#search').value = q; state.filter = 'all'; state.sel = null; inspectorPage = 0; clearInspectorRange(); renderInspector(); go('#sec-inspector');
+    toast(n ? `${n} comment(s) match “${q}”` : `No comments match “${q}” — try “drones”, “clusters” or an @user`);
+  }
+  $('#askForm').addEventListener('submit', (e) => { e.preventDefault(); ask($('#askInput').value); });
+
+  // ---- left rail: smooth anchors + active-section highlight ----
+  $('#railBrief').addEventListener('click', () => $('#btnSitrep').click());
+  $('#railSettings').addEventListener('click', () => {
+    if (!$('#livePanel').classList.contains('hidden')) { go('#livePanel'); setTimeout(() => $('#liveKey').focus(), 350); }
+    else toast(`Backend ${API_HOST} not reachable — running on the built-in demo thread`);
+  });
+  if (window.IntersectionObserver) {
+    const rails = [...document.querySelectorAll('[data-rail]')], seen = new Map();
+    const io = new IntersectionObserver((ents) => {
+      ents.forEach((e) => seen.set(e.target.id, e.isIntersecting ? e.intersectionRatio : 0));
+      const best = [...seen.entries()].sort((a, b) => b[1] - a[1])[0];
+      if (best && best[1] > 0) rails.forEach((a) => a.classList.toggle('on', a.dataset.rail === best[0]));
+    }, { threshold: [0, 0.15, 0.35, 0.6] });
+    rails.forEach((a) => { const el = document.getElementById(a.dataset.rail); if (el) io.observe(el); });
+  }
+
   let tt; function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(tt); tt = setTimeout(() => t.classList.add('hidden'), 3200); }
 
   load(SEED_COMMENTS.map((c) => ({ ...c, source: 'seed' })), ARTICLE.published, false);
+  setStage(state.stage); // hero opens on the 3D globe; the Leaflet map stays initialised underneath
   initLive();
   if (location.hash === '#batch') openModal();
 })();
