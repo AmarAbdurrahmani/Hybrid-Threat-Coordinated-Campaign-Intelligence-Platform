@@ -20,6 +20,7 @@ from typing import Any, Iterable
 
 import networkx as nx
 import numpy as np
+from infrastructure import EGRESS_TYPES
 
 from lexicons import (CALQUES, DOUBLETS, GEG_MARKERS, STD_MARKERS, STOP, TROPES, content_set, detect_lang, fold,
                       tokens_with_pos)
@@ -401,7 +402,7 @@ def _network(items, coactivity: CoActivity | None, pub):
                 s += min(40, 10 * len(ps))
                 r.append(f"Co-active with {len(ps)} account(s) across ≥{coactivity.min_threads} threads within {coactivity.window_s // 60} min (max {ps[0][1]} threads with @{ps[0][0]})")
         inf = it["c"].get("infra")
-        if inf and inf.get("type") not in (None, "residential"):
+        if inf and inf.get("type") in EGRESS_TYPES:
             have = True
             s += 15; r.append(f"Non-residential egress: {str(inf['type']).upper()} via {inf.get('asn')}")
             same = sum(1 for jt in items if jt is not it and jt["c"]["user"] != u and (jt["c"].get("infra") or {}).get("node") == inf.get("node"))
@@ -453,7 +454,8 @@ def _assemble(items, timed, pub, coactivity, infra_meta):
         for d in it["dups"]:
             if it["c"]["user"] < d["user"]:
                 edges.append({"a": it["c"]["user"], "b": d["user"], "type": "content", "w": d["sim"]})
-    inf_of = {it["c"]["user"]: it["c"]["infra"]["node"] for it in items if it["c"].get("infra") and it["c"]["infra"].get("type") != "residential"}
+    inf_of = {it["c"]["user"]: it["c"]["infra"]["node"] for it in items
+              if it["c"].get("infra") and it["c"]["infra"].get("node") and it["c"]["infra"].get("type") in EGRESS_TYPES}
     iu = list(inf_of)
     for i in range(len(iu)):
         for j in range(i + 1, len(iu)):
@@ -519,7 +521,7 @@ def _assemble(items, timed, pub, coactivity, infra_meta):
         flagged = sum(1 for i in its if i["tier"] != "organic")
         infra_list.append({**g_, "ips": sorted(g_["ips"]), "users": sorted(g_["users"]), "comments": len(its),
                            "avgRisk": round(sum(i["score"] for i in its) / len(its)), "flagged": flagged,
-                           "hostile": g_["type"] not in (None, "residential") and flagged >= max(1, len(its) / 2),
+                           "hostile": g_["type"] in EGRESS_TYPES and flagged >= max(1, len(its) / 2),
                            "first": min(ts) if ts else None, "last": max(ts) if ts else None,
                            "vectors": sorted(g_["vectors"].items(), key=lambda x: -x[1]), "meta": infra_meta.get(g_["node"])})
     infra_list.sort(key=lambda x: -x["avgRisk"])

@@ -4,6 +4,7 @@ import os
 import sys
 import time
 
+import numpy as np
 import pytest
 from fastapi.testclient import TestClient
 from starlette.websockets import WebSocketDisconnect
@@ -39,7 +40,7 @@ def test_private_reads_and_scoped_ingestion(api):
     for path in ("/", "/investigation.html", "/campaign.html", "/stitch-bridge.js", "/stitch-bridge.css",
                  "/classic.html", "/workspace.html", "/workspace.js", "/workspace-data.js", "/workspace.css", "/operations.js"):
         assert client.get(path).status_code == 200
-    for path in ("threads", "graph", "alerts", "sources", "cases", "threads/ext:one/analysis", "threads/ext:one/sitrep"):
+    for path in ("threads", "graph", "infrastructure", "alerts", "sources", "cases", "threads/ext:one/analysis", "threads/ext:one/sitrep"):
         assert client.get("/api/" + path).status_code == 401
         assert client.get("/api/" + path, headers=INGEST).status_code == 401
     ticket = client.post("/api/ws-ticket", headers=ANALYST).json()["ticket"]
@@ -63,6 +64,29 @@ def test_private_reads_and_scoped_ingestion(api):
     item = client.get("/api/threads/ext:one/analysis", headers=ANALYST).json()["items"][0]["c"]
     assert item["user"] != comment["user"] and item["account"]["friends"] != ["raw-friend"]
     assert item["url"] == comment["url"]
+
+
+def test_infrastructure_reports_coordinates_and_coverage_without_identifiers(api, monkeypatch):
+    client, pipeline = api
+    # This endpoint test does not depend on text similarity.
+    monkeypatch.setattr(pipeline.embedder, "encode", lambda texts: np.zeros((len(texts), 1), dtype=np.float32))
+    first = {"user": "fixture-a", "text": "Station update received.", "infra": {
+        "node": "fixture-region", "type": "proxy", "lat": 48.1734, "lon": 16.3712,
+        "city": "Vienna", "cc": "AT", "asn": "AS64496", "ip": "203.0.113.12",
+    }}
+    second = {"user": "fixture-b", "text": "Another public service update."}
+    response = client.post("/api/ingest/comments", headers=INGEST, json={"thread_id": "mapped", "comments": [first, second]})
+    assert response.status_code == 200
+    report = client.get("/api/infrastructure", headers=ANALYST).json()
+    assert report["mapped_comments"] == 1
+    assert report["analyzed_comments"] == 2
+    point, = report["points"]
+    assert (point["lat"], point["lon"], point["locations"]) == (48.2, 16.4, ["Vienna, AT"])
+    assert point["account_count"] == 1 and point["shared_egress"] is False
+    assert "users" not in point and "ips" not in point and "node" not in point
+    assert client.get("/api/infrastructure?thread_id=ext:mapped", headers=ANALYST).json() == report
+    assert client.get("/api/infrastructure?thread_id=other", headers=ANALYST).json()["points"] == []
+    assert client.get("/api/infrastructure?simulated=true", headers=ANALYST).json()["points"] == []
 
 
 def test_delayed_coactivity_persists_and_suggests_an_exercise_case(api):
