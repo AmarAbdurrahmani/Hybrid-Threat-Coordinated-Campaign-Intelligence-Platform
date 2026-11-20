@@ -197,7 +197,7 @@
 
   function setMode(mode) {
     if (mode === 'live' && !data.hasKey()) return connect();
-    jump(page === 'monitor' ? 'index.html' : page + '.html',{mode});
+    jump(page === 'monitor' ? 'monitor.html' : page + '.html',{mode});
   }
   function connect() {
     modal('Connect to FastAPI', box => {
@@ -205,7 +205,7 @@
       const {element,submit} = form(box,'Connect',async values => {
         data.setKey(String(values.get('key') || ''));
         try { await data.api('threads'); } catch (error) { data.setKey(''); throw error; }
-        jump('index.html',{mode:'live'});
+        jump('monitor.html',{mode:'live'});
       });
       field(element,'Analyst API key','key','password').autocomplete = 'off';
       element.append(submit);
@@ -694,7 +694,7 @@
   const actions = {
     'live-mode':()=>setMode('live'),
     'exercise-mode':()=>setMode('exercise'),
-    'all-modes':()=>jump('index.html',{mode:'preview'}),
+    'all-modes':()=>jump('monitor.html',{mode:'preview'}),
     refresh:()=>state.mode === 'preview' ? location.reload() : load(),
     'exercise-tools':()=>{ location.href = supplemental('exercise'); },
     'open-thread':openThread,
@@ -769,7 +769,7 @@
       applyFilters();
     });
     if (topFilter && page !== 'monitor') topFilter.addEventListener('keydown',event=>{
-      if (event.key === 'Enter') jump('index.html',{q:topFilter.value});
+      if (event.key === 'Enter') jump('monitor.html',{q:topFilter.value});
     });
     region('severity-filter')?.addEventListener('change',event => {
       state.level = event.target.selectedOptions[0].textContent.match(/level\s*(\d)/i)?.[1] || '';
@@ -837,7 +837,7 @@
       const warning = section('Workspace connection');
       add(warning,'p',cls.subtle,error.message);
       warning.append(button('Connect to FastAPI',connect),
-        link('Open Stitch preview',destination('index.html',{mode:'preview'})));
+        link('Open Stitch preview',destination('monitor.html',{mode:'preview'})));
       document.querySelector('main').replaceChildren(warning);
     }
   }

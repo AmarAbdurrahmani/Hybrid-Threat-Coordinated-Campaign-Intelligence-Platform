@@ -25,11 +25,13 @@ pytest -q
 uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
-Open **http://localhost:8000** for the Stitch analyst workspace. Choose **Live** and
-enter the analyst `API_KEY` to load monitored data, or choose **Exercise** for a
-simulated investigation. In an investigation, select a five-minute timeline bar
-to filter the comment inspector. The original dashboard and paste-a-batch analyzer
-are available under **Diagnostics**. OpenAPI docs: `/docs`.
+Open **http://localhost:8000** for the **Hybrid Threat Operations Center** (globe / 2D map,
+threat replay, counter-UAS, SitRep). Enter the analyst `API_KEY` in the LIVE bar to load
+monitored data; the built-in demo thread runs without a backend. Select a five-minute
+timeline bar to filter the comment inspector; `/#batch` opens the paste-a-batch analyzer.
+The Stitch analyst workspace (triage queue, cases, sources, alerts) is at
+**/monitor.html**, linked as **Workspace** in the dashboard. Choose **Live** there and enter
+the key, or **Exercise** for a simulated investigation. OpenAPI docs: `/docs`.
 
 The first start downloads `paraphrase-multilingual-MiniLM-L12-v2` (about 470 MB) from
 Hugging Face. **Download it before the venue Wi-Fi does it for you.** Without it the

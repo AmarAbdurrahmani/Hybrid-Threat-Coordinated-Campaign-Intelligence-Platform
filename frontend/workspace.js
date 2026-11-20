@@ -443,7 +443,7 @@
         <label>Scenario <select name="scenario"><option value="energy">Energy infrastructure rumor</option><option value="kfor">NATO / KFOR disinformation</option></select></label>
         <label>Accounts <input type="number" name="accounts" min="3" max="60" value="12" required></label>
         <button class="button primary" type="submit">Run exercise scenario</button></form>`)}
-      ${panel('Analyze a batch', '<p class="muted">Paste text or JSON into the browser-based analyzer.</p><a class="button" href="./classic.html#batch">Open batch analyzer</a>')}</div>`;
+      ${panel('Analyze a batch', '<p class="muted">Paste text or JSON into the browser-based analyzer.</p><a class="button" href="./index.html#batch">Open batch analyzer</a>')}</div>`;
   }
 
   async function loadThreads() {

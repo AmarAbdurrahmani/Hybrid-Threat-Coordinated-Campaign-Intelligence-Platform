@@ -559,6 +559,7 @@ async def ws_live(ws: WebSocket):
 
 
 @app.get("/", response_class=HTMLResponse)
+@app.get("/index.html", response_class=HTMLResponse, include_in_schema=False)  # same page; workspace links use ./index.html
 async def dashboard():
     path = os.path.abspath(os.path.join(os.path.dirname(__file__), settings.dashboard_path))
     if os.path.isfile(path):
@@ -567,6 +568,7 @@ async def dashboard():
 
 
 @app.get("/classic.html", include_in_schema=False)
+@app.get("/monitor.html", include_in_schema=False)
 @app.get("/workspace.html", include_in_schema=False)
 @app.get("/investigation.html", include_in_schema=False)
 @app.get("/campaign.html", include_in_schema=False)
