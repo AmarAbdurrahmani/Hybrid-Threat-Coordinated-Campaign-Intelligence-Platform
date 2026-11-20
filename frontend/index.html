@@ -11,7 +11,7 @@
 <script>
 tailwind.config = { darkMode: 'class', theme: { extend: {
   fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], mono: ['JetBrains Mono', 'ui-monospace', 'monospace'] },
-  colors: { ink: { 950: '#070a0f', 900: '#0b1017', 850: '#0f151e', 800: '#141c27', 700: '#1e2a38', 600: '#2b3a4d' } }
+  colors: { ink: { 950: '#05070b', 900: '#090d13', 850: '#0c1118', 800: '#111922', 700: '#1a2532', 600: '#26364a' } }
 } } };
 </script>
 <style>
@@ -76,7 +76,13 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
   .grid-line{stroke-dasharray:2 5}
   .map-label{color:#475569;font:500 10px 'JetBrains Mono',ui-monospace,monospace;white-space:nowrap;text-shadow:0 0 3px #000}
   .map-region{color:#1f3a33;font:700 13px Inter,system-ui,sans-serif;letter-spacing:.3em;white-space:nowrap}
-  .panel { min-width: 0; background: linear-gradient(180deg, #0f151e 0%, #0b1017 100%); border: 1px solid #1e2a38; border-radius: 14px; }
+  .panel { min-width: 0; position: relative; border: 1px solid #17212c; border-radius: 3px; box-shadow: inset 0 1px 0 #ffffff06;
+    background:
+      linear-gradient(#3d566c, #3d566c) left top / 12px 1px no-repeat, linear-gradient(#3d566c, #3d566c) left top / 1px 12px no-repeat,
+      linear-gradient(#3d566c, #3d566c) right top / 12px 1px no-repeat, linear-gradient(#3d566c, #3d566c) right top / 1px 12px no-repeat,
+      linear-gradient(#3d566c, #3d566c) left bottom / 12px 1px no-repeat, linear-gradient(#3d566c, #3d566c) left bottom / 1px 12px no-repeat,
+      linear-gradient(#3d566c, #3d566c) right bottom / 12px 1px no-repeat, linear-gradient(#3d566c, #3d566c) right bottom / 1px 12px no-repeat,
+      linear-gradient(180deg, #0b1118 0%, #070b10 100%); }
   .grid-bg { background-image: linear-gradient(#1e2a3833 1px, transparent 1px), linear-gradient(90deg, #1e2a3833 1px, transparent 1px); background-size: 28px 28px; }
   mark { border-radius: 3px; padding: 0 2px; color: inherit; cursor: help; }
   mark.trope   { background: #f43f5e33; box-shadow: inset 0 -2px 0 #f43f5e; }
@@ -91,6 +97,37 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
   ::-webkit-scrollbar { width: 8px; height: 8px; } ::-webkit-scrollbar-thumb { background: #1e2a38; border-radius: 8px; }
   .node { cursor: pointer; transition: r .15s; }
   .fade-in { animation: fade .25s ease-out; } @keyframes fade { from { opacity: 0; transform: translateY(4px); } }
+  /* ===================== COMMAND-CENTER THEME ===================== */
+  :root { --hud-cyan: #22d3ee; --hud-amber: #f59e0b; --hud-crimson: #f43f5e; --hud-bracket: #3d566c; }
+  .grid-bg { background-color: #04060a; background-image: radial-gradient(1100px 520px at 50% -8%, #0d1c27 0%, transparent 62%), linear-gradient(#15202b26 1px, transparent 1px), linear-gradient(90deg, #15202b26 1px, transparent 1px); background-size: auto, 32px 32px, 32px 32px; }
+  .rounded-xl { border-radius: 4px !important; } .rounded-lg { border-radius: 3px !important; } .rounded-md { border-radius: 2px !important; }
+  .hud-title { font: 600 11px/1.3 'JetBrains Mono', ui-monospace, monospace; letter-spacing: .16em; text-transform: uppercase; color: #d6dfe9; display: flex; align-items: center; gap: 8px; }
+  .hud-title::before { content: ''; flex: none; width: 3px; height: 11px; background: var(--hud-cyan); box-shadow: 0 0 8px var(--hud-cyan); }
+  .hud-sub { font-size: 11px; line-height: 1.4; color: #64748b; margin-top: 3px; }
+  .cmdbar { position: relative; border: 1px solid #17212c; background: linear-gradient(90deg, #0a131b 0%, #070b10 45%, #0a131b 100%); }
+  .cmdbar::after { content: ''; position: absolute; left: 0; right: 0; bottom: -1px; height: 1px; background: linear-gradient(90deg, transparent, #22d3ee99, transparent); }
+  .hud-logo { border: 1px solid #22d3ee55; background: #22d3ee0d; clip-path: polygon(8px 0, 100% 0, 100% calc(100% - 8px), calc(100% - 8px) 100%, 0 100%, 0 8px); }
+  .btn-hud { font: 600 10.5px/1 'JetBrains Mono', ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; padding: 8px 11px; border: 1px solid #26364a; background: #0a1017; color: #cbd5e1; transition: background .15s, border-color .15s, color .15s; }
+  .btn-hud:hover { border-color: #3d566c; background: #101923; color: #fff; }
+  .btn-hud:disabled { opacity: .6; cursor: wait; }
+  .btn-cyan { border-color: #22d3ee66; color: #67e8f9; } .btn-cyan:hover { background: #22d3ee14; border-color: #22d3ee; color: #cffafe; }
+  .btn-amber { background: #f59e0b; border-color: #f59e0b; color: #0a0d12; } .btn-amber:hover { background: #fbbf24; border-color: #fbbf24; color: #000; }
+  .btn-crimson { background: #e11d48; border-color: #f43f5e; color: #fff; } .btn-crimson:hover { background: #f43f5e; color: #fff; }
+  .seg { font: 600 10px/1 'JetBrains Mono', ui-monospace, monospace; letter-spacing: .08em; text-transform: uppercase; padding: 6px 9px; border: 1px solid #26364a; color: #94a3b8; background: #0a1017; white-space: nowrap; }
+  .seg:hover { background: #101923; color: #e2e8f0; }
+  .seg-on { border-color: #22d3ee88; color: #a5f3fc; background: #22d3ee14; box-shadow: inset 0 0 0 1px #22d3ee22; }
+  .seg-amber.seg-on, #uasToggle.seg-on { border-color: #f59e0b88; color: #fde68a; background: #f59e0b14; box-shadow: inset 0 0 0 1px #f59e0b22; }
+  .stage-frame .hud-corner { position: absolute; width: 18px; height: 18px; color: #22d3ee; pointer-events: none; z-index: 1060; }
+  .hud-corner.tl { left: -2px; top: -2px; border-left: 2px solid; border-top: 2px solid; } .hud-corner.tr { right: -2px; top: -2px; border-right: 2px solid; border-top: 2px solid; }
+  .hud-corner.bl { left: -2px; bottom: -2px; border-left: 2px solid; border-bottom: 2px solid; } .hud-corner.br { right: -2px; bottom: -2px; border-right: 2px solid; border-bottom: 2px solid; }
+  .ticker { border: 1px solid #17212c; background: #070b10; }
+  .ticker b { color: #cbd5e1; font-weight: 600; }
+  .uas-icon svg { filter: drop-shadow(0 0 4px #f59e0b) drop-shadow(0 0 10px #f59e0b88); }
+  .uas-line { filter: drop-shadow(0 0 3px #f59e0b); }
+  .tip-uas { border-color: #f59e0b99; color: #fde68a; } .tip-uas.leaflet-tooltip-top:before { border-top-color: #f59e0b99; }
+  .tip-site { border-color: #22d3ee66; color: #a5f3fc; font-size: 9.5px; }
+  .corr-bar { background: linear-gradient(90deg, #34d399, #f59e0b 55%, #f43f5e); }
+  #globe:active { cursor: grabbing; }
   /* --- SitRep PDF export (window.print): print only #printArea, black on white --- */
   @media print {
     @page { size: A4; margin: 14mm 14mm 16mm; }
@@ -108,160 +145,216 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
 </style>
 </head>
 <body class="text-slate-200 font-sans antialiased grid-bg min-h-screen">
-<div class="max-w-7xl mx-auto px-3 sm:px-6 py-5 space-y-4">
+<div class="cc-shell max-w-[1880px] mx-auto px-3 sm:px-4 pb-4 space-y-3">
 
   <!-- CLASSIFICATION BANNER -->
-  <div class="-mx-3 sm:-mx-6 -mt-5 mb-1 bg-emerald-600/90 text-ink-950 text-center text-[10px] sm:text-[11px] font-mono font-semibold tracking-[0.2em] py-1">UNCLASSIFIED // EXERCISE — SIMULATED DATA // PROTOTYPE</div>
+  <div class="-mx-3 sm:-mx-4 bg-emerald-600/90 text-ink-950 text-center text-[10px] sm:text-[11px] font-mono font-semibold tracking-[0.2em] py-1">UNCLASSIFIED // EXERCISE — SIMULATED DATA // PROTOTYPE</div>
 
-  <!-- HEADER -->
-  <header class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-3">
+  <!-- COMMAND BAR -->
+  <header class="cmdbar flex flex-col xl:flex-row xl:items-center xl:justify-between gap-3 px-3 sm:px-4 py-3">
     <div class="flex items-start sm:items-center gap-3 min-w-0">
-      <div class="w-11 h-11 shrink-0 rounded-xl bg-emerald-500/10 border border-emerald-400/30 grid place-items-center">
-        <svg viewBox="0 0 24 24" class="w-6 h-6 text-emerald-300" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l8 3.5v6c0 5-3.4 8.8-8 10.5-4.6-1.7-8-5.5-8-10.5v-6L12 2z"/><circle cx="12" cy="11" r="3"/><path d="M12 5v3M12 14v3M6.5 11h2.5M15 11h2.5"/></svg>
+      <div class="w-11 h-11 shrink-0 grid place-items-center hud-logo">
+        <svg viewBox="0 0 24 24" class="w-6 h-6 text-cyan-300" fill="none" stroke="currentColor" stroke-width="1.6"><path d="M12 2l8 3.5v6c0 5-3.4 8.8-8 10.5-4.6-1.7-8-5.5-8-10.5v-6L12 2z"/><circle cx="12" cy="11" r="3"/><path d="M12 5v3M12 14v3M6.5 11h2.5M15 11h2.5"/></svg>
       </div>
       <div class="min-w-0">
         <div class="flex flex-wrap items-center gap-2">
-          <h1 class="font-semibold tracking-tight text-base sm:text-xl leading-snug">Hybrid Threat &amp; Coordinated Campaign Intelligence Platform</h1>
-          <span class="text-[10px] font-mono px-2 py-0.5 rounded border border-amber-500/40 text-amber-300 bg-amber-500/10 whitespace-nowrap">PROTOTYPE · SIMULATED DATA</span>
+          <span class="font-mono text-[10px] tracking-[0.3em] text-cyan-400/80">HTCCIP // C2-ISR</span>
+          <span class="text-[10px] font-mono px-2 py-0.5 border border-amber-500/40 text-amber-300 bg-amber-500/10 whitespace-nowrap">PROTOTYPE · SIMULATED DATA</span>
         </div>
-        <p class="text-xs sm:text-sm text-slate-400 leading-snug">Platform for Detecting Hybrid Threats and Coordinated Information Campaigns <span class="text-slate-500">(MoD / Cyber-Defense Division)</span></p>
+        <h1 class="font-semibold tracking-tight text-base sm:text-lg leading-snug">Hybrid Threat &amp; Coordinated Campaign Intelligence Platform</h1>
+        <p class="text-[11px] sm:text-xs text-slate-400 leading-snug">Situational-awareness console · information + physical domain <span class="text-slate-500">(MoD / Cyber-Defense Division)</span></p>
       </div>
     </div>
-    <div class="flex flex-wrap gap-2 shrink-0">
-      <button id="btnReset" class="text-xs px-3 py-1.5 rounded-lg border border-ink-600 hover:bg-ink-800">Reset demo</button>
-      <button id="btnCopy" class="text-xs px-3 py-1.5 rounded-lg border border-ink-600 hover:bg-ink-800">Copy JSON</button>
-      <button id="btnPdf" class="text-xs px-3 py-1.5 rounded-lg border border-ink-600 hover:bg-ink-800" title="Opens the print dialog — choose “Save as PDF”">Export SitRep PDF</button>
-      <button id="btnLive" class="text-xs px-3 py-1.5 rounded-lg border border-emerald-500/50 text-emerald-300 hover:bg-emerald-500/10 inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400 pulse-dot"></span>Live Test</button>
-      <button id="btnSitrep" class="text-xs font-semibold px-3.5 py-1.5 rounded-lg bg-emerald-500 text-ink-950 hover:bg-emerald-400">Generate Operational Briefing / SitRep</button>
+    <div class="flex flex-col sm:flex-row sm:items-center gap-3 shrink-0">
+      <div class="flex items-center gap-4 font-mono text-[11px] text-slate-400">
+        <div><div class="text-[9px] tracking-[0.2em] text-slate-500">ZULU</div><div id="clkZ" class="text-cyan-300 text-sm">--:--:--Z</div></div>
+        <div><div class="text-[9px] tracking-[0.2em] text-slate-500">LOCAL</div><div id="clkL" class="text-slate-200 text-sm">--:--:--</div></div>
+        <div><div class="text-[9px] tracking-[0.2em] text-slate-500">DTG</div><div id="clkD" class="text-slate-300 text-sm">------</div></div>
+      </div>
+      <div class="flex flex-wrap gap-2">
+        <button id="btnReset" class="btn-hud">Reset demo</button>
+        <button id="btnCopy" class="btn-hud">Copy JSON</button>
+        <button id="btnPdf" class="btn-hud" title="Opens the print dialog — choose “Save as PDF”">Export SitRep PDF</button>
+        <button id="btnLive" class="btn-hud btn-cyan inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-cyan-300 pulse-dot"></span>Live Test</button>
+        <button id="btnSitrep" class="btn-hud btn-amber">Generate Operational Briefing / SitRep</button>
+      </div>
     </div>
   </header>
 
-  <!-- LIVE BACKEND (shown only when served by the FastAPI backend) -->
+  <!-- LIVE BACKEND (shown when the API at API_BASE answers /api/health) -->
   <section id="livePanel" class="hidden panel px-4 py-3 flex flex-col lg:flex-row lg:items-center gap-3 border-emerald-500/30">
     <div class="flex items-center gap-2 shrink-0"><span id="liveDot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span><span id="liveStatus" class="text-xs font-mono text-slate-300">Connecting…</span></div>
-    <select id="liveThreads" class="flex-1 min-w-0 text-xs bg-ink-950 border border-ink-600 rounded-lg px-2.5 py-1.5 focus:outline-none focus:border-emerald-500"></select>
+    <select id="liveThreads" class="flex-1 min-w-0 text-xs bg-ink-950 border border-ink-600 px-2.5 py-1.5 focus:outline-none focus:border-cyan-500"></select>
     <div class="flex flex-wrap gap-2 shrink-0">
-      <input id="liveKey" type="password" placeholder="API key" class="hidden w-28 text-xs bg-ink-950 border border-ink-600 rounded-lg px-2.5 py-1.5">
-      <select id="liveScenario" title="Attack simulation scenario" class="text-xs bg-ink-950 border border-ink-600 rounded-lg px-2 py-1.5 focus:outline-none focus:border-rose-500">
+      <input id="liveKey" type="password" placeholder="API key" class="hidden w-28 text-xs bg-ink-950 border border-ink-600 px-2.5 py-1.5">
+      <select id="liveScenario" title="Attack simulation scenario" class="text-xs bg-ink-950 border border-ink-600 px-2 py-1.5 focus:outline-none focus:border-rose-500">
         <option value="kfor">Scenario: NATO / KFOR disinformation</option>
         <option value="energy">Scenario: Energy infrastructure cyber-panic</option>
       </select>
-      <button id="liveSim" class="text-xs font-semibold px-3 py-1.5 rounded-lg bg-rose-500/90 text-white hover:bg-rose-500">Simulate attack</button>
-      <button id="liveOperations" type="button" class="text-xs px-3 py-1.5 rounded-lg border border-ink-600">Operations</button>
-      <button id="liveDemo" class="text-xs px-3 py-1.5 rounded-lg border border-ink-600 hover:bg-ink-800">Demo data</button>
+      <button id="liveSim" class="btn-hud btn-crimson">Simulate attack</button>
+      <button id="liveOperations" type="button" class="btn-hud btn-cyan">Operations</button>
+      <button id="liveDemo" class="btn-hud">Demo data</button>
     </div>
   </section>
 
-  <dialog id="operations" class="bg-ink-950 text-slate-200 rounded-lg border border-ink-600 p-5 w-[min(94vw,48rem)] max-h-[85vh] backdrop:bg-black/60">
-    <form method="dialog"><button class="float-right text-sm px-2" aria-label="Close operations">Close</button></form>
-    <h2 class="font-semibold mb-3">Operations</h2>
-    <div class="flex flex-wrap items-center gap-3 mb-3 text-sm">
-      <button type="button" data-ops="cases">Campaign cases</button>
-      <button type="button" data-ops="sources">Sources</button>
-      <button type="button" data-ops="alerts">Alerts</button>
-      <label><input id="exerciseCases" type="checkbox"> Exercise cases</label>
+  <!-- OPERATIONS (campaign cases / sources / alerts — driven by operations.js) -->
+  <dialog id="operations" class="ops-dialog bg-ink-950 text-slate-200 border border-ink-600 p-5 w-[min(94vw,48rem)] max-h-[85vh] backdrop:bg-black/70">
+    <form method="dialog"><button class="btn-hud float-right" aria-label="Close operations">Close</button></form>
+    <h2 class="hud-title mb-3">Operations</h2>
+    <div class="flex flex-wrap items-center gap-2 mb-3 text-sm">
+      <button type="button" class="seg" data-ops="cases">Campaign cases</button>
+      <button type="button" class="seg" data-ops="sources">Sources</button>
+      <button type="button" class="seg" data-ops="alerts">Alerts</button>
+      <label class="text-xs text-slate-400 inline-flex items-center gap-1.5 ml-1"><input id="exerciseCases" type="checkbox" class="accent-cyan-400"> Exercise cases</label>
     </div>
     <p id="operationsStatus" role="status" class="text-xs text-slate-400 mb-2"></p>
     <div id="operationsBody" class="text-sm space-y-3"></div>
   </dialog>
 
-  <!-- ARTICLE -->
-  <section class="panel px-4 py-3 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
-    <span class="text-[10px] font-mono uppercase tracking-widest text-rose-300 bg-rose-500/10 border border-rose-500/30 rounded px-2 py-0.5 self-start">Breaking</span>
+  <!-- ARTICLE / MONITORED SURFACE -->
+  <section class="panel px-4 py-2.5 flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
+    <span class="text-[10px] font-mono uppercase tracking-widest text-rose-300 bg-rose-500/10 border border-rose-500/30 px-2 py-0.5 self-start sm:self-auto">Breaking</span>
     <div class="min-w-0 flex-1">
       <div class="text-sm font-medium truncate" id="artTitle"></div>
       <div class="text-xs text-slate-500 truncate" id="artMeta"></div>
     </div>
+    <div id="uasChip" class="hidden sm:flex"></div>
     <div class="text-xs font-mono text-slate-400" id="artCount"></div>
   </section>
 
   <!-- KPIs -->
   <section id="kpis" class="grid grid-cols-2 lg:grid-cols-4 gap-3"></section>
 
-  <!-- TIMELINE + SIGNALS -->
-  <section class="grid lg:grid-cols-3 gap-3">
-    <div class="panel p-4 lg:col-span-2">
-      <div class="flex items-center justify-between mb-2">
-        <div><h2 class="text-sm font-semibold">Temporal burst timeline</h2><p class="text-xs text-slate-500">Comments per 5-min bucket after publication</p></div>
-        <div class="flex gap-3 text-[11px] text-slate-400" id="tlLegend"></div>
-      </div>
-      <div id="timeline" class="w-full"></div>
-    </div>
-    <div class="panel p-4">
-      <h2 class="text-sm font-semibold">Threat vectors</h2>
-      <p class="text-xs text-slate-500 mb-3">National-security narrative categories in flagged comments</p>
-      <div id="vectors" class="space-y-2 mb-4"></div>
-      <h2 class="text-sm font-semibold pt-3 border-t border-ink-700">Signal separation</h2>
-      <p class="text-xs text-slate-500 mb-3">Mean sub-score: flagged vs organic comments</p>
-      <div id="signals" class="space-y-3"></div>
-      <div class="mt-4 pt-3 border-t border-ink-700 text-[11px] text-slate-500 font-mono leading-relaxed">
-        risk = 0.30·T + 0.25·L + 0.25·N + 0.20·G<br>High ≥ 60 · Medium ≥ 35 · Organic &lt; 35
-      </div>
-    </div>
-  </section>
+  <!-- COMMAND ROOM: left intel · centre stage · right telemetry -->
+  <main class="grid gap-3 xl:grid-cols-[300px_minmax(0,1fr)_340px] 2xl:grid-cols-[340px_minmax(0,1fr)_380px] items-start">
 
-  <!-- GEOSPATIAL -->
-  <section class="grid lg:grid-cols-3 gap-3">
-    <div class="panel p-4 lg:col-span-2">
-      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 mb-2">
-        <div><h2 class="text-sm font-semibold">Geospatial threat &amp; infrastructure map</h2>
-          <p class="text-xs text-slate-500">Source infrastructure by IP geolocation / ASN, not user location. Tap a node.</p></div>
-        <div id="mapViews" class="flex gap-1.5 shrink-0"></div>
+    <!-- LEFT: INTELLIGENCE -->
+    <aside class="space-y-3 min-w-0 order-2 xl:order-1">
+      <div class="panel p-4">
+        <h2 class="hud-title">Threat vectors</h2>
+        <p class="hud-sub mb-3">National-security narrative categories in flagged comments</p>
+        <div id="vectors" class="space-y-2"></div>
       </div>
-      <div class="relative"><div id="map" class="w-full h-[380px] sm:h-[460px] rounded-xl bg-ink-950/70 border border-ink-700 overflow-hidden"></div><div id="mapNotice" class="hidden absolute left-2 right-2 sm:right-auto bottom-7 z-[1100] max-w-sm text-[10.5px] leading-snug px-2.5 py-1.5 rounded-lg bg-ink-900/95 border border-amber-500/40 text-amber-200"></div></div>
-      <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-[11px] text-slate-400">
-        <span class="inline-flex items-center gap-1.5"><svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="#f43f5e"/></svg>Hostile infrastructure</span>
-        <span class="inline-flex items-center gap-1.5"><svg width="11" height="11"><circle cx="5.5" cy="5.5" r="4" fill="#34d399" fill-opacity=".7"/></svg>Residential ISP (organic)</span>
-        <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#f43f5e" stroke-width="2" stroke-dasharray="4 3"/></svg>Attack trajectory</span>
-        <span class="inline-flex items-center gap-1.5"><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="none" stroke="#e2e8f0"/><path d="M7 0v4M7 10v4M0 7h4M10 7h4" stroke="#e2e8f0"/></svg>Targeted portal</span>
-        <span id="mapHint" class="text-slate-500">Drag to pan · scroll or pinch to zoom · tap a node to inspect</span>
+      <div class="panel p-4">
+        <h2 class="hud-title">Signal separation</h2>
+        <p class="hud-sub mb-3">Mean sub-score: flagged vs organic comments</p>
+        <div id="signals" class="space-y-3"></div>
+        <div class="mt-4 pt-3 border-t border-ink-700 text-[11px] text-slate-500 font-mono leading-relaxed">
+          risk = 0.30·T + 0.25·L + 0.25·N + 0.20·G<br>High ≥ 60 · Medium ≥ 35 · Organic &lt; 35
+        </div>
       </div>
-    </div>
-    <div class="panel p-4">
-      <h2 class="text-sm font-semibold">Infrastructure node inspector</h2>
-      <p class="text-xs text-slate-500 mb-3">Simulated: documentation-range ASNs and IPs, fictional providers</p>
-      <div id="infraDetail"></div>
-      <div id="infraList" class="mt-3 pt-3 border-t border-ink-700 space-y-1 max-h-60 overflow-auto"></div>
-    </div>
-  </section>
+      <div class="panel p-4">
+        <h2 class="hud-title">Detected clusters</h2>
+        <p class="hud-sub mb-3">Connected components with ≥ 3 accounts</p>
+        <div id="clusters" class="space-y-3 xl:max-h-[560px] xl:overflow-auto xl:pr-1"></div>
+      </div>
+    </aside>
+
+    <!-- CENTRE: GEOSPATIAL STAGE -->
+    <section class="space-y-3 min-w-0 order-1 xl:order-2">
+      <div class="panel stage p-3 sm:p-4">
+        <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-2 mb-2">
+          <div><h2 class="hud-title">Geospatial threat &amp; infrastructure map</h2>
+            <p class="hud-sub">Source infrastructure by IP geolocation / ASN (not user location) · counter-UAS sensor picture. Tap a node.</p></div>
+          <div class="flex flex-wrap items-center gap-1.5 shrink-0">
+            <div id="stageModes" class="flex gap-1.5"></div>
+            <span class="w-px h-5 bg-ink-600 mx-0.5 hidden sm:block"></span>
+            <div id="mapViews" class="flex gap-1.5"></div>
+            <button id="uasToggle" class="seg seg-on" title="Show / hide the counter-UAS layer">UAS layer</button>
+          </div>
+        </div>
+        <div class="relative stage-frame">
+          <div id="map" class="w-full h-[400px] sm:h-[520px] 2xl:h-[600px] bg-ink-950/70 border border-ink-700 overflow-hidden"></div>
+          <div id="globeWrap" class="hidden absolute inset-0 z-[1050] bg-ink-950 border border-ink-700 overflow-hidden">
+            <canvas id="globe" class="w-full h-full block cursor-grab"></canvas>
+            <div id="globeHud" class="pointer-events-none absolute left-3 top-3 font-mono text-[10px] leading-relaxed text-cyan-300/80"></div>
+            <div class="pointer-events-none absolute right-3 top-3 font-mono text-[10px] text-slate-500 text-right">ORTHOGRAPHIC · WGS84<br>drag to rotate · scroll to zoom</div>
+          </div>
+          <span class="hud-corner tl"></span><span class="hud-corner tr"></span><span class="hud-corner bl"></span><span class="hud-corner br"></span>
+          <div id="mapNotice" class="hidden absolute left-2 right-2 sm:right-auto bottom-7 z-[1100] max-w-sm text-[10.5px] leading-snug px-2.5 py-1.5 bg-ink-900/95 border border-amber-500/40 text-amber-200"></div>
+        </div>
+        <div class="flex flex-wrap gap-x-4 gap-y-1 mt-2 text-[11px] text-slate-400">
+          <span class="inline-flex items-center gap-1.5"><svg width="12" height="12"><circle cx="6" cy="6" r="5" fill="#f43f5e"/></svg>Hostile infrastructure</span>
+          <span class="inline-flex items-center gap-1.5"><svg width="11" height="11"><circle cx="5.5" cy="5.5" r="4" fill="#34d399" fill-opacity=".7"/></svg>Residential ISP (organic)</span>
+          <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#f43f5e" stroke-width="2" stroke-dasharray="4 3"/></svg>Attack trajectory</span>
+          <span class="inline-flex items-center gap-1.5"><svg width="14" height="14"><circle cx="7" cy="7" r="5" fill="none" stroke="#e2e8f0"/><path d="M7 0v4M7 10v4M0 7h4M10 7h4" stroke="#e2e8f0"/></svg>Targeted portal</span>
+          <span class="inline-flex items-center gap-1.5"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1L13 7L7 13L1 7Z" fill="none" stroke="#fbbf24" stroke-width="1.5"/></svg>UAS track</span>
+          <span class="inline-flex items-center gap-1.5"><svg width="14" height="14"><rect x="2" y="2" width="10" height="10" fill="#22d3ee" fill-opacity=".25" stroke="#22d3ee"/></svg>Critical site / sensor</span>
+          <span id="mapHint" class="text-slate-500">Drag to pan · scroll or pinch to zoom · tap a node to inspect</span>
+        </div>
+      </div>
+
+      <div class="panel p-4">
+        <div class="flex items-center justify-between mb-2">
+          <div><h2 class="hud-title">Temporal burst timeline</h2><p class="hud-sub">Comments per 5-min bucket after publication</p></div>
+          <div class="flex gap-3 text-[11px] text-slate-400" id="tlLegend"></div>
+        </div>
+        <div id="timeline" class="w-full"></div>
+      </div>
+
+      <div class="panel p-4">
+        <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-1 mb-2">
+          <div><h2 class="hud-title">Forensic fusion timeline</h2><p class="hud-sub">Physical-domain (UAS) and information-domain events on one clock — correlation, not attribution</p></div>
+          <span id="fusionVerdict" class="text-[11px] font-mono"></span>
+        </div>
+        <div id="fusion" class="w-full"></div>
+      </div>
+    </section>
+
+    <!-- RIGHT: TELEMETRY -->
+    <aside class="space-y-3 min-w-0 order-3">
+      <div class="panel p-4">
+        <h2 class="hud-title">Infrastructure node inspector</h2>
+        <p class="hud-sub mb-3">Simulated: documentation-range ASNs and IPs, fictional providers</p>
+        <div id="infraDetail"></div>
+        <div id="infraList" class="mt-3 pt-3 border-t border-ink-700 space-y-1 max-h-60 overflow-auto"></div>
+      </div>
+      <div class="panel p-4">
+        <div class="flex items-center justify-between gap-2">
+          <h2 class="hud-title">Counter-UAS detection</h2>
+          <span class="text-[9px] font-mono px-1.5 py-px border border-amber-500/40 text-amber-300">SIM · SENSOR FUSION</span>
+        </div>
+        <p class="hud-sub mb-3">RF direction-finding · micro-Doppler radar · EO/IR, fused into tracks</p>
+        <div id="uas"></div>
+      </div>
+      <div class="panel p-4">
+        <h2 class="hud-title">Mitigation playbook</h2>
+        <p class="hud-sub mb-3">Defensive actions, generated from the active vectors and tracks</p>
+        <div id="playbook"></div>
+      </div>
+    </aside>
+  </main>
 
   <!-- IMPACT ZONE -->
   <section class="panel p-4">
     <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-1 mb-3">
-      <div><h2 class="text-sm font-semibold">Target audience / impact zone</h2><p class="text-xs text-slate-500">Institutional portals and discourse areas where the same fingerprints were seen</p></div>
+      <div><h2 class="hud-title">Target audience / impact zone</h2><p class="hud-sub">Institutional portals and discourse areas where the same fingerprints were seen</p></div>
       <span class="text-[11px] font-mono text-slate-500">cross-surface sightings feed · simulated</span>
     </div>
     <div id="impact" class="grid sm:grid-cols-2 lg:grid-cols-5 gap-2"></div>
   </section>
 
-  <!-- NETWORK + CLUSTERS -->
-  <section class="grid lg:grid-cols-3 gap-3">
-    <div class="panel p-4 lg:col-span-2">
-      <div class="flex items-center justify-between mb-2 gap-2">
-        <div><h2 class="text-sm font-semibold">Account network</h2><p class="text-xs text-slate-500">Edges = friend-list overlap ≥ 50%, near-duplicate talking point, or shared hosting. Tap a node.</p></div>
-        <div class="flex flex-col sm:flex-row gap-1 sm:gap-3 text-[11px] text-slate-400 shrink-0">
-          <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#f43f5e" stroke-opacity=".7" stroke-width="1.5"/></svg>friends</span>
-          <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="3 2"/></svg>content</span>
-          <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="1 2"/></svg>infra</span>
-          <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#facc15" stroke-width="1.5"/></svg>co-activity</span>
-        </div>
+  <!-- NETWORK -->
+  <section class="panel p-4">
+    <div class="flex flex-col sm:flex-row sm:items-center justify-between mb-2 gap-2">
+      <div><h2 class="hud-title">Account network</h2><p class="hud-sub">Edges = friend-list overlap ≥ 50%, near-duplicate talking point, shared hosting or cross-thread co-activity. Tap a node.</p></div>
+      <div class="flex flex-wrap gap-x-3 gap-y-1 text-[11px] text-slate-400 shrink-0">
+        <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#f43f5e" stroke-opacity=".7" stroke-width="1.5"/></svg>friends</span>
+        <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#22d3ee" stroke-width="1.5" stroke-dasharray="3 2"/></svg>content</span>
+        <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#a78bfa" stroke-width="1.5" stroke-dasharray="1 2"/></svg>infra</span>
+        <span class="inline-flex items-center gap-1.5"><svg width="18" height="6"><line x1="0" y1="3" x2="18" y2="3" stroke="#facc15" stroke-width="1.5"/></svg>co-activity</span>
       </div>
-      <div id="network" class="w-full rounded-xl bg-ink-950/60 border border-ink-700"></div>
     </div>
-    <div class="panel p-4">
-      <h2 class="text-sm font-semibold">Detected clusters</h2>
-      <p class="text-xs text-slate-500 mb-3">Connected components with ≥ 3 accounts</p>
-      <div id="clusters" class="space-y-3"></div>
-    </div>
+    <div id="network" class="w-full bg-ink-950/60 border border-ink-700"></div>
   </section>
 
   <!-- INSPECTOR -->
   <section class="panel p-4">
     <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-3 mb-3">
-      <div><h2 class="text-sm font-semibold">Comment inspector</h2><p class="text-xs text-slate-500">Tap a row to see the evidence behind its score</p></div>
+      <div><h2 class="hud-title">Comment inspector</h2><p class="hud-sub">Tap a row to see the evidence behind its score</p></div>
       <div class="flex flex-wrap items-center gap-2">
         <div id="filters" class="flex flex-wrap gap-1.5"></div>
-        <input id="search" placeholder="Search text or @user…" class="text-xs bg-ink-950 border border-ink-600 rounded-lg px-3 py-1.5 w-full sm:w-52 focus:outline-none focus:border-cyan-500">
+        <input id="search" placeholder="Search text or @user…" class="text-xs bg-ink-950 border border-ink-600 px-3 py-1.5 w-full sm:w-52 focus:outline-none focus:border-cyan-500">
       </div>
     </div>
     <div class="flex flex-wrap gap-3 text-[11px] text-slate-400 mb-3">
@@ -270,20 +363,27 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
       <span><mark class="dialect">doublet</mark> Geg/Standard same-word mixing</span>
       <span><mark class="ngram">n-gram</mark> reused by other accounts</span>
     </div>
-    <div id="rows" class="divide-y divide-ink-700 border border-ink-700 rounded-xl overflow-hidden"></div>
+    <div id="rows" class="divide-y divide-ink-700 border border-ink-700 overflow-hidden"></div>
   </section>
 
   <!-- METHOD -->
-  <section class="panel p-4 text-xs text-slate-400 leading-relaxed grid md:grid-cols-2 gap-4">
+  <section class="panel p-4 text-xs text-slate-400 leading-relaxed grid md:grid-cols-3 gap-4">
     <div>
-      <h3 class="text-slate-200 font-semibold text-sm mb-1">What this measures</h3>
+      <h3 class="hud-title mb-1">What this measures</h3>
       <p>The score measures <b class="text-slate-200">coordination</b>, not who is behind it. Infrastructure shows where traffic exits, which for VPNs and proxies is not where the operator sits; state nexus is always "not established" until corroborated by all-source intelligence. No single signal flags an account: in the seed thread, <span class="font-mono">@arben_prishtina</span> posts inside the swarm window and gets a maximum temporal score, but stays Organic because the text, narrative and account history are clean.</p>
     </div>
     <div>
-      <h3 class="text-slate-200 font-semibold text-sm mb-1">Limits</h3>
+      <h3 class="hud-title mb-1">Counter-UAS fusion</h3>
+      <p>Drone tracks are a <b class="text-slate-200">simulated sensor feed</b> (RF, radar, EO/IR). The fusion timeline only tests whether physical-domain activity near critical sites lines up in time and theme with the online swarm. A match is a lead for investigators and the civil-aviation / police C-UAS authority, never proof that the same actor ran both.</p>
+    </div>
+    <div>
+      <h3 class="hud-title mb-1">Limits</h3>
       <p>Dialect mixing is normal for diaspora and cross-border writers, so only <i>same-word</i> doublets count. The trope and calque lexicons are hand-written seeds and need extending with fact-checker data. Any score is a lead for human review, not a verdict. All data on this page is simulated.</p>
     </div>
   </section>
+
+  <!-- STATUS TICKER -->
+  <footer id="ticker" class="ticker font-mono text-[10px] text-slate-500 px-3 py-1.5 flex flex-wrap gap-x-5 gap-y-1"></footer>
 </div>
 
 <!-- LIVE TEST MODAL -->
@@ -1048,7 +1148,7 @@ if (typeof module !== "undefined") module.exports = Engine;
   function proj(v, W, H) { const V = MAPV[v]; return (lat, lon) => [((lon - V.lon[0]) / (V.lon[1] - V.lon[0])) * W, H - ((lat - V.lat[0]) / (V.lat[1] - V.lat[0])) * H]; }
   function renderSchematic() {
     const W = 720, H = 420, v = state.mapView, V = MAPV[v], P = proj(v, W, H);
-    $('#mapViews').innerHTML = Object.entries(MAPV).map(([k, x]) => `<button data-mv="${k}" class="text-[11px] px-2.5 py-1 rounded-lg border ${v === k ? 'bg-emerald-500/15 border-emerald-500/50 text-emerald-200' : 'border-ink-600 text-slate-400 hover:bg-ink-800'}">${x.label}</button>`).join('');
+    $('#mapViews').innerHTML = Object.entries(MAPV).map(([k, x]) => `<button data-mv="${k}" class="seg ${v === k ? 'seg-on' : ''}">${x.label}</button>`).join('');
     $('#mapViews').querySelectorAll('[data-mv]').forEach((b) => b.addEventListener('click', () => { state.mapView = b.dataset.mv; renderMap(); }));
     $('#map').style.height = 'auto';
     let g = `<defs><radialGradient id="glow"><stop offset="0" stop-color="#f43f5e" stop-opacity=".45"/><stop offset="1" stop-color="#f43f5e" stop-opacity="0"/></radialGradient>
@@ -1176,13 +1276,14 @@ if (typeof module !== "undefined") module.exports = Engine;
         mk.on('click', () => { state.infraSel = n.node; renderMap(); renderInfra(); });
       }
     });
+    if (state.uasOn) drawUasLeaflet();
   }
   function renderMap() {
     const v = state.mapView;
-    $('#mapViews').innerHTML = Object.entries(MAPV).map(([k, x]) => `<button data-mv="${k}" class="text-[11px] px-2.5 py-1 rounded-lg border ${v === k ? 'bg-emerald-500/15 border-emerald-500/50 text-emerald-200' : 'border-ink-600 text-slate-400 hover:bg-ink-800'}">${x.label}</button>`).join('');
+    $('#mapViews').innerHTML = Object.entries(MAPV).map(([k, x]) => `<button data-mv="${k}" class="seg ${v === k ? 'seg-on' : ''}">${x.label}</button>`).join('');
     if (!initLeaflet()) { $('#mapHint').textContent = 'Interactive map library unavailable offline: showing the schematic view. Tap a node to inspect.'; renderSchematic(); return; }
     $('#mapViews').querySelectorAll('[data-mv]').forEach((b) => b.addEventListener('click', () => { state.mapView = b.dataset.mv; renderMap(); LMAP.flyToBounds(VIEW_BOUNDS[state.mapView], { padding: [10, 10], duration: 1.3 }); }));
-    if (!state.res.infra.length) { LDATA.clearLayers(); packets = []; mapNotice('No infrastructure telemetry in this batch. Paste JSON with an <span class="font-mono">infra</span> object to plot sources.'); return; }
+    if (!state.res.infra.length) { LDATA.clearLayers(); packets = []; if (state.uasOn) drawUasLeaflet(); mapNotice('No infrastructure telemetry in this batch. Paste JSON with an <span class="font-mono">infra</span> object to plot sources.'); return; }
     renderLeaflet();
   }
 
@@ -1437,11 +1538,11 @@ if (typeof module !== "undefined") module.exports = Engine;
   }
 
   function render() {
-    if (state.live) { const lt = state.live.thread || {}; $('#artTitle').textContent = lt.title || lt.id || 'Live thread'; $('#artMeta').textContent = `${(lt.platform || 'live').toUpperCase()} · ${lt.url || lt.id} · analysed ${new Date(state.live.generated).toLocaleTimeString()} · embedder ${state.live.embedder}`; $('#artCount').textContent = `${state.res.thread.n} comments · ${state.res.users.size} accounts`; renderKPIs(); renderTimeline(); renderVectors(); renderSignals(); renderMap(); renderInfra(); renderImpact(); renderNetwork(); renderClusters(); renderInspector(); return; }
+    if (state.live) { const lt = state.live.thread || {}; $('#artTitle').textContent = lt.title || lt.id || 'Live thread'; $('#artMeta').textContent = `${(lt.platform || 'live').toUpperCase()} · ${lt.url || lt.id} · analysed ${new Date(state.live.generated).toLocaleTimeString()} · embedder ${state.live.embedder}`; $('#artCount').textContent = `${state.res.thread.n} comments · ${state.res.users.size} accounts`; renderKPIs(); renderTimeline(); renderVectors(); renderSignals(); renderMap(); renderInfra(); renderImpact(); renderNetwork(); renderClusters(); renderInspector(); renderExtras(); return; }
     $('#artTitle').textContent = state.standalone ? 'Live batch (standalone thread)' : ARTICLE.title;
     $('#artMeta').textContent = state.standalone ? 'Scored without the seed thread as context' : `${ARTICLE.portal} · published ${hhmm(Date.parse(ARTICLE.published))}, 18 Nov 2026 · monitored surface`;
     $('#artCount').textContent = `${state.res.thread.n} comments · ${state.res.users.size} accounts`;
-    renderKPIs(); renderTimeline(); renderVectors(); renderSignals(); renderMap(); renderInfra(); renderImpact(); renderNetwork(); renderClusters(); renderInspector();
+    renderKPIs(); renderTimeline(); renderVectors(); renderSignals(); renderMap(); renderInfra(); renderImpact(); renderNetwork(); renderClusters(); renderInspector(); renderExtras();
   }
 
   // ---------------- LIVE TEST ----------------
@@ -1474,7 +1575,7 @@ if (typeof module !== "undefined") module.exports = Engine;
   $('#search').addEventListener('input', (e) => { state.q = e.target.value; renderInspector(); });
   $('#btnCopy').addEventListener('click', async () => {
     const out = { thread: { ...state.res.thread, published: new Date(state.res.thread.published).toISOString() }, clusters: state.res.clusters,
-      comments: state.res.items.map((i) => ({ id: i.c.id, user: i.c.user, ts: i.c.ts, text: i.c.text, score: i.score, tier: i.tier, signals: { temporal: i.temporal, linguistic: i.linguistic, narrative: i.narrative, network: i.network }, tropes: i.tropes.map((t) => t.key), near_duplicates: i.dups.map((d) => d.id) })) };
+      comments: state.res.items.map((i) => ({ id: i.c.id, user: i.c.user, ts: i.c.ts, text: i.c.text, score: i.score, tier: i.tier, signals: { temporal: i.temporal, linguistic: i.linguistic, narrative: i.narrative, network: i.network }, tropes: i.tropes.map((t) => t.key), near_duplicates: i.dups.map((d) => d.id) })), uas_tracks: uasExport() };
     try { await navigator.clipboard.writeText(JSON.stringify(out, null, 2)); toast('Results copied to clipboard'); } catch (e) { toast('Clipboard blocked in this viewer'); }
   });
   // ---------------- SITREP ----------------
@@ -1553,11 +1654,13 @@ if (typeof module !== "undefined") module.exports = Engine;
   }
   const sitrepModal = $('#sitrep'); let lastSitrep = null;
   async function getSitrep() {
+    let rep = null;
     if (state.live) {
-      try { const r = await apiFetch(`/api/threads/${encodeURIComponent(state.live.thread.id)}/sitrep`); if (!r.ok) throw new Error('HTTP ' + r.status); return { text: await r.text(), id: 'SITREP-' + state.live.thread.id.replace(/[^\w-]+/g, '-') }; }
-      catch (e) { return buildSitrep(); }
+      try { const r = await apiFetch(`/api/threads/${encodeURIComponent(state.live.thread.id)}/sitrep`); if (!r.ok) throw new Error('HTTP ' + r.status); rep = { text: await r.text(), id: 'SITREP-' + state.live.thread.id.replace(/[^\w-]+/g, '-') }; }
+      catch (e) { rep = null; }
     }
-    return buildSitrep();
+    rep = rep || buildSitrep();
+    return { ...rep, text: withUasAnnex(rep.text) }; // + counter-UAS annex (physical-domain correlation)
   }
   $('#btnSitrep').addEventListener('click', async () => {
     lastSitrep = await getSitrep();
@@ -1786,6 +1889,442 @@ if (typeof module !== "undefined") module.exports = Engine;
     });
     connectWS(connection, health.auth_required);
   }
+
+  // =====================================================================
+  // COMMAND-CENTER EXTENSIONS: counter-UAS sensor picture, forensic fusion,
+  // mitigation playbook, 3D globe, clocks/ticker. Everything below is a
+  // SIMULATED sensor feed for the exercise; it never calls external services.
+  // =====================================================================
+  const CRIT_SITES = [
+    { id: 'CI-01', label: 'Thermal power plant (Obiliq area)', kind: 'energy', lat: 42.689, lon: 21.071 },
+    { id: 'CI-02', label: 'Grid substation 400 kV (Pristina N)', kind: 'energy', lat: 42.712, lon: 21.150 },
+    { id: 'CI-03', label: 'International airport (PRN)', kind: 'aviation', lat: 42.573, lon: 21.036 },
+    { id: 'CI-04', label: 'Water reservoir (Badovc)', kind: 'water', lat: 42.609, lon: 21.232 },
+  ];
+  const UAS_SENSORS = [
+    { id: 'S-RF1', type: 'RF-DF', label: 'RF direction-finder', lat: 42.700, lon: 21.105, r: 6000 },
+    { id: 'S-RD1', type: 'RADAR', label: 'Micro-Doppler radar', lat: 42.655, lon: 21.120, r: 5000 },
+    { id: 'S-EO1', type: 'EO/IR', label: 'EO/IR turret', lat: 42.586, lon: 21.060, r: 3500 },
+  ];
+  // t0/t1 = minutes relative to article publication (negative = before).
+  const UAS_TRACKS = [
+    { id: 'UAS-01', hostile: true, site: 'CI-01', t0: -46, t1: -31, cls: 'Multirotor · Group 1 (~0.9 kg)', rf: '2.4 / 5.8 GHz OFDM (consumer C2 + video downlink)',
+      rid: 'Not broadcast', alt: '60–140 m AGL', spd: '9–14 m/s', sensors: ['S-RF1', 'S-RD1', 'S-EO1'], pilot: [42.735, 21.035], cep: 180, loops: 3, rad: 0.006,
+      conf: 'High', note: 'Three loiter orbits over the turbine hall and switchyard with the video downlink active throughout. EO/IR clip captured (sim).' },
+    { id: 'UAS-02', hostile: true, site: 'CI-02', t0: -27, t1: -18, cls: 'Fixed-wing · Group 1 (~2.5 kg)', rf: '900 MHz FHSS (long-range telemetry)',
+      rid: 'Not broadcast', alt: '150–220 m AGL', spd: '17–22 m/s', sensors: ['S-RF1', 'S-RD1'], pilot: [42.760, 21.205], cep: 320, loops: 2, rad: 0.009,
+      conf: 'Moderate', note: 'Racetrack pattern along the 400 kV line, then egress to the north-east. No EO/IR lock (out of turret range) (sim).' },
+    { id: 'UAS-03', hostile: false, site: 'CI-04', t0: 48, t1: 57, cls: 'Multirotor · hobby (~0.25 kg)', rf: '2.4 GHz Wi-Fi beacon',
+      rid: 'Broadcast · registered operator (sim)', alt: '30–60 m AGL', spd: '4–7 m/s', sensors: ['S-RD1'], pilot: [42.600, 21.255], cep: 25, loops: 1, rad: 0.004,
+      conf: '—', note: 'Remote ID matches a registered hobby flight outside the restricted zone. Benign; logged for completeness (sim).' },
+  ];
+  const siteOf = (id) => CRIT_SITES.find((s) => s.id === id);
+  (function buildUasPaths() {
+    const lerp = (a, b, f) => [a[0] + (b[0] - a[0]) * f, a[1] + (b[1] - a[1]) * f];
+    UAS_TRACKS.forEach((t) => {
+      const s = siteOf(t.site), k = 1 / Math.cos(s.lat * Math.PI / 180), start = [s.lat + t.rad, s.lon], pts = [];
+      for (let i = 0; i <= 12; i++) pts.push(lerp(t.pilot, start, i / 12));
+      const n = 40 * t.loops;
+      for (let i = 1; i <= n; i++) { const a = Math.PI / 2 + (i / 40) * Math.PI * 2, w = 1 + 0.18 * Math.sin(i / 7); pts.push([s.lat + Math.sin(a) * t.rad * w, s.lon + Math.cos(a) * t.rad * k * w * 1.3]); }
+      for (let i = 1; i <= 12; i++) pts.push(lerp(start, t.pilot, i / 12));
+      t.path = pts;
+    });
+  })();
+  Object.assign(state, { uasOn: true, uasSel: 'UAS-01', stage: '2d', playDone: new Set() });
+  const fmtLL = (la, lo) => `${Math.abs(la).toFixed(3)}${la >= 0 ? 'N' : 'S'} ${String(Math.abs(lo).toFixed(3)).padStart(7, '0')}${lo >= 0 ? 'E' : 'W'}`;
+  const tRel = (m) => (m === 0 ? 'T±0' : (m > 0 ? 'T+' : 'T') + m) + ' min';
+
+  // Cross-domain correlation: does physical activity near a critical site precede the
+  // online swarm and match its theme? Scored 0-100 with every reason shown. Lead, not proof.
+  function uasAnalysis() {
+    const r = state.res, th = r.thread, pub = isFinite(th.published) ? th.published : Date.now(), pk = th.peak;
+    const panicItems = r.items.filter((i) => i.tier !== 'organic' && i.tropes.some((t) => t.key === 'infrastructure_panic'));
+    const tracks = UAS_TRACKS.map((t) => {
+      const start = pub + t.t0 * 60000, end = pub + t.t1 * 60000, site = siteOf(t.site);
+      const lead = pk ? Math.round((pk.start - end) / 60000) : null;
+      let score = 0; const why = [];
+      if (t.hostile) { score += 25; why.push('No Remote ID inside a critical-site restricted zone'); } else why.push('Remote ID broadcast and operator registered');
+      if (lead !== null && lead >= 0 && lead <= 120) { score += 35 - Math.round(lead / 6); why.push(`Flight ended ${lead} min before the swarm window opened`); }
+      else if (lead !== null && lead < 0) why.push('Flight came after the swarm began, so it cannot be a precursor');
+      else if (lead === null) why.push('No swarm window in this thread to compare against');
+      if (t.hostile && panicItems.length && site.kind !== 'aviation') { score += Math.min(30, 10 + panicItems.length * 4); why.push(`${panicItems.length} flagged comment(s) push the critical-infrastructure panic narrative`); }
+      if (t.sensors.length >= 2) { score += 10; why.push(`Corroborated by ${t.sensors.length} independent sensors`); }
+      score = Math.max(0, Math.min(100, score));
+      return { ...t, start, end, siteObj: site, lead, score, why, band: score >= 70 ? 'STRONG' : score >= 40 ? 'MODERATE' : 'WEAK' };
+    });
+    const hostile = tracks.filter((t) => t.hostile);
+    return { tracks, hostile, panicItems, pub, top: [...hostile].sort((a, b) => b.score - a.score)[0] || null };
+  }
+  const BAND_CLS = { STRONG: 'text-rose-300', MODERATE: 'text-amber-300', WEAK: 'text-emerald-300' };
+
+  // Evidence integrity: SHA-256 over a canonical JSON record (Web Crypto), FNV-1a fallback.
+  const hashCache = new Map();
+  function evidenceRecord(t) {
+    return { classification: 'UNCLASSIFIED // EXERCISE — SIMULATED DATA', track: t.id, class: t.cls, rf_signature: t.rf, remote_id: t.rid, altitude: t.alt, speed: t.spd,
+      window_utc: [new Date(t.start).toISOString(), new Date(t.end).toISOString()], site: { id: t.siteObj.id, label: t.siteObj.label, lat: t.siteObj.lat, lon: t.siteObj.lon },
+      sensors: t.sensors, operator_estimate: { lat: t.pilot[0], lon: t.pilot[1], cep_m: t.cep }, correlation: { band: t.band, score: t.score, reasons: t.why },
+      path: t.path.map(([a, b]) => [+a.toFixed(5), +b.toFixed(5)]) };
+  }
+  async function sha256(str) {
+    try { const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(str)); return { alg: 'SHA-256', hex: [...new Uint8Array(d)].map((b) => b.toString(16).padStart(2, '0')).join('') }; }
+    catch (e) { let h = 0x811c9dc5; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return { alg: 'FNV-1a (Web Crypto unavailable)', hex: h.toString(16).padStart(8, '0') }; }
+  }
+  async function hashFor(t) { const s = JSON.stringify(evidenceRecord(t)); if (!hashCache.has(s)) hashCache.set(s, await sha256(s)); return hashCache.get(s); }
+
+  function renderUasChip() {
+    const A = uasAnalysis(); const el = $('#uasChip');
+    if (!A.hostile.length) { el.innerHTML = ''; return; }
+    el.innerHTML = `<button id="uasChipBtn" class="seg seg-amber seg-on inline-flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-amber-400 pulse-dot"></span>${A.hostile.length} UAS near critical sites · ${A.top ? A.top.band : ''}</button>`;
+    $('#uasChipBtn').addEventListener('click', () => focusUas(A.top ? A.top.id : A.hostile[0].id));
+  }
+  function focusUas(id) {
+    state.uasSel = id; state.uasOn = true; state.mapView = 'theatre'; setStage('2d'); renderUAS(); renderMap();
+    const t = UAS_TRACKS.find((x) => x.id === id), s = t && siteOf(t.site);
+    if (LMAP && s) LMAP.flyTo([s.lat, s.lon], 12, { duration: 1.2 });
+    document.getElementById('map').scrollIntoView({ behavior: 'smooth', block: 'center' });
+  }
+  function renderUAS() {
+    const A = uasAnalysis(); const sel = A.tracks.find((t) => t.id === state.uasSel) || A.tracks[0];
+    const cell = (k, v, cls = 'text-slate-200') => `<div class="border border-ink-700 bg-ink-950/60 px-2 py-1.5"><div class="text-[9px] font-mono tracking-widest text-slate-500">${k}</div><div class="font-mono text-base ${cls}">${v}</div></div>`;
+    const row = (k, v, cls = '') => `<dt class="text-slate-500">${k}</dt><dd class="font-mono text-right text-slate-300 ${cls} break-words">${v}</dd>`;
+    const list = A.tracks.map((t) => `<button data-uas="${t.id}" class="w-full flex items-center gap-2 text-[11px] px-2 py-1.5 border ${t.id === sel.id ? 'border-amber-500/50 bg-amber-500/5' : 'border-transparent hover:bg-ink-800/60'}">
+        <svg width="10" height="10" viewBox="0 0 10 10"><path d="M5 0L10 5L5 10L0 5Z" fill="${t.hostile ? '#fbbf24' : '#64748b'}"/></svg>
+        <span class="font-mono ${t.hostile ? 'text-amber-200' : 'text-slate-400'}">${t.id}</span><span class="text-slate-500 truncate flex-1 text-left">${esc(t.siteObj.label)}</span>
+        <span class="font-mono ${BAND_CLS[t.band]}">${t.band}</span></button>`).join('');
+    $('#uas').innerHTML = `<div class="grid grid-cols-3 gap-2 mb-3">${cell('TRACKS', A.tracks.length)}${cell('HOSTILE', A.hostile.length, A.hostile.length ? 'text-amber-300' : 'text-slate-200')}${cell('SENSORS', UAS_SENSORS.length + '/' + UAS_SENSORS.length, 'text-cyan-300')}</div>
+      <div class="space-y-0.5 mb-3">${list}</div>
+      <div class="border ${sel.hostile ? 'border-amber-500/30 bg-amber-500/5' : 'border-ink-700 bg-ink-950/40'} p-3 fade-in">
+        <div class="flex items-center justify-between gap-2"><span class="font-mono text-sm ${sel.hostile ? 'text-amber-200' : 'text-slate-300'}">${sel.id}</span>
+          <span class="text-[10px] font-mono px-2 py-0.5 border ${sel.hostile ? 'border-amber-500/50 text-amber-300' : 'border-emerald-500/30 text-emerald-300'}">${sel.hostile ? 'UNAUTHORISED' : 'COMPLIANT'} · CONF ${esc(sel.conf)}</span></div>
+        <div class="text-xs text-slate-300 mt-1">${esc(sel.cls)}</div>
+        <dl class="grid grid-cols-2 gap-x-3 gap-y-1 text-[11px] mt-2.5">
+          ${row('RF signature', esc(sel.rf))}
+          ${row('Remote ID', esc(sel.rid), sel.hostile ? 'text-amber-300' : 'text-emerald-300')}
+          ${row('Window', `${hhmm(sel.start)}–${hhmm(sel.end)}`)}
+          ${row('Relative', `${tRel(sel.t0)} → ${tRel(sel.t1)}`)}
+          ${row('Over site', esc(sel.siteObj.id + ' · ' + sel.siteObj.label))}
+          ${row('Altitude / speed', esc(sel.alt + ' · ' + sel.spd))}
+          ${row('Sensors', sel.sensors.join(', '))}
+          ${row('Operator est.', `${fmtLL(sel.pilot[0], sel.pilot[1])} · CEP ${sel.cep} m`)}
+        </dl>
+        <div class="mt-3"><div class="flex justify-between text-[11px] mb-1"><span class="text-slate-400">Cross-domain correlation</span><span class="font-mono ${BAND_CLS[sel.band]}">${sel.band} · ${sel.score}/100</span></div>
+          <div class="h-1.5 bg-ink-700 overflow-hidden"><div class="h-full corr-bar" style="width:${sel.score}%"></div></div>
+          <ul class="text-[11px] text-slate-400 space-y-0.5 mt-1.5">${sel.why.map((w) => `<li>› ${esc(w)}</li>`).join('')}</ul></div>
+        <p class="text-[11px] text-slate-400 mt-2.5 leading-relaxed">${esc(sel.note)}</p>
+        <div class="mt-2.5 text-[10px] font-mono text-slate-500">CHAIN OF CUSTODY</div>
+        <ol class="text-[10.5px] font-mono text-slate-400 mt-1 space-y-0.5">
+          <li>01 · ${hhmm(sel.start, true)}Z capture · ${sel.sensors.join(' + ')}</li>
+          <li>02 · ${hhmm(sel.end + 60000, true)}Z fused track sealed · C2-ISR node</li>
+          <li>03 · evidence hash <span id="uasHash" class="text-cyan-300 break-all">computing…</span></li>
+        </ol>
+        <div class="mt-2.5 flex flex-wrap gap-2">
+          <button id="uasFocus" class="seg">Focus on map</button>
+          <button id="uasExport" class="seg seg-amber seg-on">Export evidence (.json)</button>
+        </div>
+      </div>`;
+    $('#uas').querySelectorAll('[data-uas]').forEach((b) => b.addEventListener('click', () => { state.uasSel = b.dataset.uas; renderUAS(); if (state.uasOn) renderMap(); }));
+    $('#uasFocus').addEventListener('click', () => focusUas(sel.id));
+    $('#uasExport').addEventListener('click', () => exportEvidence(sel));
+    hashFor(sel).then((h) => { const el = document.getElementById('uasHash'); if (el && state.uasSel === sel.id) el.textContent = `${h.alg} ${h.hex.slice(0, 16)}…${h.hex.slice(-8)}`; });
+  }
+  async function exportEvidence(t) {
+    const rec = evidenceRecord(t), h = await hashFor(t);
+    const data = JSON.stringify({ ...rec, integrity: { alg: h.alg, digest: h.hex, over: 'canonical JSON of every field except integrity' }, exported: new Date().toISOString() }, null, 2);
+    const filename = `EVIDENCE-${t.id}-${new Date().toISOString().slice(0, 10)}.json`;
+    if (dlNS) { try { await dlNS.save({ filename, data }); toast('Evidence saved: ' + filename); } catch (e) { toast('Download unavailable here'); } return; }
+    try { const url = URL.createObjectURL(new Blob([data], { type: 'application/json' })); const a = document.createElement('a'); a.href = url; a.download = filename; document.body.appendChild(a); a.click(); a.remove(); setTimeout(() => URL.revokeObjectURL(url), 2000); toast('Evidence package exported: ' + filename); }
+    catch (e) { toast('Download blocked here'); }
+  }
+
+  // Forensic fusion timeline: physical + information domain on one clock.
+  function renderFusion() {
+    const A = uasAnalysis(), r = state.res, th = r.thread, pub = A.pub, pk = th.peak;
+    const flagged = r.items.filter((i) => i.tier !== 'organic' && !isNaN(i.t));
+    const panic = A.panicItems.filter((i) => !isNaN(i.t));
+    const times = [...A.tracks.flatMap((t) => [t.start, t.end]), ...flagged.map((i) => i.t), pub, pk ? pk.end : pub];
+    const t0 = Math.min(...times) - 6 * 60000, t1 = Math.max(...times, pub + 60 * 60000) + 6 * 60000;
+    const W = 760, H = 206, L = 128, R = 14, top = 14, lh = 31;
+    const x = (t) => L + ((t - t0) / (t1 - t0)) * (W - L - R);
+    const lanes = ['UAS FLIGHTS', 'RF / RADAR HITS', 'INFRA-PANIC POSTS', 'SWARM (FLAGGED)', 'ARTICLE / ALERT'];
+    const ly = (k) => top + k * lh + lh / 2;
+    const mono = 'font-family="JetBrains Mono, ui-monospace, monospace"';
+    let g = '';
+    lanes.forEach((name, k) => { g += `<rect x="${L}" y="${top + k * lh + 3}" width="${W - L - R}" height="${lh - 6}" fill="${k % 2 ? '#0a1017' : '#0c131b'}"/><text x="${L - 8}" y="${ly(k) + 3}" fill="#64748b" font-size="9.5" text-anchor="end" ${mono}>${name}</text>`; });
+    for (let m = Math.ceil((t0 - pub) / 1800000) * 30; pub + m * 60000 <= t1; m += 30) {
+      const xx = x(pub + m * 60000);
+      g += `<line x1="${xx}" x2="${xx}" y1="${top}" y2="${top + lanes.length * lh}" stroke="#16212c"/><text x="${xx}" y="${H - 4}" fill="#64748b" font-size="9.5" text-anchor="middle" ${mono}>${m === 0 ? 'T±0' : (m > 0 ? 'T+' : 'T') + m}</text>`;
+    }
+    if (pk) g += `<rect x="${x(pk.start) - 2}" y="${top + 2}" width="${Math.max(4, x(pk.end) - x(pk.start) + 4)}" height="${lanes.length * lh - 4}" fill="#f43f5e" fill-opacity=".07" stroke="#f43f5e" stroke-opacity=".45" stroke-dasharray="3 3"/>`;
+    const px = x(pub); g += `<line x1="${px}" x2="${px}" y1="${top}" y2="${top + lanes.length * lh}" stroke="#22d3ee" stroke-width="1.2"/>`;
+    A.tracks.forEach((t) => {
+      const c = t.hostile ? '#fbbf24' : '#64748b', sel = t.id === state.uasSel, x0 = x(t.start), x1 = x(t.end);
+      g += `<g data-fuas="${t.id}" style="cursor:pointer"><rect x="${x0}" y="${ly(0) - 6}" width="${Math.max(3, x1 - x0)}" height="12" fill="${c}" fill-opacity="${sel ? .9 : .55}" stroke="${sel ? '#fff' : 'none'}" stroke-width="1"><title>${t.id} · ${hhmm(t.start)}–${hhmm(t.end)} · ${t.siteObj.label}</title></rect>
+        <text x="${(x0 + x1) / 2}" y="${ly(0) - 9}" fill="${c}" font-size="9" text-anchor="middle" ${mono}>${t.id}</text></g>`;
+      for (let tt = t.start; tt <= t.end; tt += 60000) g += `<line x1="${x(tt)}" x2="${x(tt)}" y1="${ly(1) - 6}" y2="${ly(1) + 6}" stroke="${c}" stroke-opacity=".8"/>`;
+    });
+    panic.forEach((i) => { g += `<circle cx="${x(i.t)}" cy="${ly(2)}" r="3.6" fill="#f43f5e"><title>${hhmm(i.t, true)} @${esc(i.c.user)} · ${esc(i.c.text.slice(0, 80))}</title></circle>`; });
+    if (!panic.length) g += `<text x="${L + 8}" y="${ly(2) + 3}" fill="#475569" font-size="9.5" ${mono}>no infrastructure-panic posts in this thread</text>`;
+    flagged.forEach((i) => { g += `<circle cx="${x(i.t)}" cy="${ly(3) + ((i.c.id.charCodeAt(i.c.id.length - 1) % 5) - 2) * 2}" r="2.6" fill="${TIER[i.tier].hex}" fill-opacity=".9"><title>${hhmm(i.t, true)} @${esc(i.c.user)} · risk ${i.score}</title></circle>`; });
+    g += `<text x="${px - 5}" y="${ly(4) + 3}" fill="#67e8f9" font-size="9.5" text-anchor="end" ${mono}>ARTICLE LIVE ${hhmm(pub)}</text>`; // left of the line, so the alert label can sit to the right
+    if (pk && th.level <= 2) { const ax = x(pk.end); g += `<path d="M${ax} ${ly(4) - 6}L${ax + 6} ${ly(4) + 5}L${ax - 6} ${ly(4) + 5}Z" fill="${th.level === 1 ? '#f43f5e' : '#f59e0b'}"/><text x="${ax + 9}" y="${ly(4) + 4}" fill="${th.level === 1 ? '#fda4af' : '#fcd34d'}" font-size="9.5" ${mono}>LEVEL ${th.level} ALERT ${hhmm(pk.end)}</text>`; }
+    if (A.top && pk && A.top.lead !== null && A.top.lead >= 0) {
+      const ax = x(A.top.end), bx = x(pk.start), ay = ly(0) + 6, by = ly(3) - 4, mx = (ax + bx) / 2;
+      g += `<path d="M${ax} ${ay} C ${ax + 20} ${ay + 40}, ${bx - 20} ${by - 40}, ${bx} ${by}" fill="none" stroke="#f59e0b" stroke-width="1.3" stroke-dasharray="4 3"/>
+        <rect x="${mx - 34}" y="${(ay + by) / 2 - 9}" width="68" height="16" fill="#0a0d12" stroke="#f59e0b88"/><text x="${mx}" y="${(ay + by) / 2 + 3}" fill="#fde68a" font-size="9.5" text-anchor="middle" ${mono}>Δ ${A.top.lead} min</text>`;
+    }
+    $('#fusion').innerHTML = `<div class="overflow-x-auto -mx-1 px-1"><svg viewBox="0 0 ${W} ${H}" class="w-full min-w-[620px] h-auto select-none">${g}</svg></div>`;
+    $('#fusion').querySelectorAll('[data-fuas]').forEach((el) => el.addEventListener('click', () => { state.uasSel = el.dataset.fuas; renderUAS(); renderFusion(); if (state.uasOn) renderMap(); }));
+    $('#fusionVerdict').innerHTML = A.top ? `<span class="text-slate-500">CROSS-DOMAIN CORRELATION</span> <span class="${BAND_CLS[A.top.band]}">${A.top.band} · ${A.top.score}/100</span>` : '<span class="text-slate-500">No unauthorised UAS activity</span>';
+  }
+
+  // Mitigation playbook: defensive actions derived from what is actually active.
+  const VECTOR_PLAYS = {
+    infrastructure_panic: ['Ask the grid / water operator for an official status statement within 30 min', 'Publish a verified outage map and hotline through public-affairs channels'],
+    kfor_destabilization: ['Coordinate a factual KFOR posture statement with the press office'],
+    anti_nato: ['Brief public affairs with pre-bunking lines for the anti-NATO talking points'],
+    ethnic_incitement: ['Alert the community-relations liaison and watch for calls to offline mobilisation'],
+    sellout: ['Prepare plain-language explainer on the agreement text to counter sell-out framing'],
+    west_betrayal: ['Line up partner-embassy messaging on the dialogue process'],
+    defeatism: ['Amplify institutional-continuity messaging from official accounts'],
+    national_figures: ['Hand the heritage-myth claims to partner fact-checkers'],
+  };
+  function renderPlaybook() {
+    const r = state.res, A = uasAnalysis(), k1 = r.clusters[0], hostileInfra = r.infra.filter((g) => g.hostile);
+    const groups = [['IMMEDIATE · 0–1 H', []], ['SHORT-TERM · 1–24 H', []], ['FORENSIC / EVIDENCE', []]];
+    A.hostile.forEach((t) => groups[0][1].push(`Notify civil-aviation authority and police C-UAS team: ${t.id} over ${t.siteObj.id} (no Remote ID)`));
+    if (A.hostile.length) groups[0][1].push(`Raise the security posture at ${[...new Set(A.hostile.map((t) => t.siteObj.id))].join(' / ')} and brief site operators`);
+    r.thread.narratives.slice(0, 3).forEach(([, , key]) => (VECTOR_PLAYS[key] || []).forEach((p, i) => groups[i === 0 ? 0 : 1][1].push(p)));
+    if (k1) groups[1][1].push(`Refer network ${k1.id} (${k1.size} accounts) to the platform's trust & safety team with the indicator set`);
+    if (hostileInfra.length) groups[1][1].push(`Add ${hostileInfra.map((g) => g.node).join(', ')} prefixes to the 72-hour watchlist`);
+    groups[2][1].push('Preserve the thread archive: comment IDs, timestamps and hashes');
+    A.hostile.forEach((t) => groups[2][1].push(`Seal RF captures and track log for ${t.id}; export the hashed evidence package`));
+    groups[2][1].push('Re-run the analysis on correlated surfaces in 6 h and compare fingerprints');
+    const all = groups.flatMap(([, items]) => items); const done = all.filter((x) => state.playDone.has(x)).length;
+    $('#playbook').innerHTML = `<div class="flex items-center gap-2 mb-2"><div class="flex-1 h-1 bg-ink-700 overflow-hidden"><div class="h-full bg-cyan-400" style="width:${all.length ? done / all.length * 100 : 0}%"></div></div><span class="font-mono text-[10px] text-slate-400">${done}/${all.length}</span></div>` +
+      groups.filter(([, items]) => items.length).map(([name, items]) => `<div class="mb-2.5"><div class="text-[9.5px] font-mono tracking-widest text-slate-500 mb-1">${name}</div>${[...new Set(items)].map((p) => `
+        <label class="flex items-start gap-2 text-[11px] py-1 cursor-pointer ${state.playDone.has(p) ? 'text-slate-500 line-through' : 'text-slate-300'}"><input type="checkbox" data-play="${esc(p)}" class="mt-0.5 accent-cyan-400" ${state.playDone.has(p) ? 'checked' : ''}><span>${esc(p)}</span></label>`).join('')}</div>`).join('') +
+      '<div class="text-[10px] text-slate-500">Checklist state is local to this browser session. Human approval required before any action.</div>';
+    $('#playbook').querySelectorAll('[data-play]').forEach((cb) => cb.addEventListener('change', () => { cb.checked ? state.playDone.add(cb.dataset.play) : state.playDone.delete(cb.dataset.play); renderPlaybook(); }));
+  }
+
+  function renderTicker() {
+    const r = state.res, A = uasAnalysis(), th = r.thread;
+    const it = [['FEED', state.live ? 'LIVE · ' + esc(API_HOST) : 'DEMO / SEED'], ['ALERT', 'LEVEL ' + th.level], ['COMMENTS', th.n], ['FLAGGED', th.high + th.medium], ['CLUSTERS', r.clusters.length],
+      ['HOSTILE INFRA', r.infra.filter((g) => g.hostile).length], ['C-UAS SENSORS', UAS_SENSORS.length + '/' + UAS_SENSORS.length + ' ONLINE'], ['UAS TRACKS', A.tracks.length + ' (' + A.hostile.length + ' unauth.)'],
+      ['FUSION', A.top ? A.top.band : '—'], ['REFRESH', new Date().toISOString().slice(11, 19) + 'Z']];
+    $('#ticker').innerHTML = it.map(([k, v]) => `<span>${k} <b>${v}</b></span>`).join('') + '<span class="ml-auto text-slate-600">UNCLASSIFIED // EXERCISE</span>';
+  }
+
+  // SitRep annex + JSON export payload for the physical domain.
+  function uasAnnex() {
+    const A = uasAnalysis(); const L = ['ANNEX A. PHYSICAL-DOMAIN CORRELATION — COUNTER-UAS (simulated sensor feed)'];
+    A.tracks.forEach((t, i) => {
+      L.push(`   ${String.fromCharCode(97 + i)}. ${t.id}  ${t.cls}  ${t.hostile ? 'UNAUTHORISED' : 'COMPLIANT'}`);
+      L.push(wrap(`Over ${t.siteObj.id} ${t.siteObj.label}, ${hhmm(t.start)}–${hhmm(t.end)} (${tRel(t.t0)} to ${tRel(t.t1)}). RF: ${t.rf}. Remote ID: ${t.rid}. Sensors: ${t.sensors.join(', ')}.`, '      '));
+      if (t.hostile) L.push(wrap(`Operator point estimate ${fmtLL(t.pilot[0], t.pilot[1])} (CEP ${t.cep} m).`, '      '));
+      L.push(wrap(`Correlation with the online swarm: ${t.band} (${t.score}/100): ${t.why.join('; ')}.`, '      '));
+    });
+    L.push(wrap('Caveat: this is temporal and thematic correlation only. It does not establish that the same actor operated the aircraft and the accounts; refer to the civil-aviation authority and police for investigation.', '   '));
+    return L.join('\n');
+  }
+  function withUasAnnex(text) {
+    const annex = uasAnnex(); const end = text.lastIndexOf('END OF REPORT');
+    if (end < 0) return text + '\n\n' + annex + '\n';
+    const hrStart = text.lastIndexOf('\n', end - 2);
+    return hrStart > 0 ? text.slice(0, hrStart) + '\n' + annex + '\n' + text.slice(hrStart) : text.slice(0, end) + annex + '\n\n' + text.slice(end);
+  }
+  function uasExport() {
+    return uasAnalysis().tracks.map((t) => ({ id: t.id, hostile: t.hostile, class: t.cls, rf: t.rf, remote_id: t.rid, site: t.siteObj.id, window: [new Date(t.start).toISOString(), new Date(t.end).toISOString()],
+      sensors: t.sensors, operator_estimate: { lat: t.pilot[0], lon: t.pilot[1], cep_m: t.cep }, correlation: { band: t.band, score: t.score, reasons: t.why } }));
+  }
+
+  // Leaflet layer for the counter-UAS picture (drawn into LDATA by renderLeaflet).
+  function drawUasLeaflet() {
+    const A = uasAnalysis(), near = state.mapView === 'theatre';
+    UAS_SENSORS.forEach((s) => {
+      L.circle([s.lat, s.lon], { radius: s.r, color: '#22d3ee', weight: 1, opacity: 0.45, dashArray: '2 6', fillColor: '#22d3ee', fillOpacity: 0.025, interactive: false }).addTo(LDATA);
+      L.marker([s.lat, s.lon], { icon: L.divIcon({ className: '', iconSize: [12, 12], iconAnchor: [6, 6], html: '<svg width="12" height="12"><rect x="1.5" y="1.5" width="9" height="9" fill="#22d3ee33" stroke="#22d3ee"/><circle cx="6" cy="6" r="1.5" fill="#a5f3fc"/></svg>' }) })
+        .addTo(LDATA).bindTooltip(`${s.id} · ${s.label} · ${s.r / 1000} km`, { direction: 'bottom', offset: [0, 6], className: 'tip-site' });
+    });
+    CRIT_SITES.forEach((s) => {
+      L.marker([s.lat, s.lon], { icon: L.divIcon({ className: '', iconSize: [14, 14], iconAnchor: [7, 7], html: `<svg width="14" height="14"><rect x="1" y="1" width="12" height="12" fill="none" stroke="#e2e8f0" stroke-width="1.2"/><rect x="4.5" y="4.5" width="5" height="5" fill="${s.kind === 'energy' ? '#fbbf24' : s.kind === 'water' ? '#38bdf8' : '#e2e8f0'}"/></svg>` }) })
+        .addTo(LDATA).bindTooltip(`${s.id} · ${esc(s.label)}`, { permanent: near, direction: 'right', offset: [8, 0], className: 'tip-site' });
+    });
+    A.tracks.forEach((t) => {
+      const col = t.hostile ? '#fbbf24' : '#94a3b8', sel = state.uasSel === t.id;
+      L.polyline(t.path, { color: col, weight: sel ? 2.2 : 1.3, opacity: sel ? 0.95 : 0.55, dashArray: t.hostile ? null : '3 4', className: t.hostile ? 'uas-line' : '', interactive: false }).addTo(LDATA);
+      if (t.hostile) L.circle(t.pilot, { radius: t.cep, color: '#f59e0b', weight: 1, dashArray: '3 3', fillColor: '#f59e0b', fillOpacity: 0.08 }).addTo(LDATA).bindTooltip(`${t.id} · operator point estimate · CEP ${t.cep} m`, { direction: 'top', className: 'tip-uas' });
+      const m = L.marker(t.path[0], { zIndexOffset: 400, icon: L.divIcon({ className: 'uas-icon', iconSize: [20, 20], iconAnchor: [10, 10], html: `<svg width="20" height="20" viewBox="0 0 20 20" style="overflow:visible"><path d="M10 2L18 10L10 18L2 10Z" fill="${t.hostile ? '#f59e0b33' : '#64748b33'}" stroke="${col}" stroke-width="1.6"/><circle cx="10" cy="10" r="2" fill="${col}"/>${sel ? `<circle cx="10" cy="10" r="12" fill="none" stroke="${col}" stroke-dasharray="2 3"/>` : ''}</svg>` }) }).addTo(LDATA);
+      m.bindTooltip(`<b>${t.id}</b> · ${esc(t.cls)}<br><span style="color:#94a3b8">${t.hostile ? 'NO REMOTE ID' : 'Remote ID OK'} · ${esc(t.siteObj.id)} · ${t.band}</span>`, { direction: 'top', offset: [0, -10], className: t.hostile ? 'tip-uas' : '', permanent: near && sel });
+      m.on('click', () => { state.uasSel = t.id; renderUAS(); renderFusion(); renderMap(); });
+      packets.push({ m, pts: t.path, period: 9000 + t.path.length * 45, phase: Math.abs(t.t0) * 997 }); // phase must stay >= 0 (index into pts)
+    });
+  }
+
+  // ---------------- 3D GLOBE (canvas orthographic, no library) ----------------
+  const Globe = (() => {
+    const LAND = 'AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADg/wEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADA/v8/AOD//z8AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD+///D/////5//AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPAH/j/+//////8PAAAAgB0AAHgAAAAAAD8AAAAAAAAAAAAAAAAAAAAAAAAAAOD//wP8//////8BAACAfx4AAAAAAAAAAP4AAAAAAAAAAAAAAAAAAAAAAAA4+I73//n///////8AAAAAfwAAAAAAAAAAAAAfAAAAAAAAAAAAAAAAAAAAAOAQACDwP4D///////8BAAAAPAQAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAAAAADzAgPP5H8D//////38AAAAAAAAAAAAA4AEAAAD+DwAAAAAAAAAAAAAAAAAAAIC/g7PfBwAA/v////8AAAAAAAAAAADgBwAAwP//PwAA4B8AAAAAAAAAAAAAAAAMAAD8AgAA+P////8AAAAAAAAAAABwAAAA/P//AwAAAAAAAAAAAAAAAAAAAP8Ahvc5OwAA8P///38AAAAAAAAAAAAcAADg////34cHAAcAAAAAAAAAAAAAgN9/xzf8RwAA4P///z8AAAAAAAAAAAAPAB7g//////8fgB8AAAAAAT4AAAAAAO//B3f8/wsA4P///z8AAAAAAAAAAAAPAG////////8f2f8HAAAAAAD4HwAAAAD8H/D4/38A4P///xMAAAAAAPAHAAAAgN//////////////DwAAAAD+///h/4//H+/Bg/8BwP7//w8AAAAAwP8fAAAAj9///////////////88//h8AAAAAAAD8+Dsw+AH//wAAAP//////DwAA/P8cgEEAAAAAAAAAAAAAAAAA8P8AAAAAAAAAAAAQeAbwPwAA+P//////AwAA4AwAAGAAAAAAAAAAAAAAAAAAIH4DAAAAAAAAAAAA/gPAfwAA/v//////AQBg4AAAABAAAAAAAAAAAAAAAAAAAQ8AAAAAAAAAAACg/wPnfwDw/x/A////AByADwAAAAAAAAAAAAAAAAAAAAAAQID4///////////Pw/0DAP8HAMAfAACA//F//v////////////////////8/AAP4///////////BBPAHAP4HAAAAAADg//z///////////////////////9/AID///////////8AQ8ABAPwBAAAAAAD8P/7///////////////////////9fAMD//////////z8AwA8AAPgBAAAAAAD+H/7/////////////////////Of8BAID///z//////z8AwD8AAMABAAAAAAD+P/z///////////////////9/wH8AAAD8MwD//////x8AwH8MAAAAAAAAAAD+P2D///////////////////95cAAAAACAAwD8/////38AwP8eAAAAAAAAgAGcH/D//////////////////wEAOAAAAADADgDA/////38AgP8/AAAAAAAAwANAH/T//////////////////wAAfgAAAAAwAAAA//////8PgP8/AAAAAAAAwAFwD/7/////////////////PwAAfwAAAAAGAAAA//////8/wP//AAAAAAAAwAOwA/7/////////////////DwCAPwAAAIAAAAAA/v//////8///BwAAAAAAOAcgcP//////////////////HwAAHwAAAAAAAACA+P//////4///DwAAAAAAOA74/////////////////////wUADwAAAAAAAAAA8P//////4///DwAAAAAAGD///////////////////////wUAAwAAAAAAAAAA8P//////7///FwAAAAAAAB///////////////////////wUAAgAAAAAAAAAA0P//////////CAAAAAAAgOH//////////////////////w0AAAAAAAAAAAAAYP////////8xLAAAAAAAAPz//////////////////////wwAAAAAAAAAAAAAAP7//////38HfgAAAAAAgP///////////////////////wQAAAAAAAAAAAAAAP3///////8HUAAAAAAAAP7/////////////////////fwQAAAAAAAAAAAAAAP////////+XAAAAAAAAAPz///93/D/+////////////PwwAAAAAAAAAAAAAAP////////9/AAAAAAAAAPj//f9j/g/+////////////HwAAAAAAAAAAAAAAAP////////8MAAAAAAAAAPj/+P8B/Mf/////////////DwQAAAAAAAAAAAAAAP///////z8AAAAAAAAAcPzH8/8A8I//////////////Bx4AAAAAAAAAAAAAAP///////x8AAAAAAAAA+H+Aw/8AwA/+//////////9/AA8AAAAAAAAAAAAAAP///////x8AAAAAAAAA+D8Aj//w4R/8//////////8/AAAAAAAAAAAAAAAAAP///////wMAAAAAAAAA+B8wuE/+/z/+/////////98fAAMAAAAAAAAAAAAAAP///////wMAAAAAAAAA+A8wEMf//x/+/////////0cOAAMAAAAAAAAAAAAAAP7//////wEAAAAAAAAA+A8AAI7//x/8/////////wMOAAEAAAAAAAAAAAAAAP7//////wAAAAAAAAAA+AcABob//z/8/////////zccwAEAAAAAAAAAAAAAAPz//////wAAAAAAAAAAQOB/AAQ2/////////////x8c8AEAAAAAAAAAAAAAAPj//////wAAAAAAAAAAQPx/AAAA/////////////w8Y/gEAAAAAAAAAAAAAAPD/////fwAAAAAAAAAA4P8/AAAA/////////////w+EGwAAAAAAAAAAAAAAAMD/////HwAAAAAAAAAA8P9/AACA/////////////x/AAwAAAAAAAAAAAAAAAID/////DwAAAAAAAAAA+P//BwaA/////////////x/AAAAAAAAAAAAAAAAAAID9////BwAAAAAAAAAA/P//D3+E/////////////z9AAAAAAAAAAAAAAAAAAAD5////BwAAAAAAAAAA/P//f////////////////x8AAAAAAAAAAAAAAAAAAADy/x8GBgAAAAAAAAAA/P/////v/8///////////z8AAAAAAAAAAAAAAAAAAAD0/w8ABgAAAAAAAAAA/v////+//4///////////z8AAAAAAAAAAAAAAAAAAADu/wcADgAAAAAAAACA//////8f/x/+/////////x8AAAAAAAAAAAAAAAAAAACI/wcALAAAAAAAAADA//////8//z/g/////////w8AAAAAAAAAAAAAAAAAAACQ/wcACAAAAAAAAADg//////9//r+A/////////wcAAAAAAAAAAAAAAAAAAAAQ/wMAAAAAAAAAAADg//////9//n8cgP///////ycAAAAAAAAAAAAAAAAAAAAA/gMAAAAAAAAAAADw////////+P9/AP///////xEAAAAAAAAAAAAAAAAAAAAA/AMAHQAAAAAAAADw////////+P//APz/f///fxAAAAAAAAAAAAAAAAAAAAAA+AcAYAAAAAAAAAD4////////+f9/APz/B///BgAAAAAAAAAAAAAAAAAAAAAA/AccgAEAAAAAAADw////////8f9/AOD/B/5/AAAAAAAAAAAAAAAAAQAAAAAA+A8eADgAAAAAAADw////////4f8/AOD/Afw/BgAAAAAAAAAAAAAAAAAAAAAA8J8PAPwCAAAAAADw////////4/8fAOD/APw/AgAAAAAAAAAAAAAAAAAAAAAAgP8PAAAAAAAAAADw////////x/8HAOB/APx/ADAAAAAAAAAAAAAAAAAAAAAAAP4PAAAAAAAAAAD4////////h/8BAOA/APz/ADAAAAAAAAAAAAAAAAAAAAAAAID/AAAAAAAAAAD4////////j/8AAMAPAMD/ATAAAAAAAAAAAAAAAAAAAAAAAAD/AQAAAAAAAAD4////////nx8AAMAPAMD/ATAAAAAAAAAAAAAAAAAAAAAAAAD8AAAAAAAAAAD4////////vwcAAIAPAMD/AcAAAAAAAAAAAAAAAAAAAAAAAADgAQAAAAAAAAD4////////fwAAAIAPAMD8AQABAAAAAAAAAAAAAAAAAAAAAADAAAgAAAAAAADw////////f2AAAAAPAID4AUACAAAAAAAAAAAAAAAAAAAAAADAAe9zAAAAAADg/////////34AAAAPAEBwAAgAAAAAAAAAAAAAAAAAAAAAAAAAE+9/AAAAAADA/////////38AAAAXAEAgAAQCAAAAAAAAAAAAAAAAAAAAAAAAz///AAAAAACA/////////z8AAAASAMAAAIACAAAAAAAAAAAAAAAAAAAAAAAAyP//AQAAAACA/////////z8AAAAwAIAAAEAHAAAAAAAAAAAAAAAAAAAAAAAAgP//AwAAAAAA/v///////x8AAAAwAAADAAMBAAAAAAAAAAAAAAAAAAAAAAAAwP//fwAAAAAA/A/+/////x8AAAAAAAAHAAcAAAAAAAAAAAAAAAAAAAAAAAAAgP///wAAAAAAEAD8/////w8AAAAAADAGwAcAAAAAAAAAAAAAAAAAAAAAAAAAgP///wEAAAAAAADA/////wcAAAAAAGAG4AEAAAAAAAAAAAAAAAAAAAAAAAAA4P///wEAAAAAAADA/////wMAAAAAAMAM+AMAAAAAAAAAAAAAAAAAAAAAAAAA4P///wMAAAAAAADg/////wEAAAAAAIAL/gMQAAAAAAAAAAAAAAAAAAAAAAAA8P///wMAAAAAAADg////fwAAAAAAAIAH/vMQAAAAAAAAAAAAAAAAAAAAAAAA8P///wcAAAAAAADg////PwAAAAAAAAAP/gMAAQAAAAAAAAAAAAAAAAAAAAAA+P///38AAAAAAADg////PwAAAAAAAAAO/DmAAwAAAAAAAAAAAAAAAAAAAAAA+P///38BAAAAAADA////HwAAAAAAAAA+/DkA8gAAAAAAAAAAAAAAAAAAAAAA8P////8fAAAAAACA////DwAAAAAAAAA8wChE/gcAAAAAAAAAAAAAAAAAAAAA+P////8/AAAAAACA////BwAAAAAAAAA4AEAA8B8AAAAAAAAAAAAAAAAAAAAA+P//////AQAAAAAA////BwAAAAAAAAAwAEAAxD8NAAAAAAAAAAAAAAAAAAAA+P//////AQAAAAAA////BwAAAAAAAADAAQAAxP+AAAAAAAAAAAAAAAAAAAAA8P//////AQAAAAAA/v//BwAAAAAAAACAHwAAwH8ABAAAAAAAAAAAAAAAAAAA4P//////AQAAAAAA/v//BwAAAAAAAAAAQFYEAMcAAAAAAAAAAAAAAAAAAAAA4P//////AAAAAAAA/v//DwAAAAAAAAAAAAgBAIABMAAAAAAAAAAAAAAAAAAAwP//////AAAAAAAA/v//DwAAAAAAAAAAAAAAAAAEAAAAAAAAAAAAAAAAAAAAgP////9/AAAAAAAA/P//DwAAAAAAAAAAAAAAAQQAAAAAAAAAAAAAAAAAAAAAgP////8/AAAAAAAA/v//HyAAAAAAAAAAAACAHwQAAAAAAAAAAAAAAAAAAAAAAP////8fAAAAAAAA/v//HyAAAAAAAAAAAADADwwAAAAAAAAAAAAAAAAAAAAAAP////8fAAAAAAAA////HzAAAAAAAAAAAADsDxwAAAAAAAAAAAAAAAAAAAAAAP7///8fAAAAAAAA////DzgAAAAAAAAAAAD/DxwAAAAA/////////////////wcAAADg////////AAAA8MD///////////8AwMH///d/AAAAAAAAAAAAAAAAAOD///8fAAAAAAAA////Ax8AAAAAAAAAAMD//z4AAABAAAAAAAAAAAAAAAAAAMD///8PAAAAAAAA////AB8AAAAAAAAAAMD//z8AAAAAAAAAAAAAAAAAAAAAAMD///8PAAAAAAAA/v9/AB8AAAAAAAAAAOD//38AAAAAAAAAAAAAAAAAAAAAAMD///8PAAAAAAAA/v9/AB8AAAAAAAAAAPz///8BAAEAAAAAAAAAAAAAAAAAAMD///8HAAAAAAAA/P9/gA8AAAAAAAAAgP////8BAAIAAAAAAAAAAAAAAAAAAMD///8DAAAAAAAA/P//gA8AAAAAAAAAwP////8DAAAAAAAAAAAAAAAAAAAAAMD//38AAAAAAAAA/P9/AA8AAAAAAAAAwP////8HAAAAAAAAAAAAAAAAAAAAAOD//x8AAAAAAAAA+P9/AAcAAAAAAAAA4P////8PAAAAAAAAAAAAAAAAAAAAAOD//w8AAAAAAAAA+P8fAAIAAAAAAAAAwP////8fAAAAAAAAAAAAAAAAAAAAAOD//wcAAAAAAAAA+P8fAAAAAAAAAAAA4P////8fAAAAAAAAAAAAAAAAAAAAAOD//wcAAAAAAAAA+P8fAAAAAAAAAAAAwP////8fAAAAAAAAAAAAAAAAAAAAAOD//wcAAAAAAAAA8P8PAAAAAAAAAAAAgP////8/AAAAAAAAAAAAAAAAAAAAAOD//wMAAAAAAAAA4P8HAAAAAAAAAAAAgP////8fAAAAAAAAAAAAAAAAAAAAAPD//wMAAAAAAAAA4P8HAAAAAAAAAAAAgP////8fAAAAAAAAAAAAAAAAAAAAAPD//wEAAAAAAAAAwP8DAAAAAAAAAAAAAP////8fAAAAAAAAAAAAAAAAAAAAAOD//wAAAAAAAAAAwP8BAAAAAAAAAAAAAP8D/P8PAAAAAAAAAAAAAAAAAAAAAPD/fwAAAAAAAAAAwH8AAAAAAAAAAAAAgP8A2P8HAAAAAAAAAAAAAAAAAAAAAPD/OwAAAAAAAAAAgAEAAAAAAAAAAAAAAAcA6P8HAAAAAAAAAAAAAAAAAAAAAPj/BwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAwP8DAAACAAAAAAAAAAAAAAAAAPj/BwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP8DAAAEAAAAAAAAAAAAAAAAAPz/BwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP8DAAAIAAAAAAAAAAAAAAAAAPj/AQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAGgAAAA4AAAAAAAAAAAAAAAAAPg/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAcAAAAAAAAAAAAAAAAAPw/AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAYAAAAAAAAAAAAAAAAAPwHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAAALAAAAAAAAAAAAAAAAAPwfAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAIADAAAAAAAAAAAAAAAAAPgHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAEAAAMABAAAAAAAAAAAAAAAAAPwHAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAAAP4BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAHgAAAAAAAAAAAAAAAAAAP4BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADAAAAAAAAAAAAAAAAAAAP4DAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP8BAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAP8AAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH4AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAH6AAwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPwAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAPADAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAABAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAACAAAAAAAAAAAAAAAAAAAAAAAAAAOAAAAAAAAAAAAAAAAAIAfAAAAAAAeeADADwAAAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAAPD/AADA/////////z8AAAAAAAAAAAAAAAAAAAAAAAAHAAAAAAAAAAAAAAAAgP///wH4//////////8DAAAAAAAAAAAAAAAAAAAAADAfAAAAAAAAAAAAAADw8////wP+////////////AwAAAAAAAAAAAAAAAAAAAHA/AAAAAAAAAAA8//P//////+D/////////////HwAAAAAAAAAAAAAAAAAAAP5+AAAAAAAA5v////////////D//////////////38AAAAAAAAAAAAAAAAAAAB+AAAAAACA/////////////////////////////38AAAAAAAAAYAYA4ON/OPh/AAAAAADw/////////////////////////////x8AAAAAAADwv/MXgP////8fAAAAAADw/////////////////////////////wMAAAAAAPz///////////8HAAAAAAD+/////////////////////////////wAAAAAAAPz//////////z8AAAAAAP///////////////////////////////wAAAADA/////////////wEAAAAA8P///////////////////////////////wAAAACH////////////PwAAAPgA/////////////////////////////////wcAAAAcgP//////////fwAAAP4BwP//////////////////////////////HwAAAAAAAP7//////////wf8wD8AwP//////////////////////////////DwAAAAAA/v////////////8HAAD4////////////////////////////////HwAAAAAA+P//////////////4f///////////////////////////////////wAAAAAA/P///////////////////////////////////////////////////x8A3x8AAP7/////////////////////////////////////////////fwAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA'; // 360x180 1-degree land bitmask (Natural Earth 1:110m, public domain), base64
+    const cv = $('#globe'), wrap = $('#globeWrap'), hud = $('#globeHud'); const ctx = cv.getContext('2d');
+    const VIEW3D = { strategic: { lon: 14, lat: 42, z: 1.12 }, theatre: { lon: 17.5, lat: 45.5, z: 3.6 } };
+    const DETAIL_Z = 150; // individual UAS tracks + site markers only when zoomed this far in
+    let W = 0, H = 0, dpr = 1, running = false, raf = 0, dots = null, hits = [], drag = null, userLock = false, frame = 0;
+    const rot = { lon: 14, lat: 44, z: 1 }, tgt = { lon: 14, lat: 44, z: 1 };
+    const D2R = Math.PI / 180;
+    const vec = (lat, lon) => { const p = lat * D2R, l = lon * D2R; return [Math.cos(p) * Math.cos(l), Math.cos(p) * Math.sin(l), Math.sin(p)]; };
+    function buildDots() {
+      const bin = atob(LAND), bits = new Uint8Array(bin.length); for (let i = 0; i < bin.length; i++) bits[i] = bin.charCodeAt(i);
+      const has = (i, j) => { const k = j * 360 + i; return (bits[k >> 3] >> (k & 7)) & 1; };
+      dots = [];
+      for (let lat = -84; lat <= 84; lat += 1.1) { const step = 1.1 / Math.max(0.12, Math.cos(lat * D2R)); for (let lon = -180; lon < 180; lon += step) if (has(Math.min(359, Math.floor(lon + 180)), Math.min(179, Math.floor(90 - lat)))) dots.push(vec(lat, lon)); }
+    }
+    let P; // projector for the current frame
+    function makeProj() {
+      const l0 = rot.lon * D2R, p0 = rot.lat * D2R, c0 = Math.cos(l0), s0 = Math.sin(l0), cp = Math.cos(p0), sp = Math.sin(p0);
+      const R = Math.min(W, H) * 0.42 * rot.z, cx = W / 2, cy = H / 2;
+      return { R, cx, cy, f: (v, h = 0) => { const a = v[0] * c0 + v[1] * s0, b = v[1] * c0 - v[0] * s0, x = b, y = cp * v[2] - sp * a, z = sp * v[2] + cp * a, k = 1 + h;
+        return { x: cx + R * x * k, y: cy - R * y * k, z, vis: z >= 0 || (x * x + y * y) * k * k > 1 }; } };
+    }
+    const slerp = (a, b, t) => { const d = Math.acos(Math.max(-1, Math.min(1, a[0] * b[0] + a[1] * b[1] + a[2] * b[2]))); if (d < 1e-6) return a; const s = Math.sin(d), u = Math.sin((1 - t) * d) / s, w = Math.sin(t * d) / s; return [a[0] * u + b[0] * w, a[1] * u + b[1] * w, a[2] * u + b[2] * w]; };
+    function poly(pts, stroke, width, alpha) { ctx.beginPath(); let on = false; pts.forEach((p) => { if (!p.vis) { on = false; return; } on ? ctx.lineTo(p.x, p.y) : ctx.moveTo(p.x, p.y); on = true; }); ctx.strokeStyle = stroke; ctx.globalAlpha = alpha; ctx.lineWidth = width; ctx.stroke(); ctx.globalAlpha = 1; }
+    function draw(now) {
+      if (!running) return;
+      raf = requestAnimationFrame(draw); frame++;
+      if (!dots) buildDots();
+      const v = VIEW3D[state.mapView] || VIEW3D.strategic;
+      if (!userLock && !drag) { tgt.lat = v.lat; tgt.z = v.z; tgt.lon = v.lon + (state.mapView === 'strategic' ? 18 * Math.sin(now / 9000) : 0); }
+      const off = Math.hypot(tgt.lon - rot.lon, tgt.lat - rot.lat), zk = tgt.z > rot.z && off > 0.03 ? 0.01 : 0.06; // pan first, then zoom in
+      rot.lon += (tgt.lon - rot.lon) * 0.09; rot.lat += (tgt.lat - rot.lat) * 0.09; rot.z *= Math.pow(tgt.z / rot.z, zk); // log-space zoom easing
+      P = makeProj(); const { R, cx, cy } = P;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
+      // atmosphere + sphere
+      let gr = ctx.createRadialGradient(cx, cy, R * 0.92, cx, cy, R * 1.22); gr.addColorStop(0, '#22d3ee30'); gr.addColorStop(1, '#22d3ee00');
+      ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(cx, cy, R * 1.22, 0, Math.PI * 2); ctx.fill();
+      gr = ctx.createRadialGradient(cx - R * 0.35, cy - R * 0.4, R * 0.1, cx, cy, R); gr.addColorStop(0, '#102231'); gr.addColorStop(1, '#04070b');
+      ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill();
+      ctx.strokeStyle = '#22d3ee'; ctx.globalAlpha = 0.45; ctx.lineWidth = 1.2; ctx.stroke(); ctx.globalAlpha = 1;
+      // graticule
+      for (let la = -75; la <= 75; la += 15) { const pts = []; for (let lo = -180; lo <= 180; lo += 3) pts.push(P.f(vec(la, lo))); poly(pts.map((p) => ({ ...p, vis: p.z > 0 })), '#5b7a96', la === 0 ? 1 : 0.6, la === 0 ? 0.5 : 0.28); }
+      for (let lo = -180; lo < 180; lo += 15) { const pts = []; for (let la = -90; la <= 90; la += 3) pts.push(P.f(vec(la, lo))); poly(pts.map((p) => ({ ...p, vis: p.z > 0 })), '#5b7a96', 0.6, 0.28); }
+      // land dots
+      const ds = Math.max(1, Math.min(2.4, rot.z * 0.9)); ctx.fillStyle = '#cbd5e1';
+      for (const d of dots) { const p = P.f(d); if (p.z <= 0 || p.x < -4 || p.y < -4 || p.x > W + 4 || p.y > H + 4) continue; ctx.globalAlpha = 0.18 + 0.62 * p.z; ctx.fillRect(p.x - ds / 2, p.y - ds / 2, ds, ds); }
+      ctx.globalAlpha = 1;
+      // orbital ISR track (decorative, simulated)
+      const inc = 52 * D2R, orb = []; for (let a = 0; a <= 360; a += 3) { const t = a * D2R; orb.push(P.f([Math.cos(t), Math.sin(t) * Math.cos(inc), Math.sin(t) * Math.sin(inc)], 0.16)); }
+      poly(orb, '#22d3ee', 1, 0.35);
+      const sa = (now / 26000) * Math.PI * 2, sat = P.f([Math.cos(sa), Math.sin(sa) * Math.cos(inc), Math.sin(sa) * Math.sin(inc)], 0.16);
+      if (sat.vis) { ctx.fillStyle = '#a5f3fc'; ctx.fillRect(sat.x - 3, sat.y - 3, 6, 6); ctx.font = '9px JetBrains Mono, monospace'; ctx.fillText('ISR-SAT-2 (sim)', sat.x + 7, sat.y - 5); }
+      // infrastructure, arcs, spikes
+      hits = [];
+      const T = vec(TARGET.lat, TARGET.lon), now2 = now;
+      const nodes = (state.res && state.res.infra) || [];
+      nodes.forEach((n, i) => {
+        const a = vec(n.lat, n.lon), sel = state.infraSel === n.node;
+        if (n.hostile) {
+          const dist = Math.acos(Math.max(-1, Math.min(1, a[0] * T[0] + a[1] * T[1] + a[2] * T[2]))), hmax = Math.min(0.35, 0.04 + dist * 1.4), pts = [];
+          for (let k = 0; k <= 48; k++) pts.push(P.f(slerp(a, T, k / 48), hmax * Math.sin(Math.PI * k / 48)));
+          poly(pts, '#f43f5e', sel ? 2.2 : 1.4, sel ? 0.95 : 0.7);
+          const f = ((now2 + i * 700) % 2600) / 2600, pk = P.f(slerp(a, T, f), hmax * Math.sin(Math.PI * f));
+          if (pk.vis) { ctx.fillStyle = '#ffe4e6'; ctx.shadowColor = '#f43f5e'; ctx.shadowBlur = 10; ctx.beginPath(); ctx.arc(pk.x, pk.y, 2.6, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0; }
+        }
+        // activity spikes: one per comment, jittered around the node (reference-style bars)
+        for (let c = 0; c < n.comments; c++) {
+          const jl = n.lat + Math.sin(c * 2.399) * 0.9 * Math.sqrt(c / Math.max(1, n.comments)), jo = n.lon + Math.cos(c * 2.399) * 1.2 * Math.sqrt(c / Math.max(1, n.comments));
+          const base = vec(jl, jo), b0 = P.f(base), b1 = P.f(base, 0.03 + ((c * 37) % 11) / 11 * 0.05 + (n.hostile ? 0.03 : 0));
+          if (b0.z <= 0) continue;
+          ctx.strokeStyle = n.hostile ? '#fb923c' : '#34d399'; ctx.globalAlpha = n.hostile ? 0.85 : 0.6; ctx.lineWidth = 1.2; ctx.beginPath(); ctx.moveTo(b0.x, b0.y); ctx.lineTo(b1.x, b1.y); ctx.stroke(); ctx.globalAlpha = 1;
+        }
+        const p = P.f(a); if (p.z <= 0) return;
+        const r = n.hostile ? 4 + Math.sqrt(n.comments) * 1.6 : 2.5;
+        ctx.fillStyle = n.hostile ? '#f43f5e' : '#34d399'; ctx.shadowColor = ctx.fillStyle; ctx.shadowBlur = n.hostile ? 12 : 4;
+        ctx.beginPath(); ctx.arc(p.x, p.y, r, 0, Math.PI * 2); ctx.fill(); ctx.shadowBlur = 0;
+        if (sel) { ctx.strokeStyle = '#fecdd3'; ctx.setLineDash([3, 3]); ctx.beginPath(); ctx.arc(p.x, p.y, r + 5, 0, Math.PI * 2); ctx.stroke(); ctx.setLineDash([]); }
+        if (n.hostile) { ctx.fillStyle = '#fecdd3'; ctx.font = '10px JetBrains Mono, monospace'; ctx.fillText(`${n.node} ${n.cc}`, p.x + r + 5, p.y + 3); }
+        hits.push({ x: p.x, y: p.y, r: r + 6, kind: 'infra', id: n.node });
+      });
+      // target crosshair
+      const tp = P.f(T);
+      if (tp.z > 0) { const pr = 9 + 5 * ((now % 2000) / 2000); ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1.3; ctx.beginPath(); ctx.arc(tp.x, tp.y, 8, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1 - (now % 2000) / 2000; ctx.beginPath(); ctx.arc(tp.x, tp.y, pr, 0, Math.PI * 2); ctx.stroke(); ctx.globalAlpha = 1;
+        ctx.beginPath(); ctx.moveTo(tp.x - 16, tp.y); ctx.lineTo(tp.x - 10, tp.y); ctx.moveTo(tp.x + 10, tp.y); ctx.lineTo(tp.x + 16, tp.y); ctx.moveTo(tp.x, tp.y - 16); ctx.lineTo(tp.x, tp.y - 10); ctx.moveTo(tp.x, tp.y + 10); ctx.lineTo(tp.x, tp.y + 16); ctx.stroke();
+        ctx.fillStyle = '#e2e8f0'; ctx.font = '600 10px JetBrains Mono, monospace'; ctx.fillText('TARGET · ' + TARGET.label, tp.x + 14, tp.y - 12); }
+      // counter-UAS: tracks (visible when zoomed into the theatre) + site markers
+      if (state.uasOn && rot.z < DETAIL_Z) {
+        // aggregated counter-UAS marker at theatre scale (tracks are only a few km across)
+        const A = uasAnalysis(), q = P.f(vec(42.69, 21.10));
+        if (q.z > 0) {
+          const pr = 7 + 4 * ((now % 1600) / 1600);
+          ctx.save(); ctx.translate(q.x - 22, q.y + 16); ctx.rotate(Math.PI / 4); ctx.strokeStyle = '#fbbf24'; ctx.lineWidth = 1.6; ctx.shadowColor = '#f59e0b'; ctx.shadowBlur = 10; ctx.strokeRect(-5, -5, 10, 10);
+          ctx.globalAlpha = 1 - (now % 1600) / 1600; ctx.strokeRect(-pr, -pr, pr * 2, pr * 2); ctx.restore(); ctx.globalAlpha = 1; ctx.shadowBlur = 0;
+          ctx.fillStyle = '#fde68a'; ctx.font = '600 10px JetBrains Mono, monospace'; ctx.fillText(`UAS ×${A.tracks.length} · ${A.hostile.length} UNAUTH`, q.x - 50, q.y + 40);
+          hits.push({ x: q.x - 22, y: q.y + 16, r: 14, kind: 'uas', id: (A.top || A.tracks[0]).id });
+        }
+      }
+      if (state.uasOn && rot.z >= DETAIL_Z) {
+        const A = uasAnalysis();
+        A.tracks.forEach((t) => {
+          const col = t.hostile ? '#fbbf24' : '#94a3b8';
+          poly(t.path.map(([la, lo]) => P.f(vec(la, lo))), col, state.uasSel === t.id ? 2 : 1.2, 0.8);
+          const k = Math.floor(((now + t.t0 * 997 + 1e7) % 12000) / 12000 * (t.path.length - 1)), q = P.f(vec(t.path[k][0], t.path[k][1]));
+          if (!q.vis) return;
+          ctx.save(); ctx.translate(q.x, q.y); ctx.rotate(Math.PI / 4); ctx.strokeStyle = col; ctx.lineWidth = 1.5; ctx.shadowColor = col; ctx.shadowBlur = 8; ctx.strokeRect(-4, -4, 8, 8); ctx.restore(); ctx.shadowBlur = 0;
+          { ctx.fillStyle = col; ctx.font = '9.5px JetBrains Mono, monospace'; ctx.fillText(t.id, q.x + 8, q.y + 12); }
+          hits.push({ x: q.x, y: q.y, r: 10, kind: 'uas', id: t.id });
+        });
+        CRIT_SITES.forEach((s) => { const p = P.f(vec(s.lat, s.lon)); if (p.z <= 0) return; ctx.strokeStyle = '#e2e8f0'; ctx.lineWidth = 1; ctx.strokeRect(p.x - 5, p.y - 5, 10, 10); ctx.fillStyle = s.kind === 'energy' ? '#fbbf24' : s.kind === 'water' ? '#38bdf8' : '#e2e8f0'; ctx.fillRect(p.x - 2, p.y - 2, 4, 4); ctx.fillStyle = '#a5f3fc'; ctx.font = '9px JetBrains Mono, monospace'; ctx.fillText(s.id, p.x + 8, p.y - 6); });
+      }
+      if (frame % 15 === 1) {
+        const hostile = nodes.filter((n) => n.hostile).length;
+        hud.innerHTML = `CENTER ${fmtLL(rot.lat, ((rot.lon + 540) % 360) - 180)}<br>ZOOM ${rot.z.toFixed(1)}× · VIEW ${state.mapView.toUpperCase()}<br><span style="color:#fda4af">HOSTILE NODES ${hostile} · ARCS ${hostile}</span><br><span style="color:#fcd34d">UAS ${state.uasOn ? UAS_TRACKS.length + ' TRACKS' : 'LAYER OFF'}</span>`;
+      }
+    }
+    function resize() { const b = wrap.getBoundingClientRect(); dpr = Math.min(2, window.devicePixelRatio || 1); W = Math.max(1, b.width); H = Math.max(1, b.height); cv.width = W * dpr; cv.height = H * dpr; }
+    if (window.ResizeObserver) new ResizeObserver(() => running && resize()).observe(wrap);
+    cv.addEventListener('pointerdown', (e) => { drag = { x: e.clientX, y: e.clientY, lon: tgt.lon, lat: tgt.lat, moved: false }; cv.setPointerCapture(e.pointerId); });
+    cv.addEventListener('pointermove', (e) => {
+      if (!drag) return; const dx = e.clientX - drag.x, dy = e.clientY - drag.y; if (Math.abs(dx) + Math.abs(dy) > 3) drag.moved = true;
+      const k = 0.28 / rot.z; tgt.lon = rot.lon = drag.lon - dx * k; tgt.lat = rot.lat = Math.max(-80, Math.min(80, drag.lat + dy * k)); userLock = true;
+    });
+    cv.addEventListener('pointerup', (e) => {
+      const d = drag; drag = null; if (!d || d.moved) return;
+      const b = cv.getBoundingClientRect(), x = e.clientX - b.left, y = e.clientY - b.top;
+      const h = hits.filter((q) => Math.hypot(q.x - x, q.y - y) < q.r).sort((a, c) => (a.kind === 'uas' ? -1 : 1) - (c.kind === 'uas' ? -1 : 1))[0];
+      if (!h) return;
+      if (h.kind === 'infra') { state.infraSel = h.id; renderInfra(); renderMap(); return; }
+      state.uasSel = h.id; renderUAS(); renderFusion();
+      if (rot.z < DETAIL_Z) { userLock = true; tgt.lon = 21.125; tgt.lat = 42.68; tgt.z = 1000; } // fly down to the counter-UAS picture
+    });
+    cv.addEventListener('wheel', (e) => { e.preventDefault(); tgt.z = Math.max(0.6, Math.min(3000, tgt.z * Math.exp(-e.deltaY * 0.0015))); userLock = true; }, { passive: false });
+    return {
+      start() { if (running) return; running = true; resize(); raf = requestAnimationFrame(draw); },
+      stop() { running = false; cancelAnimationFrame(raf); },
+      view() { userLock = false; },
+    };
+  })();
+
+  function renderStageModes() {
+    $('#stageModes').innerHTML = [['2d', '2D map'], ['3d', '3D globe']].map(([k, l]) => `<button data-stage="${k}" class="seg ${state.stage === k ? 'seg-on' : ''}">${l}</button>`).join('');
+    $('#stageModes').querySelectorAll('[data-stage]').forEach((b) => b.addEventListener('click', () => setStage(b.dataset.stage)));
+  }
+  function setStage(mode) {
+    state.stage = mode; renderStageModes();
+    $('#globeWrap').classList.toggle('hidden', mode !== '3d');
+    if (mode === '3d') { Globe.view(); Globe.start(); $('#mapHint').textContent = 'Drag to rotate · scroll to zoom · tap a node or UAS to inspect'; }
+    else { Globe.stop(); if (LMAP) setTimeout(() => LMAP.invalidateSize(), 30); $('#mapHint').textContent = 'Drag to pan · scroll or pinch to zoom · tap a node to inspect'; }
+  }
+  $('#mapViews').addEventListener('click', (e) => { if (e.target.closest('[data-mv]')) Globe.view(); });
+  $('#uasToggle').addEventListener('click', () => { state.uasOn = !state.uasOn; $('#uasToggle').classList.toggle('seg-on', state.uasOn); renderMap(); });
+  renderStageModes();
+
+  function renderExtras() { renderUasChip(); renderUAS(); renderFusion(); renderPlaybook(); renderTicker(); }
+
+  // clocks
+  (function tick() {
+    const d = new Date(), M = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
+    $('#clkZ').textContent = d.toISOString().slice(11, 19) + 'Z';
+    $('#clkL').textContent = d.toTimeString().slice(0, 8);
+    $('#clkD').textContent = `${p2(d.getUTCDate())}${p2(d.getUTCHours())}${p2(d.getUTCMinutes())}Z${M[d.getUTCMonth()]}${String(d.getUTCFullYear()).slice(2)}`;
+    setTimeout(tick, 1000 - (d.getMilliseconds()));
+  })();
 
   let tt; function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(tt); tt = setTimeout(() => t.classList.add('hidden'), 3200); }
 
