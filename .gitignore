@@ -18,3 +18,5 @@ models/
 .DS_Store
 .vscode/
 .idea/
+# context handoff output (session-derived; stays local)
+.claude/handoff/
