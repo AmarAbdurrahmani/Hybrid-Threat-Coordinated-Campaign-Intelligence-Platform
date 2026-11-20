@@ -16,7 +16,7 @@ telethon>=1.36                 # Telegram public channels (user session)
 maxminddb>=2.6                 # optional: GeoLite2 ASN/City for YOUR portal's IPs
 
 # --- optional LLM-assisted calque review ---
-anthropic>=0.40
+anthropic>=1.0  # messages.parse (structured outputs) for the evaluation lab
 
 # --- dev ---
 pytest>=8

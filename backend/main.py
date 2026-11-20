@@ -20,6 +20,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse, HTMLResponse, PlainTextResponse
 from pydantic import BaseModel, Field, HttpUrl, IPvAnyAddress, StringConstraints, field_validator
 
+import evaluator
 import ingest
 from config import settings
 from infrastructure import globe_points
@@ -262,6 +263,26 @@ class SimulateIn(BaseModel):
     scenario: Literal["kfor", "energy"] = "kfor"
 
 
+class LabAccountIn(BaseModel):
+    age_days: int | None = Field(None, ge=0, le=20000)
+    followers: int | None = Field(None, ge=0, le=100_000_000)
+    posts_24h: int | None = Field(None, ge=0, le=100_000)
+    template_hits: int | None = Field(None, ge=0, le=100_000)
+    friend_overlap: float | None = Field(None, ge=0, le=1)
+    in_burst: bool | None = None
+
+
+class LabCaseIn(BaseModel):
+    id: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=64)]
+    text: Annotated[str, StringConstraints(strip_whitespace=True, min_length=1, max_length=1000)]
+    lang: Annotated[str, StringConstraints(max_length=8)] | None = None
+    account: LabAccountIn | None = None
+
+
+class LabIn(BaseModel):
+    cases: list[LabCaseIn] = Field(..., min_length=1, max_length=40)
+
+
 class SourceIn(BaseModel):
     kind: Literal["youtube", "telegram"]
     ref: ShortText
@@ -296,7 +317,8 @@ async def health():
             "auth_required": bool(settings.api_key or not settings.allow_unauthenticated),
             "analyst_key_configured": bool(settings.api_key),
             "youtube": bool(settings.youtube_api_key), "telegram": bool(settings.tg_api_id and settings.tg_api_hash),
-            "llm": settings.llm_enabled and bool(settings.anthropic_api_key)}
+            "llm": settings.llm_enabled and bool(settings.anthropic_api_key),
+            "llm_model": settings.llm_model if evaluator.available() else None}
 
 
 @app.get("/api/threads", dependencies=[Depends(require_key)])
@@ -396,6 +418,15 @@ async def simulate_attack(body: SimulateIn):
                                      background=body.background, scenario=body.scenario, start_ms=now)
     result = await pipeline.ingest(thread_records, comments)
     return {**result, "thread_ids": tids, "primary": tids[-1]}
+
+
+@app.post("/api/lab/evaluate", dependencies=[Depends(require_key)])
+async def lab_evaluate(body: LabIn):
+    """Second-opinion bot/human verdicts from the configured LLM for the dashboard's evaluation lab."""
+    if not evaluator.available():
+        raise HTTPException(503, "LLM reviewer not configured (set LLM_ENABLED=1 and ANTHROPIC_API_KEY)")
+    cases = [c.model_dump(exclude_none=True) for c in body.cases]
+    return await asyncio.to_thread(evaluator.evaluate, cases)
 
 
 @app.get("/api/sources", dependencies=[Depends(require_key)])

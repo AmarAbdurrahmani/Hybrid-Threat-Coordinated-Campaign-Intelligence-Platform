@@ -9,4 +9,4 @@ networkx>=3.2
 scikit-learn>=1.4
 telethon>=1.36
 maxminddb>=2.6
-anthropic>=0.40
+anthropic>=1.0  # messages.parse (structured outputs) for the evaluation lab

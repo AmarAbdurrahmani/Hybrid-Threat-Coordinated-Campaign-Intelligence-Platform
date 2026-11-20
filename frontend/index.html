@@ -124,6 +124,7 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
     </a>
     <a class="rail-btn on" href="#sec-overview" data-rail="sec-overview" title="Overview"><svg viewBox="0 0 24 24" width="19" height="19" fill="currentColor"><rect x="3.5" y="3.5" width="7" height="7" rx="2"/><rect x="13.5" y="3.5" width="7" height="7" rx="2"/><rect x="3.5" y="13.5" width="7" height="7" rx="2"/><rect x="13.5" y="13.5" width="7" height="7" rx="2"/></svg></a>
     <a class="rail-btn" href="#sec-alerts" data-rail="sec-alerts" title="Alerts · forensic fusion timeline"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3.5 21 19.5H3z"/><path d="M12 10v4.5M12 17.3v.2" stroke-linecap="round"/></svg></a>
+    <a class="rail-btn" href="#sec-lab" data-rail="sec-lab" title="Bot / human evaluation lab"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"><path d="M9.5 3.5h5M10.5 3.5v5.2L5.4 17.6A2 2 0 0 0 7.1 20.5h9.8a2 2 0 0 0 1.7-2.9l-5.1-8.9V3.5"/><path d="M7.6 14h8.8"/></svg></a>
     <a class="rail-btn" href="#sec-psyop" data-rail="sec-psyop" title="Influence exercise · account farms"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round"><circle cx="12" cy="12" r="2"/><path d="M8.2 15.8a5.4 5.4 0 0 1 0-7.6M15.8 8.2a5.4 5.4 0 0 1 0 7.6M5.4 18.6a9.4 9.4 0 0 1 0-13.2M18.6 5.4a9.4 9.4 0 0 1 0 13.2"/></svg></a>
     <a class="rail-btn" href="#sec-infra" data-rail="sec-infra" title="Source infrastructure"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7"><rect x="4" y="4" width="16" height="6.5" rx="2"/><rect x="4" y="13.5" width="16" height="6.5" rx="2"/><path d="M8 7.2h.01M8 16.7h.01" stroke-linecap="round" stroke-width="2.4"/></svg></a>
     <a class="rail-btn" href="#sec-uas" data-rail="sec-uas" title="Counter-UAS detection"><svg viewBox="0 0 24 24" width="19" height="19" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round"><path d="M12 3 19.5 6v5.5c0 4.6-3.2 8.2-7.5 9.5-4.3-1.3-7.5-4.9-7.5-9.5V6z"/><path d="m8.8 12 2.2 2.2 4.4-4.4" stroke-linecap="round"/></svg></a>
@@ -324,10 +325,54 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
         </div>
         <div class="min-w-0">
           <div class="text-[13px] font-medium text-slate-300 mb-2">Account farms</div>
-          <div id="psyFarms" class="space-y-2.5"></div>
+          <div id="psyFarms" class="space-y-2.5 lg:max-h-[700px] lg:overflow-auto lg:pr-1"></div>
         </div>
       </div>
       <p class="text-[10.5px] text-slate-500 mt-4 leading-relaxed">Origin = network egress of the farm (VPN / proxy / SIM-box exit). That is not where the operator sits and not proof of state sponsorship. IPs are RFC 5737 documentation addresses and ASNs are private-use numbers: this feed is an exercise scenario, not intelligence.</p>
+    </section>
+
+    <!-- BOT / HUMAN EVALUATION LAB -->
+    <section id="sec-lab" class="panel p-4 sm:p-5 scroll-mt-6">
+      <div class="flex flex-col xl:flex-row xl:items-start justify-between gap-3 mb-4">
+        <div>
+          <div class="flex items-center gap-2 flex-wrap"><h2 class="hud-title">Bot / human evaluation lab</h2><span class="tag">SMOKE + SANITY TESTS</span><span class="tag tag-rose">EXERCISE CORPUS</span></div>
+          <p class="hud-sub">Every test comment is scored by the rule engine (language artefacts + account behaviour) and, when the backend has one configured, by an LLM reviewer · results are compared with the expected label</p>
+        </div>
+        <div class="flex items-center gap-2 flex-wrap">
+          <span id="labEngine" class="chip !h-8 !text-[11.5px] !cursor-default"></span>
+          <span id="labLlm" class="chip !h-8 !text-[11.5px] !cursor-default"></span>
+          <button type="button" id="labRun" class="chip chip-teal !h-8">Run test suite</button>
+        </div>
+      </div>
+      <div id="labTabs" class="flex flex-wrap gap-2 mb-3"></div>
+      <div id="labDossier" class="mb-4"></div>
+      <div class="grid gap-4 xl:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] items-start">
+        <div class="min-w-0">
+          <div id="labRows" class="divide-y divide-ink-700 border border-ink-700 rounded-xl overflow-hidden"></div>
+          <form id="labForm" class="mt-3 rounded-xl border border-ink-700 bg-ink-950/40 p-3 space-y-2">
+            <div class="text-[11px] uppercase tracking-wider text-slate-500">Evaluate your own comment</div>
+            <textarea id="labText" rows="2" maxlength="1000" class="w-full text-[13px] bg-ink-950 border border-ink-600 rounded-[10px] px-3 py-2 focus:outline-none focus:border-cyan-500" placeholder="e.g. Vdekje Zelensky let russia take crimea"></textarea>
+            <div class="flex flex-wrap items-center gap-2">
+              <label class="pill !h-9"><span>Account:</span><select id="labProfile"><option value="unknown">unknown (text only)</option><option value="farm">farm-like (new, bursty, duplicates)</option><option value="organic">established human</option></select></label>
+              <button type="submit" class="chip chip-teal !h-9">Evaluate</button>
+              <span id="labOwnStatus" class="text-[11px] text-slate-500"></span>
+            </div>
+          </form>
+        </div>
+        <div class="min-w-0 space-y-3">
+          <div class="rounded-xl border border-ink-700 bg-ink-950/50 p-3">
+            <div class="flex items-center justify-between gap-2 mb-1"><span class="text-[12.5px] font-medium text-slate-100">Detector network · selected comment</span><span id="labNeuralP" class="font-mono text-[11px]"></span></div>
+            <div id="labNeural"></div>
+            <div id="labWhy" class="mt-2 space-y-1"></div>
+          </div>
+          <div class="rounded-xl border border-ink-700 bg-ink-950/50 p-3">
+            <div class="text-[12.5px] font-medium text-slate-100 mb-2">Test results</div>
+            <div id="labSummary"></div>
+            <div id="labSanity" class="mt-3 space-y-1.5"></div>
+          </div>
+        </div>
+      </div>
+      <p class="text-[10.5px] text-slate-500 mt-4 leading-relaxed">The corpus is a hand-written exercise set; account metadata is simulated. A verdict is a lead for human review, never proof. Political opinion or a slogan alone is not treated as automation: an established account posting the same slogan stays human (sanity check S1). Neither the engine nor the LLM attributes content to a state or agency.</p>
     </section>
 
     <!-- ANALYSIS GRID -->
@@ -1163,7 +1208,7 @@ if (typeof module !== "undefined") module.exports = Engine;
   const VEC_LABEL = (k) => (Engine.TROPES[k] ? Engine.TROPES[k].label : k);
   // Country flags: flagcdn.com PNGs (no key, CORS-enabled, so the globe canvas can draw them too).
   // Windows does not render flag emoji, so images are used; offline they fall back to a code chip.
-  const CC_NAME = { XK: 'Kosovo', AL: 'Albania', RS: 'Serbia', RU: 'Russia', HU: 'Hungary', BG: 'Bulgaria', GR: 'Greece', TR: 'Türkiye', DE: 'Germany', NL: 'Netherlands', MK: 'North Macedonia', ME: 'Montenegro', BA: 'Bosnia and Herzegovina', HR: 'Croatia', RO: 'Romania', AT: 'Austria', FR: 'France', IT: 'Italy', UA: 'Ukraine', US: 'United States', GB: 'United Kingdom' };
+  const CC_NAME = { XK: 'Kosovo', AL: 'Albania', RS: 'Serbia', RU: 'Russia', HU: 'Hungary', BG: 'Bulgaria', GR: 'Greece', TR: 'Türkiye', DE: 'Germany', NL: 'Netherlands', MK: 'North Macedonia', ME: 'Montenegro', BA: 'Bosnia and Herzegovina', HR: 'Croatia', RO: 'Romania', AT: 'Austria', FR: 'France', IT: 'Italy', UA: 'Ukraine', US: 'United States', GB: 'United Kingdom', MD: 'Moldova', GE: 'Georgia', AM: 'Armenia', AZ: 'Azerbaijan', IL: 'Israel', PS: 'Palestine', CY: 'Cyprus' };
   const flagSrc = (cc) => `https://flagcdn.com/w40/${String(cc).toLowerCase()}.png`;
   const flag = (cc, h = 12) => (cc ? `<img src="${flagSrc(cc)}" alt="${esc(cc)}" title="${esc(CC_NAME[cc] || cc)}" class="flag" style="height:${h}px" onerror="this.replaceWith(Object.assign(document.createElement('span'),{className:'flag-fb',textContent:this.alt}))">` : '');
 
@@ -1612,7 +1657,7 @@ if (typeof module !== "undefined") module.exports = Engine;
   $('#search').addEventListener('input', (e) => { state.q = e.target.value; inspectorPage = 0; renderInspector(); });
   $('#btnCopy').addEventListener('click', async () => {
     const out = { thread: { ...state.res.thread, published: new Date(state.res.thread.published).toISOString() }, clusters: state.res.clusters,
-      comments: state.res.items.map((i) => ({ id: i.c.id, user: i.c.user, ts: i.c.ts, text: i.c.text, score: i.score, tier: i.tier, signals: { temporal: i.temporal, linguistic: i.linguistic, narrative: i.narrative, network: i.network }, tropes: i.tropes.map((t) => t.key), near_duplicates: i.dups.map((d) => d.id) })), uas_tracks: uasExport(), psyop_exercise: psyExport() };
+      comments: state.res.items.map((i) => ({ id: i.c.id, user: i.c.user, ts: i.c.ts, text: i.c.text, score: i.score, tier: i.tier, signals: { temporal: i.temporal, linguistic: i.linguistic, narrative: i.narrative, network: i.network }, tropes: i.tropes.map((t) => t.key), near_duplicates: i.dups.map((d) => d.id) })), uas_tracks: uasExport(), psyop_exercise: psyExport(), evaluation_lab: labExport() };
     try { await navigator.clipboard.writeText(JSON.stringify(out, null, 2)); toast('Results copied to clipboard'); } catch (e) { toast('Clipboard blocked in this viewer'); }
   });
   // ---------------- SITREP ----------------
@@ -1872,6 +1917,7 @@ if (typeof module !== "undefined") module.exports = Engine;
       const response = await fetch(API_BASE + '/api/health', { cache: 'no-store' });
       if (!response.ok) return;
       health = await response.json();
+      state.health = health; renderLabStatus(); renderLabSummary();
       if (health.contract !== '1') return;
     } catch { return; }
     $('#livePanel').classList.remove('hidden');
@@ -2187,11 +2233,18 @@ if (typeof module !== "undefined") module.exports = Engine;
   // SIM-box exit), never to a state. IPs are RFC 5737 documentation
   // addresses, ASNs are RFC 5398 private-use numbers.
   // =====================================================================
-  const CAPITAL = { RU: [55.75, 37.62], RS: [44.79, 20.45], HU: [47.50, 19.04], BG: [42.70, 23.32], GR: [37.98, 23.73], TR: [39.93, 32.86], XK: [42.66, 21.17], AL: [41.33, 19.82] };
+  const CAPITAL = { RU: [55.75, 37.62], RS: [44.79, 20.45], HU: [47.50, 19.04], BG: [42.70, 23.32], GR: [37.98, 23.73], TR: [39.93, 32.86], XK: [42.66, 21.17], AL: [41.33, 19.82], UA: [50.45, 30.52], MD: [47.01, 28.86], GE: [41.72, 44.79], BA: [43.86, 18.41], ME: [42.44, 19.26], AM: [40.18, 44.51], AZ: [40.41, 49.87] };
   const PSY_FARMS = [
     { id: 'FARM-RU-01', origin: 'RU', targets: ['XK'], w: 4, col: '#f43f5e', kind: 'VPS farm', asn: 'AS64511 · bulletproof VPS host (sim)', ips: ['203.0.113.41', '203.0.113.42', '203.0.113.57', '203.0.113.58'], accounts: 46, narratives: ['Anti-NATO / KFOR-exit talking points', 'Dialogue “sell-out” framing', 'Western-betrayal narrative'] },
     { id: 'FARM-RU-02', origin: 'RU', targets: ['XK', 'AL'], w: 3, col: '#fb7185', kind: 'proxy farm', asn: 'AS64511 · residential proxy pool (sim)', ips: ['203.0.113.101', '203.0.113.102', '203.0.113.119'], accounts: 31, narratives: ['Energy-grid blackout panic', 'Defeatism / “the state has failed”'] },
     { id: 'FARM-RS-01', origin: 'RS', targets: ['HU', 'BG'], w: 3, col: '#fb923c', kind: 'SIM-box farm', asn: 'AS64512 · mobile-carrier NAT (sim)', ips: ['198.51.100.23', '198.51.100.24', '198.51.100.31'], accounts: 27, narratives: ['Migration-panic rumours', 'EU-sanctions backlash'] },
+    { id: 'FARM-RS-02', origin: 'RS', targets: ['XK'], w: 5, col: '#f97316', kind: 'troll farm', asn: 'AS64514 · mobile + VPS mix (sim)', ips: ['198.51.100.61', '198.51.100.62', '198.51.100.77', '198.51.100.78'], accounts: 58, narratives: ['“Kosovo je Srbija” sovereignty denial', 'Ethnic-fear and exodus rumours', 'KFOR “occupation” framing'],
+      hyp: 'Exercise hypothesis: state-security-linked (BIA) amplification recycling UDB-era narratives · UNVERIFIED' },
+    { id: 'FARM-RU-03', origin: 'RU', targets: ['UA'], w: 3, col: '#e11d48', kind: 'clone-site network', asn: 'AS64515 · bulletproof hosting (sim)', ips: ['203.0.113.140', '203.0.113.141'], accounts: 64, narratives: ['“Crimea is Russia” talking points', 'Mobilisation-panic rumours', 'Fake media-outlet clones'] },
+    { id: 'FARM-RU-04', origin: 'RU', targets: ['MD', 'GE'], w: 2, col: '#be123c', kind: 'paid-comment farm', asn: 'AS64516 · residential proxies (sim)', ips: ['203.0.113.170', '203.0.113.171'], accounts: 33, narratives: ['“EU will bring war” narrative', 'Referendum-fraud claims'] },
+    { id: 'FARM-RS-03', origin: 'RS', targets: ['BA', 'ME'], w: 2, col: '#fdba74', kind: 'SIM-box farm', asn: 'AS64512 · mobile-carrier NAT (sim)', ips: ['198.51.100.90', '198.51.100.91'], accounts: 22, narratives: ['Secession / “failed state” framing', 'Anti-NATO framing'] },
+    { id: 'FARM-AZ-01', origin: 'AZ', targets: ['AM'], w: 1, col: '#38bdf8', kind: 'VPN farm', asn: 'AS64517 · hosting / VPN exit (sim)', ips: ['192.0.2.120', '192.0.2.121'], accounts: 17, narratives: ['“Aggressor state” framing', 'Border-incident rumours'] },
+    { id: 'FARM-AM-01', origin: 'AM', targets: ['AZ'], w: 1, col: '#60a5fa', kind: 'VPN farm', asn: 'AS64518 · hosting / VPN exit (sim)', ips: ['192.0.2.150', '192.0.2.151'], accounts: 15, narratives: ['“Terrorist state” framing', 'Border-incident rumours'] },
     { id: 'FARM-GR-01', origin: 'GR', targets: ['TR'], w: 2, col: '#a78bfa', kind: 'VPN farm', asn: 'AS64513 · hosting / VPN exit (sim)', ips: ['192.0.2.77', '192.0.2.78', '192.0.2.90'], accounts: 19, narratives: ['Maritime-border escalation claims', 'Energy-corridor rumours'] },
   ];
   const PSY = { on: true, events: [], seq: 0, sel: null, timer: null, farm: new Map(PSY_FARMS.map((f) => [f.id, { hits: 0, seen: new Set(), last: 0 }])), pair: new Map() };
@@ -2225,7 +2278,7 @@ if (typeof module !== "undefined") module.exports = Engine;
       $('#psyFeed').innerHTML = PSY.events.slice(0, 10).map(psyRow).join('') || '<div class="text-xs text-slate-500 p-4">Waiting for the first event…</div>';
       $('#psyFarms').innerHTML = PSY_FARMS.map((f) => { const sel = PSY.sel === f.id; return `<button type="button" data-farm="${f.id}" aria-pressed="${sel}" class="w-full text-left rounded-xl border p-3 transition-colors ${sel ? 'border-cyan-400/50 bg-cyan-400/5' : 'border-ink-700 bg-ink-950/40 hover:border-ink-600'}">
           <div class="flex items-center gap-2">${flag(f.origin, 14)}<span class="font-mono text-[12px] text-slate-100">${f.id}</span><span class="tag" style="color:${f.col};background:${f.col}1f">${esc(f.kind)}</span><span class="ml-auto text-[10.5px] text-slate-500 font-mono" data-fl="last">—</span></div>
-          <div class="text-[11px] text-slate-500 mt-1">${esc(f.asn)} · egress ${esc(CC_NAME[f.origin])}</div>
+          <div class="text-[11px] text-slate-500 mt-1">${esc(f.asn)} · egress ${esc(CC_NAME[f.origin])}</div>${f.hyp ? `<div class="text-[10.5px] text-amber-300/90 mt-1">${esc(f.hyp)}</div>` : ''}
           <div class="flex flex-wrap gap-1 mt-2">${f.ips.map((ip) => `<span class="font-mono text-[10.5px] px-1.5 py-0.5 rounded-md bg-ink-800 border border-ink-600 text-slate-300">${ip}</span>`).join('')}</div>
           <div class="flex flex-wrap items-center gap-x-3 gap-y-1 mt-2 text-[11px] text-slate-400"><span class="inline-flex items-center gap-1">Targets ${f.targets.map((t) => flag(t, 11)).join('')}</span><span><b data-fl="acc" class="text-slate-200 font-mono">0</b>/${f.accounts} accounts seen</span><span><b data-fl="hits" class="text-slate-200 font-mono">0</b> bursts</span></div></button>`; }).join('');
     }
@@ -2712,7 +2765,7 @@ if (typeof module !== "undefined") module.exports = Engine;
     }
     if (/\b(sitrep|brief|briefing|report)\b/.test(lq)) { $('#btnSitrep').click(); return; }
     if (/^(high|medium|organic|all)( risk)?$/.test(lq)) { state.filter = lq.split(' ')[0]; state.sel = null; inspectorPage = 0; renderInspector(); go('#sec-inspector'); return; }
-    const routes = [[/\b(psyops?|farms?|influence|russia|serbia|greece|hungary|bulgaria|turkey|t[üu]rkiye)\b/, '#sec-psyop', 'Influence exercise'], [/\b(drones?|uas|uav|c-uas|counter[- ]?uas|remote id)\b/, '#sec-uas', 'Counter-UAS detection'], [/\b(clusters?|network|bots?|accounts?|sockpuppets?)\b/, '#sec-network', 'Account network & clusters'],
+    const routes = [[/\b(lab|evaluat\w*|smoke|sanity|bot or human|human or bot|is (it|this) a bot)\b/, '#sec-lab', 'Bot / human evaluation lab'], [/\b(psyops?|farms?|influence|russia|serbia|greece|hungary|bulgaria|turkey|t[üu]rkiye)\b/, '#sec-psyop', 'Influence exercise'], [/\b(drones?|uas|uav|c-uas|counter[- ]?uas|remote id)\b/, '#sec-uas', 'Counter-UAS detection'], [/\b(clusters?|network|bots?|accounts?|sockpuppets?)\b/, '#sec-network', 'Account network & clusters'],
       [/\b(infra|infrastructure|asn|ip|hosting|vps|proxy|nodes?)\b/, '#sec-infra', 'Infrastructure node inspector'], [/\b(fusion|correlat\w*|alerts?)\b/, '#sec-alerts', 'Forensic fusion timeline'],
       [/\b(playbook|mitigat\w*|actions?|respond|response)\b/, '#sec-playbook', 'Mitigation playbook'], [/\b(impact|audience|portals?|surfaces?)\b/, '#sec-impact', 'Impact zone'],
       [/\b(timeline|burst|swarm|peak)\b/, '#sec-timeline', 'Temporal burst timeline'], [/\b(vectors?|narratives?|tropes?)\b/, '#vectors', 'Threat vectors']];
@@ -2740,11 +2793,294 @@ if (typeof module !== "undefined") module.exports = Engine;
     rails.forEach((a) => { const el = document.getElementById(a.dataset.rail); if (el) io.observe(el); });
   }
 
+
+  // =====================================================================
+  // BOT / HUMAN EVALUATION LAB: hand-written exercise corpus per conflict
+  // theatre, a transparent rule-based detector (logistic model over text
+  // artefacts + account behaviour) and an optional LLM second opinion via
+  // POST /api/lab/evaluate (Anthropic, configured on the backend).
+  // =====================================================================
+  const FARM_ACC = { age_days: 9, followers: 3, posts_24h: 140, template_hits: 23, friend_overlap: 0.8, in_burst: true };
+  const MID_ACC = { age_days: 45, followers: 30, posts_24h: 25, template_hits: 4, friend_overlap: 0.3, in_burst: true };
+  const HUMAN_ACC = { age_days: 3100, followers: 410, posts_24h: 3, template_hits: 0, friend_overlap: 0.05, in_burst: false };
+  const LAB_PROFILES = { farm: { age_days: 6, followers: 2, posts_24h: 160, template_hits: 18, friend_overlap: 0.7, in_burst: true }, organic: { age_days: 2400, followers: 300, posts_24h: 4, template_hits: 0, friend_overlap: 0.05, in_burst: false }, unknown: {} };
+  const LAB_THEATRES = [
+    { id: 'XK', ccs: ['XK'], name: 'Kosovo', focus: true,
+      brief: 'Primary theatre. Serbian- and Russian-language farms push sovereignty denial (“Kosovo je Srbija”), KFOR-“occupation”, exodus and ethnic-fear narratives into Albanian and Serbian spaces, and re-package Kremlin talking points (Ukraine, NATO) for Albanian-speaking audiences.',
+      precedent: 'Public precedent: in April 2020 Twitter removed 8,558 accounts it linked to Serbia’s ruling SNS party for coordinated inauthentic promotion (Twitter transparency disclosure; Stanford Internet Observatory analysis).',
+      hypothesis: 'Exercise hypothesis H-XK-1: amplification by a state-security-linked network (BIA) recycling UDB-era narratives. Status UNVERIFIED: confirming it needs platform attribution, a legal process or all-source intelligence. The detector itself only measures automation and coordination.',
+      cases: [
+        { id: 'xk-1', lang: 'sr', text: 'Kosovо je Srbija!!! NATO okupatori napolje', a: FARM_ACC, expect: 'bot', note: 'Cyrillic “о” hidden in a Latin word (homoglyph evasion), 23 near-duplicates' },
+        { id: 'xk-2', lang: 'sr', text: 'Kosovo je Srbija, tako me je učio deda. Ali mir je važniji od svega.', a: HUMAN_ACC, expect: 'human', note: 'Same slogan, established account with personal context' },
+        { id: 'xk-3', lang: 'sq/en', text: 'Vdekje Zelensky let russia take crimea', a: MID_ACC, expect: 'bot', note: 'Albanian + English in one line, lower-cased place names, Kremlin talking point for Albanian audiences' },
+        { id: 'xk-4', lang: 'sq', text: 'Qeveria e Kosovës është bërë marionetë e perëndimit, zgjohuni njerëz!!!', a: { age_days: 21, followers: 8, posts_24h: 70, template_hits: 14, friend_overlap: 0.6, in_burst: true }, expect: 'bot', note: 'Template text shared by 14 accounts inside the burst' },
+        { id: 'xk-5', lang: 'sr', text: 'Albanci beže sa Kosova, država im se raspada', a: FARM_ACC, expect: 'bot', note: 'Exodus / collapse rumour from a farm profile' },
+        { id: 'xk-6', lang: 'sq', text: 'Sot rryma u ndal në Fushë Kosovë prej 9 deri 11, a e dini kur kthehet?', a: HUMAN_ACC, expect: 'human', note: 'Local, specific, personal question' },
+        { id: 'xk-7', lang: 'sr', text: 'Kosovo je srce Srbije, nikada ga nećemo dati', a: { age_days: 12, followers: 5, posts_24h: 95, template_hits: 31, friend_overlap: 0.7, in_burst: true }, expect: 'bot', note: 'Slogan copied by 31 accounts within minutes' },
+      ] },
+    { id: 'UA', ccs: ['UA', 'RU'], name: 'Ukraine – Russia',
+      brief: 'Kremlin-aligned networks push “Crimea is Russia”, “Kyiv regime” and mobilisation-panic narratives in English, Russian and local languages, often with machine-translation artefacts.',
+      precedent: 'Public precedent: the “Doppelganger” campaign (cloned media sites + fake accounts) documented by EU DisinfoLab in 2022 and attributed by France’s VIGINUM in 2023 to Russian actors; the EU sanctioned the Social Design Agency and Structura over it in 2023.',
+      cases: [
+        { id: 'ua-1', lang: 'en', text: 'Crimea is always Russia, Kyiv regime is make provocation against peace', a: MID_ACC, expect: 'bot', note: 'Non-native grammar (“is make”), slogan' },
+        { id: 'ua-2', lang: 'ru', text: 'Киев бомбит Донбасс уже 10 лет, а Запад молчит!!!', a: FARM_ACC, expect: 'bot', note: 'Farm profile, duplicated across accounts' },
+        { id: 'ua-3', lang: 'uk', text: 'Світло знову вимкнули о 18:00, тримаймося', a: HUMAN_ACC, expect: 'human', note: 'Everyday local detail' },
+        { id: 'ua-4', lang: 'en', text: 'My cousin in Kharkiv says the sirens went off three times last night.', a: HUMAN_ACC, expect: 'human', note: 'Personal, specific' },
+      ] },
+    { id: 'BA', ccs: ['BA'], name: 'Bosnia and Herzegovina',
+      brief: 'Secession and “failed state” framing around Republika Srpska, amplified at moments of political crisis.',
+      cases: [
+        { id: 'ba-1', lang: 'sr', text: 'Republika Srpska mora otići, BiH je propala država', a: FARM_ACC, expect: 'bot', note: 'Farm profile, template text' },
+        { id: 'ba-2', lang: 'bs', text: 'U Sarajevu opet magla, djeca ne idu vani. Kad će neko riješiti grijanje?', a: HUMAN_ACC, expect: 'human', note: 'Local complaint' },
+        { id: 'ba-3', lang: 'bs', text: 'Ne slažem se sa Dodikom, ali ni Schmidt nije rješenje.', a: HUMAN_ACC, expect: 'human', note: 'Strong opinion, still human' },
+      ] },
+    { id: 'ME', ccs: ['ME'], name: 'Montenegro',
+      brief: 'Anti-NATO and identity narratives targeting Montenegro’s NATO membership and church disputes.',
+      cases: [
+        { id: 'me-1', lang: 'sr', text: 'Crna Gora je srpska zemlja, NATO je okupator!!!', a: FARM_ACC, expect: 'bot', note: 'Farm profile, slogan' },
+        { id: 'me-2', lang: 'cnr', text: 'Budva preko ljeta opet nema vode, ista priča svake godine.', a: HUMAN_ACC, expect: 'human', note: 'Local complaint' },
+      ] },
+    { id: 'MD', ccs: ['MD'], name: 'Moldova',
+      brief: 'Referendum-fraud and “EU will bring war” narratives around EU-integration votes.',
+      precedent: 'Public precedent: in 2024 Moldovan authorities alleged a Russia-funded vote-buying and influence network around the EU referendum.',
+      cases: [
+        { id: 'md-1', lang: 'ro', text: 'Referendumul este o fraudă a Bruxelles-ului, votați NU!!!', a: FARM_ACC, expect: 'bot', note: 'Farm profile, slogan' },
+        { id: 'md-2', lang: 'ro', text: 'Am votat azi dimineață la Chișinău, coadă mică la secție.', a: HUMAN_ACC, expect: 'human', note: 'Personal, specific' },
+      ] },
+    { id: 'GE', ccs: ['GE'], name: 'Georgia',
+      brief: '“Neutrality” and “the EU will drag Georgia into war” narratives around protests and EU accession.',
+      cases: [
+        { id: 'ge-1', lang: 'en', text: 'georgia must stay neutral, EU will bring war like in ukraine', a: MID_ACC, expect: 'bot', note: 'Lower-cased country names, template text' },
+        { id: 'ge-2', lang: 'en', text: 'Protest on Rustaveli again tonight, stay safe everyone.', a: HUMAN_ACC, expect: 'human', note: 'Local, specific' },
+      ] },
+    { id: 'AMAZ', ccs: ['AM', 'AZ'], name: 'Armenia – Azerbaijan',
+      brief: 'Mirror-image farms on both sides trade “aggressor” and “terrorist state” framing after border incidents.',
+      cases: [
+        { id: 'az-1', lang: 'en', text: 'armenia is aggressor, karabakh is azerbaijan forever!!!', a: FARM_ACC, expect: 'bot', note: 'Farm profile, lower-cased names' },
+        { id: 'am-1', lang: 'en', text: 'azerbaijan is terrorist state, artsakh will be free!!!', a: FARM_ACC, expect: 'bot', note: 'Farm profile, lower-cased names' },
+        { id: 'aa-3', lang: 'en', text: 'Hoping the border talks finally bring peace for families on both sides.', a: HUMAN_ACC, expect: 'human', note: 'Moderate, established account' },
+      ] },
+    { id: 'ILPS', ccs: ['IL', 'PS'], name: 'Israel – Palestine',
+      brief: 'Inauthentic networks on all sides of the Gaza war; detection must stay symmetric.',
+      precedent: 'Public precedent: in 2024 Meta and OpenAI reported fake-account operations run by STOIC, an Israel-based political marketing firm, targeting audiences in the US and Canada over the Gaza war.',
+      cases: [
+        { id: 'ip-1', lang: 'en', text: 'the gaza is hamas, all who support them is terrorist', a: MID_ACC, expect: 'bot', note: 'Non-native grammar, template text' },
+        { id: 'ip-2', lang: 'en', text: 'israel is making genocide, western media is hiding everything!!!', a: MID_ACC, expect: 'bot', note: 'Non-native grammar, lower-cased names' },
+        { id: 'ip-3', lang: 'en', text: 'My friend in Haifa and my friend in Ramallah both just want this war to end.', a: HUMAN_ACC, expect: 'human', note: 'Personal, balanced' },
+      ] },
+    { id: 'GRTR', ccs: ['GR', 'TR', 'CY'], name: 'Greece – Türkiye – Cyprus',
+      brief: 'Aegean escalation and island-militarisation rumours, pushed in both Greek and Turkish.',
+      cases: [
+        { id: 'gr-1', lang: 'el', text: 'Η Τουρκία ετοιμάζει πόλεμο στο Αιγαίο!!!', a: FARM_ACC, expect: 'bot', note: 'Farm profile, alarm' },
+        { id: 'tr-1', lang: 'tr', text: 'Yunanistan adaları silahlandırıyor, uyanın!!!', a: FARM_ACC, expect: 'bot', note: 'Farm profile, alarm' },
+        { id: 'gt-3', lang: 'en', text: 'Ferry to Lesvos delayed again because of the wind, see you tomorrow.', a: HUMAN_ACC, expect: 'human', note: 'Everyday detail' },
+      ] },
+    { id: 'HUBG', ccs: ['HU', 'BG'], name: 'Hungary – Bulgaria',
+      brief: 'Anti-EU war-fear and migration-panic narratives aimed at EU member states in the region.',
+      cases: [
+        { id: 'hu-1', lang: 'hu', text: 'Brüsszel háborúba akar vinni minket!!!', a: FARM_ACC, expect: 'bot', note: 'Farm profile, slogan' },
+        { id: 'bg-1', lang: 'bg', text: 'Днес в София пак задръстване на Цариградско шосе.', a: HUMAN_ACC, expect: 'human', note: 'Local, specific' },
+      ] },
+  ];
+  // ---- detector: logistic model, every weight visible in the UI ----
+  const LAB_FEATURES = [
+    { k: 'acct_new', label: 'Account < 30 days old', w: 1.2, grp: 'behaviour' },
+    { k: 'acct_fresh', label: 'Account < 7 days old', w: 0.5, grp: 'behaviour' },
+    { k: 'few_followers', label: 'Under 20 followers', w: 0.5, grp: 'behaviour' },
+    { k: 'high_rate', label: '60+ posts in 24 h', w: 1.1, grp: 'behaviour' },
+    { k: 'template', label: 'Near-duplicate of 3+ other posts', w: 1.5, grp: 'behaviour' },
+    { k: 'template_heavy', label: 'Near-duplicate of 15+ posts', w: 0.6, grp: 'behaviour' },
+    { k: 'overlap', label: 'Friend-list overlap ≥ 50%', w: 1.0, grp: 'behaviour' },
+    { k: 'burst', label: 'Inside a coordinated burst', w: 0.7, grp: 'behaviour' },
+    { k: 'homoglyph', label: 'Cyrillic/Latin mixed inside a word', w: 1.8, grp: 'text' },
+    { k: 'script_mix', label: 'Two scripts in one comment', w: 0.5, grp: 'text' },
+    { k: 'code_switch', label: 'Several languages in one short line', w: 0.9, grp: 'text' },
+    { k: 'mt_grammar', label: 'Machine-translation / non-native grammar', w: 0.9, grp: 'text' },
+    { k: 'lower_proper', label: 'Lower-cased country / leader names', w: 0.5, grp: 'text' },
+    { k: 'shouting', label: 'Repeated !!! or all caps', w: 0.3, grp: 'text' },
+    { k: 'narrative', label: 'Matches a known campaign narrative', w: 0.4, grp: 'text' },
+    { k: 'established', label: 'Established account (2+ years, 100+ followers)', w: -1.6, grp: 'behaviour' },
+    { k: 'personal', label: 'Personal or local detail', w: -0.6, grp: 'text' },
+  ];
+  const LAB_BIAS = -2.2;
+  const LEX = {
+    sq: /\b(vdekje|rroft[eë]|zgjohuni|qeveria|është|eshte|nuk|dhe|për|janë|jane|njerëz|perëndimit|sot|rryma|kthehet)\b/iu,
+    en: /\b(the|let|take|will|must|is|are|who|them|always|against|bring|forever)\b/i,
+    sr: /\b(su|nikada|nećemo|necemo|srce|ali|mir|okupatori|napolje|mora|država|drzava|beže|beze|raspada)\b/iu,
+  };
+  const PROPER = ['russia', 'crimea', 'ukraine', 'kosovo', 'serbia', 'europe', 'armenia', 'azerbaijan', 'israel', 'gaza', 'karabakh', 'artsakh', 'georgia', 'kyiv', 'zelensky', 'brussels', 'turkey', 'greece', 'hamas'];
+  const MT_RX = [/\b(is|are|was) (make|do|bring|go|take|want|support)\b/i, /\bthe (gaza|kosovo|ukraine|crimea|russia|serbia|armenia|azerbaijan)\b/i, /\b(all|those|everyone) who \w+( \w+)? is\b/i, /\bmaking (genocide|provocation|war)\b/i, /\bis aggressor\b|\bis terrorist state\b/i];
+  const NARR_RX = /kosov[oо] je srbij|srce srbije|okupator|napolje|crimea is|take crimea|kyiv regime|запад молчит|propala država|srpska zemlja|fraudă|bring war|aggressor|terrorist|genocide|zgjohuni|marionet|uyanın|πόλεμο|háború|bombit|beže sa kosova|raspada|forever|will be free/iu;
+  const PERSONAL_RX = /\b(my|i|me|mi|moj|deda|djeca|sot|today|danas|azi|tonight|cousin|friend|ferry|coadă|см|тримаймося|пак)\b|днес|сьогодні|світло/iu;
+  function labFeatures(text, a = {}) {
+    const f = {}, toks = text.split(/[\s,.;:!?()"“”«»]+/).filter(Boolean);
+    const known = a.age_days != null;
+    f.acct_new = known && a.age_days < 30; f.acct_fresh = known && a.age_days < 7;
+    f.few_followers = a.followers != null && a.followers < 20;
+    f.high_rate = (a.posts_24h || 0) >= 60; f.template = (a.template_hits || 0) >= 3; f.template_heavy = (a.template_hits || 0) >= 15;
+    f.overlap = (a.friend_overlap || 0) >= 0.5; f.burst = !!a.in_burst;
+    f.homoglyph = toks.some((t) => /[\u0400-\u04FF]/.test(t) && /[A-Za-z]/.test(t));
+    f.script_mix = /[\u0400-\u04FF]/.test(text) && /[A-Za-z]{2,}/.test(text);
+    f.code_switch = toks.length <= 16 && Object.values(LEX).filter((rx) => rx.test(text)).length >= 2;
+    f.mt_grammar = MT_RX.some((rx) => rx.test(text));
+    f.lower_proper = toks.some((t) => PROPER.includes(t) && t === t.toLowerCase());
+    const letters = text.replace(/[^\p{L}]/gu, ''); f.shouting = /[!?]{2,}/.test(text) || (letters.length >= 8 && letters === letters.toUpperCase() && letters !== letters.toLowerCase());
+    f.narrative = NARR_RX.test(text);
+    f.established = known && a.age_days >= 730 && (a.followers || 0) >= 100;
+    f.personal = PERSONAL_RX.test(text);
+    return f;
+  }
+  function labScore(text, a) {
+    const f = labFeatures(text, a); let z = LAB_BIAS; const fired = [];
+    LAB_FEATURES.forEach((x) => { if (f[x.k]) { z += x.w; fired.push(x); } });
+    const p = 1 / (1 + Math.exp(-z));
+    const sum = (g) => fired.filter((x) => x.grp === g).reduce((t, x) => t + x.w, 0);
+    return { f, fired, z, p, verdict: p >= 0.6 ? 'bot' : p <= 0.4 ? 'human' : 'uncertain', text: sum('text'), behaviour: sum('behaviour') };
+  }
+  const LAB = { theatre: 'XK', sel: 'xk-3', res: new Map(), llm: new Map(), llmModel: null, llmErr: null, running: false, own: null, done: new Set() };
+  const VCLS = { bot: 'text-rose-300', human: 'text-emerald-300', uncertain: 'text-amber-300' };
+  const vbadge = (v, p) => v ? `<span class="font-mono text-[11px] ${VCLS[v]}">${v.toUpperCase()}${p != null ? ' ' + Math.round(p * 100) + '%' : ''}</span>` : '<span class="text-[11px] text-slate-600">—</span>';
+  const allCases = () => LAB_THEATRES.flatMap((t) => t.cases.map((c) => ({ ...c, theatre: t.id })));
+  const accText = (a) => a && a.age_days != null ? `${a.age_days}d old · ${a.followers} followers · ${a.posts_24h}/24h · ${a.template_hits} dupes${a.in_burst ? ' · in burst' : ''}` : 'no account metadata (text only)';
+  function labEvalAll() { allCases().forEach((c) => { LAB.res.set(c.id, labScore(c.text, c.a)); LAB.done.add(c.id); }); }
+  function llmState() {
+    if (!state.health) return ['offline', 'LLM reviewer: offline · connect the backend'];
+    if (!state.health.llm) return ['off', 'LLM reviewer: not configured on the backend'];
+    return ['on', 'LLM reviewer: connected · ' + (state.health.llm_model || 'model')];
+  }
+  function renderLabStatus() {
+    const [st, label] = llmState();
+    $('#labEngine').innerHTML = '<span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span>Rule engine v1 · 17 signals';
+    $('#labLlm').innerHTML = `<span class="w-1.5 h-1.5 rounded-full ${st === 'on' ? 'bg-emerald-400 pulse-dot' : st === 'off' ? 'bg-amber-400' : 'bg-slate-500'}"></span>${esc(label)}`;
+    $('#labLlm').title = st === 'on' ? 'Run test suite also sends the corpus to the backend LLM reviewer' : st === 'off' ? 'Set LLM_ENABLED=1 and ANTHROPIC_API_KEY on the backend to add LLM verdicts' : 'The LLM reviewer runs on the backend; open the dashboard with the backend reachable and enter the analyst key';
+  }
+  function renderLabTabs() {
+    $('#labTabs').innerHTML = LAB_THEATRES.map((t) => {
+      const cs = t.cases, pass = cs.filter((c) => LAB.res.get(c.id)?.verdict === c.expect).length;
+      return `<button type="button" data-lt="${t.id}" class="chip !h-9 ${LAB.theatre === t.id ? '!border-cyan-400/60 !bg-cyan-400/10' : ''}">${t.ccs.map((c) => flag(c, 12)).join('')}<span>${esc(t.name)}</span>${t.focus ? '<span class="tag tag-rose">FOCUS</span>' : ''}<span class="font-mono text-[10.5px] ${pass === cs.length ? 'text-emerald-300' : 'text-amber-300'}">${pass}/${cs.length}</span></button>`;
+    }).join('');
+  }
+  function renderLabDossier() {
+    const t = LAB_THEATRES.find((x) => x.id === LAB.theatre);
+    $('#labDossier').innerHTML = `<div class="rounded-xl border ${t.focus ? 'border-rose-500/30 bg-rose-500/5' : 'border-ink-700 bg-ink-950/40'} p-3 text-[12px] leading-relaxed">
+      <div class="flex items-center gap-2 mb-1">${t.ccs.map((c) => flag(c, 14)).join('')}<span class="font-medium text-slate-100">${esc(t.name)} · theatre dossier</span></div>
+      <p class="text-slate-300">${esc(t.brief)}</p>
+      ${t.precedent ? `<p class="text-slate-400 mt-1.5">${esc(t.precedent)}</p>` : '<p class="text-slate-500 mt-1.5">No public precedent cited for this exercise theatre.</p>'}
+      ${t.hypothesis ? `<p class="mt-1.5 text-amber-200/90"><span class="tag tag-amber mr-1">UNVERIFIED</span>${esc(t.hypothesis)}</p>` : ''}</div>`;
+  }
+  function renderLabRows() {
+    const t = LAB_THEATRES.find((x) => x.id === LAB.theatre);
+    $('#labRows').innerHTML = t.cases.map((c) => {
+      const r = LAB.res.get(c.id), l = LAB.llm.get(c.id), ok = r && r.verdict === c.expect, running = LAB.running && !LAB.done.has(c.id);
+      const icon = running ? '<span class="w-4 h-4 rounded-full border-2 border-cyan-400/70 border-t-transparent animate-spin"></span>' : ok ? '<span class="text-emerald-300 text-[13px]">✓</span>' : '<span class="text-rose-300 text-[13px]">✗</span>';
+      return `<button type="button" data-lc="${c.id}" class="w-full text-left px-3 py-2.5 flex gap-3 items-start hover:bg-ink-800/60 ${LAB.sel === c.id ? 'bg-ink-850' : ''}">
+        <span class="w-5 shrink-0 pt-0.5 grid place-items-center">${icon}</span>
+        <span class="min-w-0 flex-1"><span class="flex items-center gap-2 mb-0.5"><span class="tag">${esc(c.lang)}</span><span class="font-mono text-[10.5px] text-slate-500">${c.id}</span><span class="text-[10.5px] text-slate-500 truncate">${esc(accText(c.a))}</span></span>
+          <span class="block text-[13px] text-slate-100">${esc(c.text)}</span>
+          <span class="block text-[11px] text-slate-500 mt-0.5">${esc(c.note)}${r ? ' · ' + r.fired.filter((x) => x.w > 0).slice(0, 3).map((x) => x.label.toLowerCase()).join(', ') : ''}</span></span>
+        <span class="shrink-0 text-right space-y-0.5 w-[118px] text-[11px] text-slate-500"><span class="block text-[10px] text-slate-500">expected <b class="${VCLS[c.expect]}">${c.expect.toUpperCase()}</b></span>
+          <span class="block">${running ? '<span class="text-[11px] text-slate-500">evaluating…</span>' : 'engine ' + vbadge(r?.verdict, r?.p)}</span>
+          <span class="block text-[10.5px]">${l ? 'LLM ' + vbadge(l.verdict, l.bot_probability / 100) : ''}</span></span></button>`;
+    }).join('');
+  }
+  function renderLabNeural() {
+    const own = LAB.sel === 'own' && LAB.own, c = own ? LAB.own : allCases().find((x) => x.id === LAB.sel) || allCases()[0];
+    const r = own ? LAB.own.r : LAB.res.get(c.id) || labScore(c.text, c.a);
+    const W = 500, H = 300, n = LAB_FEATURES.length, y = (i) => 14 + i * ((H - 28) / (n - 1)), sx = 380, sy = H / 2, ox = 462;
+    let g = '';
+    LAB_FEATURES.forEach((x, i) => {
+      const on = r.f[x.k], col = x.w > 0 ? '#f43f5e' : '#2ee6d3', yy = y(i);
+      g += `<path d="M198 ${yy} C 290 ${yy}, 300 ${sy}, ${sx - 16} ${sy}" fill="none" stroke="${col}" stroke-opacity="${on ? 0.85 : 0.07}" stroke-width="${on ? 0.8 + Math.abs(x.w) * 1.4 : 0.8}">${on ? `<animate attributeName="stroke-dasharray" values="0 400;400 0" dur="0.9s" fill="freeze"/>` : ''}</path>`;
+      g += `<circle cx="192" cy="${yy}" r="5" fill="${on ? col : '#0b1213'}" stroke="${on ? col : '#2b3a39'}" ${on ? `style="filter:drop-shadow(0 0 4px ${col})"` : ''}/><text x="184" y="${yy + 3}" fill="${on ? '#e2e8f0' : '#4f6463'}" font-size="9" text-anchor="end" font-family="Inter, system-ui, sans-serif">${esc(x.label.length > 40 ? x.label.slice(0, 39) + '…' : x.label)}</text>`;
+      if (on) g += `<text x="204" y="${yy - 3}" fill="${col}" font-size="7.5" font-family="JetBrains Mono, monospace">${x.w > 0 ? '+' : ''}${x.w}</text>`;
+    });
+    const vc = r.verdict === 'bot' ? '#f43f5e' : r.verdict === 'human' ? '#34d399' : '#f59e0b';
+    g += `<circle cx="${sx}" cy="${sy}" r="16" fill="#0b1213" stroke="#5ff5e6"/><text x="${sx}" y="${sy + 4}" fill="#b5fff5" font-size="13" text-anchor="middle" font-family="Inter">Σ</text>
+      <text x="${sx}" y="${sy + 30}" fill="#7f9392" font-size="8.5" text-anchor="middle" font-family="JetBrains Mono, monospace">z = ${r.z.toFixed(2)}</text>
+      <line x1="${sx + 16}" y1="${sy}" x2="${ox - 20}" y2="${sy}" stroke="${vc}" stroke-width="2"/>
+      <circle cx="${ox}" cy="${sy}" r="20" fill="${vc}1f" stroke="${vc}" style="filter:drop-shadow(0 0 8px ${vc})"/><text x="${ox}" y="${sy + 4}" fill="${vc}" font-size="11" font-weight="600" text-anchor="middle" font-family="Inter">${Math.round(r.p * 100)}%</text>
+      <text x="${ox}" y="${sy - 28}" fill="${vc}" font-size="9.5" font-weight="600" text-anchor="middle" font-family="Inter">${r.verdict.toUpperCase()}</text><text x="${ox}" y="${sy + 36}" fill="#7f9392" font-size="8" text-anchor="middle" font-family="Inter">σ(z)</text>
+      <text x="${sx}" y="${sy - 26}" fill="#7f9392" font-size="8" text-anchor="middle" font-family="Inter">bias ${LAB_BIAS}</text>`;
+    $('#labNeural').innerHTML = `<div class="text-[11.5px] text-slate-300 mb-1 truncate" title="${esc(c.text)}">“${esc(c.text)}”</div><svg viewBox="0 0 ${W} ${H}" class="w-full h-auto block">${g}</svg>`;
+    $('#labNeuralP').innerHTML = vbadge(r.verdict, r.p);
+    const l = own ? LAB.own.llm : LAB.llm.get(c.id);
+    $('#labWhy').innerHTML = `<div class="text-[11px] text-slate-400">Text signals <b class="font-mono text-slate-200">${r.text >= 0 ? '+' : ''}${r.text.toFixed(1)}</b> · account behaviour <b class="font-mono text-slate-200">${r.behaviour >= 0 ? '+' : ''}${r.behaviour.toFixed(1)}</b> · ${esc(accText(c.a))}</div>`
+      + (l ? `<div class="text-[11px] rounded-lg border border-cyan-400/25 bg-cyan-400/5 p-2"><span class="text-cyan-200">LLM reviewer (${esc(LAB.llmModel || 'model')}):</span> ${vbadge(l.verdict, l.bot_probability / 100)} <span class="text-slate-300">${esc(l.rationale || '')}</span>${l.indicators?.length ? `<div class="text-slate-500 mt-0.5">${l.indicators.map(esc).join(' · ')}</div>` : ''}</div>` : '');
+  }
+  function labSanity() {
+    const x2 = allCases().find((c) => c.id === 'xk-2'), x1 = allCases().find((c) => c.id === 'xk-1');
+    const latin = labScore('Kosovo je Srbija', {}), homo = labScore('Kosovо je Srbija', {});
+    const a1 = allCases().map((c) => labScore(c.text, c.a).p.toFixed(6)).join(), a2 = allCases().map((c) => labScore(c.text, c.a).p.toFixed(6)).join();
+    const textOnly = ['Kosovo je Srbija!!!', 'Crimea is Russia', 'Vdekje Zelensky let russia take crimea'].map((t) => labScore(t, {}).verdict);
+    return [
+      ['S1', 'A slogan alone does not make a bot (xk-2: established account → human)', labScore(x2.text, x2.a).verdict === 'human'],
+      ['S2', 'Homoglyph evasion is caught (Cyrillic “о” raises the score vs all-Latin)', homo.f.homoglyph && homo.p > latin.p],
+      ['S3', 'Account behaviour matters: same text, farm vs established profile → different verdicts', labScore(x1.text, x1.a).verdict === 'bot' && labScore(x1.text, HUMAN_ACC).verdict === 'human'],
+      ['S4', 'Deterministic: two runs over the corpus give identical scores', a1 === a2],
+      ['S5', 'Text alone never yields BOT (no account data → human or uncertain)', textOnly.every((v) => v !== 'bot')],
+      ['S6', 'Every theatre has at least one bot and one human case', LAB_THEATRES.every((t) => t.cases.some((c) => c.expect === 'bot') && t.cases.some((c) => c.expect === 'human'))],
+    ];
+  }
+  function renderLabSummary() {
+    const cs = allCases(), m = { tp: 0, fn: 0, fp: 0, tn: 0, unc: 0 };
+    cs.forEach((c) => { const v = LAB.res.get(c.id)?.verdict; if (v === 'uncertain') m.unc++; else if (c.expect === 'bot') v === 'bot' ? m.tp++ : m.fn++; else v === 'human' ? m.tn++ : m.fp++; });
+    const pass = cs.filter((c) => LAB.res.get(c.id)?.verdict === c.expect).length;
+    const lv = cs.filter((c) => LAB.llm.has(c.id)), lpass = lv.filter((c) => LAB.llm.get(c.id).verdict === c.expect).length, agree = lv.filter((c) => LAB.llm.get(c.id).verdict === LAB.res.get(c.id)?.verdict).length;
+    const cell = (k, v, cls) => `<div class="tile !p-2 text-center"><div class="text-[10px] text-slate-500">${k}</div><div class="font-mono text-[17px] ${cls}">${v}</div></div>`;
+    $('#labSummary').innerHTML = `<div class="flex items-baseline gap-2 mb-2"><span class="big-num !text-[26px]">${pass}/${cs.length}</span><span class="text-[12px] text-slate-400">smoke tests pass · rule engine · ${LAB_THEATRES.length} theatres</span></div>
+      <div class="grid grid-cols-5 gap-1.5">${cell('Bot ✓', m.tp, 'text-rose-300')}${cell('Bot missed', m.fn, 'text-amber-300')}${cell('Human ✓', m.tn, 'text-emerald-300')}${cell('False bot', m.fp, 'text-amber-300')}${cell('Uncertain', m.unc, 'text-slate-300')}</div>
+      <div class="text-[11px] mt-2 ${LAB.llmErr ? 'text-amber-300' : 'text-slate-400'}">${lv.length ? `LLM reviewer (${esc(LAB.llmModel || '')}): <b class="text-slate-200">${lpass}/${lv.length}</b> match the expected label · agrees with the rule engine on <b class="text-slate-200">${agree}/${lv.length}</b>` : LAB.llmErr ? 'LLM reviewer: ' + esc(LAB.llmErr) : esc(llmState()[1]) + ' · rule-engine results only'}</div>`;
+    $('#labSanity').innerHTML = '<div class="text-[11px] uppercase tracking-wider text-slate-500">Sanity checks</div>' + labSanity().map(([id, label, ok]) => `<div class="flex items-start gap-2 text-[11.5px]"><span class="font-mono shrink-0 ${ok ? 'text-emerald-300' : 'text-rose-300'}">${ok ? 'PASS' : 'FAIL'}</span><span class="font-mono text-slate-500 shrink-0">${id}</span><span class="text-slate-300">${esc(label)}</span></div>`).join('');
+  }
+  function renderLab() { renderLabStatus(); renderLabTabs(); renderLabDossier(); renderLabRows(); renderLabNeural(); renderLabSummary(); }
+  async function labLlm(cases) {
+    if (llmState()[0] !== 'on') return;
+    try {
+      const r = await apiFetch('/api/lab/evaluate', { method: 'POST', body: JSON.stringify({ cases: cases.map((c) => ({ id: c.id, text: c.text, lang: c.lang, account: c.a && c.a.age_days != null ? c.a : undefined })) }) });
+      if (!r.ok) throw new Error(r.status === 401 ? 'enter the analyst API key in the LIVE bar' : r.status === 503 ? 'not configured on the backend' : 'HTTP ' + r.status);
+      const j = await r.json(); LAB.llmModel = j.model; LAB.llmErr = j.error || null;
+      Object.entries(j.results || {}).forEach(([id, v]) => LAB.llm.set(id, v));
+    } catch (e) { LAB.llmErr = e.message; }
+  }
+  async function labRunSuite() {
+    if (LAB.running) return;
+    LAB.running = true; LAB.done.clear(); LAB.res.clear(); LAB.llm.clear(); LAB.llmErr = null; $('#labRun').disabled = true; $('#labRun').textContent = 'Running…';
+    renderLab();
+    const llmP = labLlm(allCases());
+    for (const t of LAB_THEATRES) for (const c of t.cases) { await new Promise((ok) => setTimeout(ok, 45)); LAB.res.set(c.id, labScore(c.text, c.a)); LAB.done.add(c.id); if (t.id === LAB.theatre) renderLabRows(); renderLabTabs(); }
+    await llmP;
+    LAB.running = false; $('#labRun').disabled = false; $('#labRun').textContent = 'Run test suite'; renderLab();
+    const cs = allCases(); toast(`Evaluation suite: ${cs.filter((c) => LAB.res.get(c.id).verdict === c.expect).length}/${cs.length} pass · ${labSanity().filter((x) => x[2]).length}/6 sanity checks${LAB.llm.size ? ' · LLM ' + LAB.llm.size + ' verdicts' : ''}`);
+  }
+  $('#labRun').addEventListener('click', labRunSuite);
+  $('#labTabs').addEventListener('click', (e) => { const b = e.target.closest('[data-lt]'); if (!b) return; LAB.theatre = b.dataset.lt; const t = LAB_THEATRES.find((x) => x.id === LAB.theatre); LAB.sel = t.cases[0].id; renderLab(); });
+  $('#labRows').addEventListener('click', (e) => { const b = e.target.closest('[data-lc]'); if (!b) return; LAB.sel = b.dataset.lc; renderLabRows(); renderLabNeural(); });
+  $('#labForm').addEventListener('submit', async (e) => {
+    e.preventDefault(); const text = $('#labText').value.trim(); if (!text) return;
+    const a = LAB_PROFILES[$('#labProfile').value] || {};
+    LAB.own = { id: 'own', lang: '?', text, a, r: labScore(text, a), llm: null }; LAB.sel = 'own'; renderLabRows(); renderLabNeural();
+    $('#labOwnStatus').textContent = `Rule engine: ${LAB.own.r.verdict.toUpperCase()} ${Math.round(LAB.own.r.p * 100)}%`;
+    if (llmState()[0] === 'on') {
+      $('#labOwnStatus').textContent += ' · asking the LLM reviewer…';
+      try {
+        const r = await apiFetch('/api/lab/evaluate', { method: 'POST', body: JSON.stringify({ cases: [{ id: 'own', text, account: a.age_days != null ? a : undefined }] }) });
+        const j = r.ok ? await r.json() : null; LAB.own.llm = j && j.results && j.results.own; LAB.llmModel = j && j.model || LAB.llmModel;
+        $('#labOwnStatus').textContent = `Rule engine: ${LAB.own.r.verdict.toUpperCase()} ${Math.round(LAB.own.r.p * 100)}%` + (LAB.own.llm ? ` · LLM: ${LAB.own.llm.verdict.toUpperCase()} ${LAB.own.llm.bot_probability}%` : ` · LLM unavailable${j && j.error ? ': ' + j.error : ''}`);
+      } catch (err) { $('#labOwnStatus').textContent += ' failed'; }
+      renderLabNeural();
+    }
+  });
+  function labExport() {
+    return { corpus: 'exercise', engine: 'rules-v1', llm_model: LAB.llmModel, results: allCases().map((c) => { const r = LAB.res.get(c.id), l = LAB.llm.get(c.id); return { id: c.id, theatre: c.theatre, lang: c.lang, text: c.text, expected: c.expect, engine: r && { verdict: r.verdict, bot_probability: Math.round(r.p * 100), signals: r.fired.map((x) => x.k) }, llm: l || null }; }),
+      sanity: labSanity().map(([id, label, ok]) => ({ id, label, pass: ok })) };
+  }
+
   let tt; function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(tt); tt = setTimeout(() => t.classList.add('hidden'), 3200); }
 
   load(SEED_COMMENTS.map((c) => ({ ...c, source: 'seed' })), ARTICLE.published, false);
   renderGlobeRegions();
   Globe.start();
+  labEvalAll(); renderLab();
   { const t0 = Date.now(); for (let k = 8; k >= 1; k--) psyEvent(t0 - k * 3500, false); renderPsy(true); PSY.timer = setTimeout(psyTick, 900); } // seed the feed, then stream
   initLive();
   if (location.hash === '#batch') openModal();

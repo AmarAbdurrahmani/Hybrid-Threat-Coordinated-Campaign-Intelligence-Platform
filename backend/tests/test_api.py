@@ -156,3 +156,27 @@ def test_source_controls_and_exercise_alert_routing(api, monkeypatch):
     pipeline.alerts.deliver_pending()
     assert destinations == ["exercise-fixture"]
     assert pipeline.store.alerts()[0]["status"] == "delivered"
+
+def test_lab_evaluate_requires_key_and_configured_llm(api, monkeypatch):
+    client, _ = api
+    main = sys.modules["main"]
+    body = {"cases": [{"id": "xk-1", "text": "Kosovo je Srbija!!!", "lang": "sr",
+                       "account": {"age_days": 9, "posts_24h": 140, "template_hits": 23, "in_burst": True}}]}
+    assert client.post("/api/lab/evaluate", json=body).status_code == 401
+    assert client.get("/api/health").json()["llm_model"] is None
+    assert client.post("/api/lab/evaluate", json=body, headers=ANALYST).status_code == 503
+
+    seen = {}
+
+    def fake_evaluate(cases):
+        seen["cases"] = cases
+        return {"model": "test-model", "results": {"xk-1": {"id": "xk-1", "verdict": "bot", "bot_probability": 91,
+                                                              "indicators": ["template reuse"], "rationale": "farm-like"}}}
+
+    monkeypatch.setattr(main.evaluator, "available", lambda: True)
+    monkeypatch.setattr(main.evaluator, "evaluate", fake_evaluate)
+    r = client.post("/api/lab/evaluate", json=body, headers=ANALYST)
+    assert r.status_code == 200 and r.json()["results"]["xk-1"]["verdict"] == "bot"
+    assert seen["cases"][0]["account"] == {"age_days": 9, "posts_24h": 140, "template_hits": 23, "in_burst": True}
+    assert client.post("/api/lab/evaluate", json={"cases": []}, headers=ANALYST).status_code == 422
+    assert client.post("/api/lab/evaluate", json={"cases": [{"id": "x", "text": "y" * 1001}]}, headers=ANALYST).status_code == 422
