@@ -248,21 +248,24 @@ class GeoIP:
     def lookup(self, ip: str) -> dict | None:
         if not ip:
             return None
-        info = {"ip": truncate_ip(ip)}
+        info = {"ip": truncate_ip(ip), "type": "unknown"}
         if self.asn:
             a = self.asn.get(ip) or {}
             org = (a.get("autonomous_system_organization") or "").lower()
-            info["asn"] = f"AS{a.get('autonomous_system_number')}" if a.get("autonomous_system_number") else "AS?"
-            info["org"] = a.get("autonomous_system_organization")
-            info["type"] = "vpn" if any(h in org for h in _VPN_HINTS) else "datacenter" if any(h in org for h in _HOSTING_HINTS) else "residential"
+            if a.get("autonomous_system_number"):
+                info["asn"] = f"AS{a['autonomous_system_number']}"
+                info["org"] = a.get("autonomous_system_organization")
+                info["type"] = "vpn" if any(h in org for h in _VPN_HINTS) else "datacenter" if any(h in org for h in _HOSTING_HINTS) else "unknown"
         if self.city:
             c = self.city.get(ip) or {}
             loc = c.get("location") or {}
             info.update({"city": ((c.get("city") or {}).get("names") or {}).get("en"), "cc": (c.get("country") or {}).get("iso_code"),
                          "lat": loc.get("latitude"), "lon": loc.get("longitude")})
-        if "asn" not in info:
+        has_location = info.get("lat") is not None and info.get("lon") is not None
+        if "asn" not in info and not has_location:
             return None
-        info["node"] = f"{info['asn']}:{info.get('cc') or '??'}"
+        location = f":{info['lat']:.1f}:{info['lon']:.1f}" if has_location else ""
+        info["node"] = f"{info.get('asn', 'GEO')}:{info.get('cc') or '??'}{location}"
         return info
 
 

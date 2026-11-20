@@ -22,6 +22,7 @@ from pydantic import BaseModel, Field, HttpUrl, IPvAnyAddress, StringConstraints
 
 import ingest
 from config import settings
+from infrastructure import globe_points
 from service import Pipeline
 
 logging.basicConfig(level=os.getenv("LOG_LEVEL", "INFO"), format="%(asctime)s %(levelname)s %(name)s: %(message)s")
@@ -322,6 +323,13 @@ async def thread_sitrep(tid: str):
 @app.get("/api/graph", dependencies=[Depends(require_key)])
 async def graph(simulated: bool = False):
     return await asyncio.to_thread(pipeline.global_graph, simulated)
+
+
+@app.get("/api/infrastructure", dependencies=[Depends(require_key)])
+async def infrastructure(simulated: bool = False, thread_id: str | None = None):
+    def collect():
+        return {**globe_points(pipeline.store.infrastructure_snapshots(simulated, thread_id)), "simulated": simulated}
+    return await asyncio.to_thread(collect)
 
 
 def normalize_batch(batch: ThreadIn, platform: str, portal: bool = False) -> tuple[dict, list[dict]]:

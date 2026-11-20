@@ -198,6 +198,19 @@ class Store:
             ).fetchall()
         return [json.loads(row[0]) for row in rows]
 
+    def infrastructure_snapshots(self, simulated: bool, thread_id: str | None = None) -> list[dict]:
+        where = " AND t.id=?" if thread_id else ""
+        with self._lock:
+            rows = self._db.execute(
+                "SELECT t.id, t.platform, json_extract(a.payload, '$.thread.n') AS comments, "
+                "json_extract(a.payload, '$.infra') AS nodes "
+                "FROM analyses a JOIN threads t ON t.id=a.thread_id "
+                "WHERE a.dirty=0 AND a.payload IS NOT NULL AND t.simulated=?" + where,
+                (int(simulated), thread_id) if thread_id else (int(simulated),),
+            ).fetchall()
+        return [{"thread_id": row["id"], "platform": row["platform"], "comments": row["comments"] or 0,
+                 "nodes": json.loads(row["nodes"] or "[]")} for row in rows]
+
     def thread_comments(self, tid: str) -> list[dict]:
         with self._lock:
             rows = self._db.execute(

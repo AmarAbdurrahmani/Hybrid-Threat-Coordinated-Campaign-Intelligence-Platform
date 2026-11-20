@@ -68,6 +68,7 @@ pollers and WebSocket tickets.
 | GET | `/api/threads/{id}/analysis` | Full analysis (contract v1, see `frontend/contract.ts`) |
 | GET | `/api/threads/{id}/sitrep` | Plain-text SitRep |
 | GET | `/api/graph` | Global co-activity graph (nodes/edges JSON, Louvain communities) |
+| GET | `/api/infrastructure` | Regional egress and comment coverage from current thread analyses |
 | POST | `/api/simulate-attack` | Inject an exercise swarm |
 | POST | `/api/ingest/comments` | Ingest external comments with scoped IDs and optional evidence URLs |
 | POST | `/api/ingest/portal` | Ingest your portal's comments with server-side IP for GeoIP lookup |
@@ -91,6 +92,12 @@ Health and the static dashboard remain public. `ALLOW_UNAUTHENTICATED=true`
 is available for isolated local demos. Use `?simulated=true` for exercise graphs,
 cases, suggestions and feedback. Collector backfills revisit a bounded recent set
 of source pages or posts.
+
+`GET /api/infrastructure` returns rounded regional coordinates, comment counts, and
+shared-egress coordination signals from available network telemetry. It also returns
+the number of comments analyzed and mapped. Individual account identifiers and IP
+addresses are omitted. Use the analyst API key, `?simulated=true` for exercises,
+and `thread_id` to limit the report to one thread.
 
 ## How the engine scores (engine.py)
 
