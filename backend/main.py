@@ -504,6 +504,28 @@ async def health():
             "llm_model": settings.llm_model if evaluator.available() else None}
 
 
+_LOOPBACK = {"127.0.0.1", "::1", "localhost"}
+
+
+@app.get("/api/dev/analyst-key", include_in_schema=False)
+async def dev_analyst_key(request: Request):
+    """Local-dev convenience: hand API_KEY to the dashboard served by this same backend on localhost.
+
+    Off unless DEV_AUTO_ANALYST_KEY=true. Only a loopback TCP client, a loopback Host header (defeats
+    DNS rebinding) and a same-origin browser request qualify; everything else gets a plain 404.
+    """
+    origin = request.headers.get("origin")
+    same_origin = f"{request.url.scheme}://{request.headers.get('host', '')}"
+    ok = (settings.dev_auto_analyst_key and settings.api_key
+          and (request.client.host if request.client else "") in {"127.0.0.1", "::1"}
+          and (request.url.hostname or "").strip("[]") in _LOOPBACK
+          and (origin is None or origin == same_origin)
+          and request.headers.get("sec-fetch-site", "same-origin") in {"same-origin", "none"})
+    if not ok:
+        raise HTTPException(404, "Not Found")
+    return {"api_key": settings.api_key}
+
+
 @app.get("/api/threads", dependencies=[Depends(require_key)])
 async def threads():
     return await asyncio.to_thread(pipeline.store.list_threads)

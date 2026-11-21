@@ -31,6 +31,9 @@ class Settings:
     api_key: str = os.getenv("API_KEY", "").strip()
     ingest_api_key: str = os.getenv("INGEST_API_KEY", "")
     allow_unauthenticated: bool = _bool("ALLOW_UNAUTHENTICATED", False)
+    # Local development only: lets the dashboard served by THIS backend on localhost fetch API_KEY
+    # automatically (GET /api/dev/analyst-key). Refused for any non-loopback client, host or origin.
+    dev_auto_analyst_key: bool = _bool("DEV_AUTO_ANALYST_KEY", False)
     cors_origins: list[str] = field(default_factory=lambda: _list("CORS_ORIGINS") or ["http://localhost:8000", "http://127.0.0.1:8000", "http://localhost:5173"])
     # Lets the Vercel-hosted dashboard (production + preview URLs) call this API cross-origin.
     # No cookies are used and writes still need X-API-Key. Set CORS_ORIGIN_REGEX="" to disable,

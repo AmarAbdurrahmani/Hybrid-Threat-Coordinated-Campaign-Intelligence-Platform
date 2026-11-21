@@ -299,3 +299,19 @@ def test_missing_server_api_key_is_explicit(api, monkeypatch):
     assert health["auth_required"] and not health["analyst_key_configured"]
     r = client.post("/api/osint/youtube/auto-scan", json={}, headers=ANALYST)
     assert r.status_code == 503 and "API_KEY" in r.json()["detail"]
+
+
+def test_dev_analyst_key_only_for_local_same_origin(api, monkeypatch):
+    client, _ = api
+    assert client.get("/api/dev/analyst-key").status_code == 404           # flag off
+    monkeypatch.setattr(settings, "dev_auto_analyst_key", True)
+    assert client.get("/api/dev/analyst-key").status_code == 404           # non-loopback client/host
+    local = TestClient(client.app, base_url="http://localhost:8000", client=("127.0.0.1", 50000))
+    r = local.get("/api/dev/analyst-key")
+    assert r.status_code == 200 and r.json()["api_key"] == settings.api_key
+    assert local.get("/api/dev/analyst-key", headers={"Origin": "https://evil.vercel.app"}).status_code == 404
+    assert local.get("/api/dev/analyst-key", headers={"Sec-Fetch-Site": "cross-site"}).status_code == 404
+    rebind = TestClient(client.app, base_url="http://attacker.example", client=("127.0.0.1", 50000))
+    assert rebind.get("/api/dev/analyst-key").status_code == 404           # DNS rebinding
+    monkeypatch.setattr(settings, "api_key", "")
+    assert local.get("/api/dev/analyst-key").status_code == 404

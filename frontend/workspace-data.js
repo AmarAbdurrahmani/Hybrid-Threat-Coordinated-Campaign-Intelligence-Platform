@@ -19,7 +19,8 @@
   const origin = apiOrigin();
   const keySlot = 'htccip_key:' + origin;
   let key = '';
-  try { key = sessionStorage.getItem(keySlot) || ''; } catch {}
+  // Same slot as the dashboard: remembered on this device (localStorage), older tab-only keys migrate.
+  try { key = localStorage.getItem(keySlot) || sessionStorage.getItem(keySlot) || ''; } catch {}
   async function api(path, options = {}) {
     const { method = 'GET', body, signal, authenticated = true } = options;
     const response = await fetch(origin + '/api/' + path, {
@@ -44,8 +45,9 @@
   function setKey(value) {
     key = value.trim();
     try {
-      if (key) sessionStorage.setItem(keySlot, key);
-      else sessionStorage.removeItem(keySlot);
+      if (key) localStorage.setItem(keySlot, key);
+      else localStorage.removeItem(keySlot);
+      sessionStorage.removeItem(keySlot);
     } catch {}
   }
 

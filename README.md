@@ -26,8 +26,8 @@ uvicorn main:app --host 0.0.0.0 --port 8000
 ```
 
 Open **http://localhost:8000** for the **Hybrid Threat Operations Center** (globe / 2D map,
-threat replay, counter-UAS, SitRep). Enter the analyst `API_KEY` in the LIVE bar to load
-monitored data; the built-in demo thread runs without a backend. Select a five-minute
+threat replay, counter-UAS, SitRep). Enter the analyst `API_KEY` in the LIVE bar once (it is remembered; see
+"Analyst key without retyping") to load monitored data; the built-in demo thread runs without a backend. Select a five-minute
 timeline bar to filter the comment inspector; `/#batch` opens the paste-a-batch analyzer.
 The Stitch analyst workspace (triage queue, cases, sources, alerts) is at
 **/monitor.html**, linked as **Workspace** in the dashboard. Choose **Live** there and enter
@@ -138,6 +138,18 @@ The backend needs **`API_KEY`** (the analyst key you paste in the LIVE bar) and 
 `backend/.env`, which is loaded from that folder whatever directory uvicorn starts in. On Render, set them in the
 service's Environment tab. Without `API_KEY`, analyst endpoints return 503 with an explicit message, and
 `/api/health` shows `analyst_key_configured: false`.
+
+**Analyst key without retyping.** The dashboard (and the workspace) resolve the analyst key in this order; the first hit wins:
+1. A one-time link `https://<dashboard>/#key=<API_KEY>`. The URL fragment is never sent to any server, and the page removes it
+   from the address bar immediately.
+2. The key remembered on this device (`localStorage`, one entry per backend origin). Typing it once in the LIVE bar saves it there.
+3. Local dev only: with `DEV_AUTO_ANALYST_KEY=true` in `backend/.env`, the dashboard served by that backend on `localhost`
+   fetches `API_KEY` from `GET /api/dev/analyst-key`. The endpoint returns 404 unless the client, the Host header and the
+   Origin are all loopback and same-origin. Never set it on Render.
+
+There is no build-time key (for example `VITE_ANALYST_API_KEY`): anything baked into the static Vercel page is public.
+Once connected, the key field collapses into a **Key** button. Click it to change the key, or clear the field to forget it.
+A saved key the backend rejects reopens the field with "Saved analyst key was rejected".
 
 ## How the engine scores (engine.py)
 

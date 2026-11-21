@@ -172,7 +172,8 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
       <div class="flex items-center gap-2 shrink-0"><span id="liveDot" class="w-2.5 h-2.5 rounded-full bg-slate-500"></span><span id="liveStatus" class="text-xs font-mono text-slate-300">Connecting…</span></div>
       <select id="liveThreads" class="flex-1 min-w-0 text-xs bg-ink-950 border border-ink-600 rounded-[10px] px-2.5 py-2 focus:outline-none focus:border-cyan-500"></select>
       <div class="flex flex-wrap gap-2 shrink-0">
-        <input id="liveKey" type="password" placeholder="API key" class="hidden w-28 text-xs bg-ink-950 border border-ink-600 rounded-[10px] px-2.5 py-2">
+        <input id="liveKey" type="password" placeholder="Analyst API key" autocomplete="off" title="Analyst API key (remembered on this device; clear the field to forget it)" class="hidden w-36 text-xs bg-ink-950 border border-ink-600 rounded-[10px] px-2.5 py-2">
+        <button id="liveKeyBtn" type="button" class="hidden btn-hud" title="Analyst key saved on this device. Click to change or clear it.">&#128273; Key</button>
         <select id="liveScenario" title="Attack simulation scenario" class="text-xs bg-ink-950 border border-ink-600 rounded-[10px] px-2 py-2 focus:outline-none focus:border-rose-500">
           <option value="kfor">Scenario: NATO / KFOR disinformation</option>
           <option value="energy">Scenario: Energy infrastructure cyber-panic</option>
@@ -1814,7 +1815,29 @@ if (typeof module !== "undefined") module.exports = Engine;
   const KEY_NAME = 'htccip_key:' + API_ORIGIN;
   let ws = null, reconnectTimer = null, liveTimer = null, apiKey = '', connection = 0, threadRequest = 0;
   let threadList = [], selectedUpdates = new Set();
-  try { apiKey = sessionStorage.getItem(KEY_NAME) || ''; } catch (e) {}
+  // Analyst key resolution (first hit wins), so nobody retypes it on every load:
+  //   1. a one-time link  …/#key=<API_KEY>  (the fragment never reaches any server; it is removed at once)
+  //   2. this device's localStorage (set by any of the paths here or by typing it once in the LIVE bar)
+  //   3. an older tab-only sessionStorage entry (migrated)
+  //   4. local dev only: GET /api/dev/analyst-key on the backend serving this page (see initLive)
+  // Nothing is baked into the static bundle: a key shipped in public JS would be readable by anyone.
+  function saveKey(k) {
+    try {
+      if (k) localStorage.setItem(KEY_NAME, k); else localStorage.removeItem(KEY_NAME);
+      sessionStorage.removeItem(KEY_NAME);
+    } catch (e) {}
+  }
+  let keySource = '';
+  try {
+    const m = /(?:^#|&)key=([^&]+)/.exec(location.hash);
+    if (m) {
+      apiKey = decodeURIComponent(m[1]).trim(); keySource = 'link'; saveKey(apiKey);
+      const rest = location.hash.replace(/(^#|&)key=[^&]+/, '$1').replace(/^#&/, '#').replace(/^#$/, '');
+      history.replaceState(null, '', location.pathname + location.search + rest);
+    }
+    if (!apiKey && (apiKey = localStorage.getItem(KEY_NAME) || '')) keySource = 'saved';
+    if (!apiKey && (apiKey = sessionStorage.getItem(KEY_NAME) || '')) { keySource = 'saved'; saveKey(apiKey); }
+  } catch (e) {}
   const apiFetch = (path, opt = {}) => fetch(API_BASE + path, {
     ...opt,
     headers: {
@@ -1834,6 +1857,13 @@ if (typeof module !== "undefined") module.exports = Engine;
     };
   }
   let liveReady = false;
+  // Connected with a key -> collapse the input into a small "Key" button; otherwise show the field.
+  function keyUi(connected) {
+    const input = $('#liveKey'), btn = $('#liveKeyBtn');
+    const compact = connected && !!apiKey && document.activeElement !== input;
+    input.classList.toggle('hidden', compact);
+    btn.classList.toggle('hidden', !compact);
+  }
   function setLive(ok, msg) {
     liveReady = !!ok;
     $('#liveDot').className = 'w-2.5 h-2.5 rounded-full ' + (ok ? 'bg-emerald-400' : 'bg-rose-500');
@@ -1879,6 +1909,7 @@ if (typeof module !== "undefined") module.exports = Engine;
       return;
     }
     if (authRequired && !apiKey) {
+      keyUi(false);
       setLive(false, 'Enter analyst API key');
       return;
     }
@@ -1886,7 +1917,8 @@ if (typeof module !== "undefined") module.exports = Engine;
       const response = await apiFetch('/api/ws-ticket', { method: 'POST' });
       if (attempt !== connection) return;
       if (response.status === 401) {
-        setLive(false, 'Enter a valid analyst API key');
+        keyUi(false);
+        setLive(false, keySource && keySource !== 'typed' ? `Saved analyst key was rejected by ${API_HOST} · enter the current one` : 'Enter a valid analyst API key');
         return;
       }
       if (!response.ok) throw new Error('Ticket unavailable');
@@ -1906,6 +1938,9 @@ if (typeof module !== "undefined") module.exports = Engine;
         try { m = JSON.parse(event.data); } catch { return; }
         if (m.type === 'hello') {
           setLive(true, 'LIVE · ' + API_HOST);
+          $('#liveKeyBtn').title = 'Analyst key ' + ({ link: 'from a #key= link', saved: 'remembered on this device', dev: 'loaded from backend/.env (local dev)' }[keySource] || 'saved on this device') + '. Click to change or clear it.';
+          $('#liveKeyBtn').dataset.source = keySource;
+          keyUi(true);
           const id = setThreadList(m.threads || []);
           if (id && (state.live || !$('#liveThreads').dataset.demo)) loadLiveThread(id).catch((error) => toast(error.message));
           return;
@@ -1953,15 +1988,24 @@ if (typeof module !== "undefined") module.exports = Engine;
     if (!health) return;
     renderLabStatus(); renderLabSummary();
     $('#livePanel').classList.remove('hidden');
+    // Local dev: the backend serving this very page may hand over its API_KEY (DEV_AUTO_ANALYST_KEY=true).
+    if (!apiKey && health.auth_required && health.analyst_key_configured && !API_BASE && /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname)) {
+      try {
+        const r = await fetch('/api/dev/analyst-key', { cache: 'no-store' });
+        if (r.ok) { const j = await r.json(); if (j.api_key) { apiKey = j.api_key; keySource = 'dev'; saveKey(apiKey); } }
+      } catch (e) {}
+    }
     const input = $('#liveKey');
     input.classList.remove('hidden');
     input.value = apiKey;
+    $('#liveKeyBtn').addEventListener('click', () => {
+      $('#liveKeyBtn').classList.add('hidden'); input.classList.remove('hidden'); input.focus(); input.select();
+    });
+    input.addEventListener('blur', () => { if (liveReady && input.value.trim() === apiKey) keyUi(true); });
     input.addEventListener('change', () => {
       apiKey = input.value.trim();
-      try {
-        if (apiKey) sessionStorage.setItem(KEY_NAME, apiKey);
-        else sessionStorage.removeItem(KEY_NAME);
-      } catch {}
+      keySource = apiKey ? 'typed' : '';
+      saveKey(apiKey);
       ++connection;
       ++threadRequest;
       clearTimeout(reconnectTimer);
@@ -2792,7 +2836,7 @@ if (typeof module !== "undefined") module.exports = Engine;
   // ---- left rail: smooth anchors + active-section highlight ----
   $('#railBrief').addEventListener('click', () => $('#btnSitrep').click());
   $('#railSettings').addEventListener('click', () => {
-    if (!$('#livePanel').classList.contains('hidden')) { go('#livePanel'); setTimeout(() => $('#liveKey').focus(), 350); }
+    if (!$('#livePanel').classList.contains('hidden')) { go('#livePanel'); setTimeout(() => { $('#liveKeyBtn').classList.add('hidden'); $('#liveKey').classList.remove('hidden'); $('#liveKey').focus(); }, 350); }
     else toast(`Backend ${API_HOST} not reachable — running on the built-in demo thread`);
   });
   if (window.IntersectionObserver) {
