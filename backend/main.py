@@ -767,7 +767,15 @@ async def bot_score(body: BotScoreIn, x_api_key: str | None = Header(default=Non
             if col not in posts:
                 posts[col] = ""
         recs, *_ = bm["mod"].score(accounts, posts, bm["m"])
-        return sorted(recs, key=lambda r: -r["bot_probability"])
+        # The benchmark model was trained with full profile metadata; without it a score is out of distribution.
+        need = ("created_ts", "followers", "following", "posts_total")
+        meta = accounts.drop_duplicates("account_id").set_index("account_id").reindex([r["account_id"] for r in recs])
+        complete = meta[list(need)].apply(pd.to_numeric, errors="coerce").notna().all(axis=1).to_numpy()
+        for r, ok in zip(recs, complete):
+            r["reliable"] = bool(ok)
+            if not ok:
+                r["warning"] = "Missing account metadata (" + ", ".join(need) + "): score is outside the training distribution."
+        return sorted(recs, key=lambda r: (-r["reliable"], -r["bot_probability"]))
 
     recs = await asyncio.to_thread(run)
     meta = bm["m"]["meta"]
