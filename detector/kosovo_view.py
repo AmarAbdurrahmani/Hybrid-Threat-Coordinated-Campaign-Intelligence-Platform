@@ -1,0 +1,362 @@
+"""Kosovo view: the top pro-Serbian narrative pushes in real YouTube comments, as a static page.
+
+  python -m detector.kosovo_view [--db detector/data/youtube_10k.db] [--out frontend/kosovo.html]
+
+A "push" is a narrative (matched in English, Serbian Latin and Serbian Cyrillic). For each push: accounts, how many
+posted word-for-word copies, same-text bursts (≥2 accounts within 10 minutes), share of brand-new channels
+(< 180 days old when commenting), targeted videos and example texts. Nodes are shaded by a COORDINATION score, not a
+BOT %: the bot model is validated on the benchmark, not yet on YouTube.
+"""
+from __future__ import annotations
+
+import argparse
+import hashlib
+import json
+import re
+import sqlite3
+from pathlib import Path
+
+import numpy as np
+import pandas as pd
+
+HERE = Path(__file__).resolve().parent
+CYR = str.maketrans({"а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "ђ": "đ", "е": "e", "ж": "ž", "з": "z", "и": "i", "ј": "j",
+                     "к": "k", "л": "l", "љ": "lj", "м": "m", "н": "n", "њ": "nj", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t",
+                     "ћ": "ć", "у": "u", "ф": "f", "х": "h", "ц": "c", "ч": "č", "џ": "dž", "ш": "š"})
+PUSHES = {
+    "“Kosovo is Serbia”": r"kosovo\s*(?:je|is|=)\s*(?:srbija|serbia|srpsko|serbian)|^\W*kosovo\s+(?:srbija|serbia)\W*$|kosovo i metohija je srbija",
+    "“Part / heart of Serbia”": r"(?:part|piece|heart)\s+of\s+serbia|srce\s+srbije|deo\s+srbije|dio\s+srbije|kim\s+je\s+srbija",
+    "Russia / Putin as protector": r"\b(?:putin\w*|rusij\w*|russia\w*|rusi)\b",
+    "Albanians as enemies (slurs, “terrorists”, “occupiers”)": r"[šs]iptar|teroris|terroris|okupator|occupier|albanian\s+(?:mafia|terror)",
+    "NATO aggression / 1999 bombing": r"nato\s+(?:agres|bomb|aggress)|agresij|bombing\s+of\s+(?:serbia|yugoslavia)|\b1999\b",
+    "Orthodox “holy land” / cradle claim": r"svet[ae]?\s+zemlj|holy\s+land|kolevk|cradle\s+of\s+serb|manastir|monaster|\bzavet",
+    "“Kosovo is not a country / fake state”": r"(?:not|isn'?t)\s+a\s+(?:real\s+)?country|fake\s+(?:country|state)|la[žz]na\s+dr[žz]ava|nije\s+dr[žz]ava|nije\s+zemlja",
+    "“We will never give Kosovo”": r"nikad[a]?\s+(?:ga\s+)?(?:ne\s+)?(?:damo|dati|predati|odreći|odreci)|never\s+give\s+(?:up\s+)?kosovo|ne\s+damo\s+kosov",
+    "West’s double standards / Crimea": r"double\s+standard|dvostruk|crimea|\bkrim\b",
+    "“Kosovo will return to Serbia”": r"(?:kosovo|kim)\s+(?:će|ce)\s+(?:biti|se\s+vratiti)|will\s+return\s+to\s+serbia|we\s+will\s+be\s+back|vrati(?:ćemo|cemo)",
+}
+
+
+# Motive clades: a fixed taxonomy, measured (not assumed) in the comments. Matched on lower-cased text with Serbian
+# Cyrillic transliterated to Latin. A comment can carry more than one motive.
+MOTIVES = {
+    "Serbian sovereignty denial": (r"kosovo\s*(?:je|is|=)\s*(?:srbija|serbia|srpsk|serbian)|(?:part|piece|heart)\s+of\s+serbia|srce\s+srbije|"
+                                   r"de?o\s+srbije|nikad[a]?\s+(?:ga\s+)?(?:ne\s+)?(?:damo|dati|predati)|kim\s+je\s+srbija|kosovo\s+i\s+metohija", "#991b1b"),
+    "Russian / pan-Slavic brotherhood": (r"\b(?:putin\w*|rusij\w*|russia\w*|rusi|rusk\w*|bratsk\w*|bra[ćc]a\s+rus\w*|slaven\w*|slavic|pan-?slav\w*|"
+                                         r"slovens\w*|majka\s+rusija)\b", "#1e3a8a"),
+    "Anti-NATO / anti-West": (r"\bnato\b.*(?:agres|bomb|aggress|zlo[čc]in|crime|occup|okup)|agresij|double\s+standard|dvostruk|"
+                              r"(?:usa|america|amerika|zapad|west)\w*\s+(?:is|je|su)?\s*(?:evil|zlo|imperij|kriv|guilty)", "#7c2d12"),
+    "Ethnic hostility / slurs": (r"[šs]iptar|teroris|terroris|okupator|occupier|albanian\s+(?:mafia|terror)|serb\s+(?:dogs|chetnik)|[čc]etni|shkije|shkija", "#111827"),
+    "Orthodox “holy land” claim": (r"svet[ae]?\s+zemlj|holy\s+land|kolevk|cradle\s+of\s+serb|manastir|monaster|\bzavet|pe[ćc]k\w*\s+patrijar", "#6b21a8"),
+    "Kosovo statehood denied": (r"(?:not|isn'?t)\s+a\s+(?:real\s+)?country|fake\s+(?:country|state)|la[žz]na\s+dr[žz]ava|nije\s+dr[žz]ava|"
+                                r"nije\s+zemlja|not\s+recogni[sz]", "#b45309"),
+    "Islamist / Sharia advocacy": (r"\b(?:sharia\w*|sheriat\w*|[šs]erijat\w*|khilaf\w*|hilafet\w*|caliphat\w*|kalifat\w*|halifat\w*|"
+                                   r"jihad\w*|d[žz]ihad\w*|xhihad\w*|ummah)\b", "#065f46"),
+    "Greater Albania / irredentism": (r"kosov[oa]\s*(?:is|është|eshte|=)\s*(?:albania|shqip\w*)|shqip[eë]ri\w*\s+(?:e|etnike)\s+madhe|"
+                                      r"greater\s+albania|bashkim\w*\s+kombëtar|natural\s+albania", "#be185d"),
+    "Pro-Kosovo independence": (r"kosov[oa]\s+(?:is|është|eshte)\s+(?:a\s+)?(?:country|independent|shtet|e\s+pavarur)|independent\s+kosov|"
+                                r"kosova\s+e\s+lir|republi\w+\s+e\s+kosov|i'?m\s+from\s+kosov|unë\s+jam\s+nga\s+kosov", "#0f766e"),
+}
+
+
+def _pseudo(a: str) -> str:
+    return "yt_" + hashlib.blake2b(str(a).encode(), digest_size=4, key=b"htccip-kosovo").hexdigest()
+
+
+def _norm(s: str) -> str:
+    return re.sub(r"\s+", " ", re.sub(r"[^\w\s]", "", str(s).lower())).strip()
+
+
+def _lang(s: str) -> str:
+    if re.search(r"[Ѐ-ӿ]", s):
+        return "SR (Cyrillic)"
+    if re.search(r"\b(je|nije|srbija|nikad|samo|sve|što|sto|kosovu|srbi)\b", s.lower()):
+        return "SR (Latin)"
+    if re.search(r"\b(është|eshte|nuk|dhe|shqip)\b", s.lower()):
+        return "SQ"
+    return "EN"
+
+
+def bench_stats() -> dict:
+    """Held-out benchmark: accuracy, and bot farms confirmed against the human labels."""
+    import scipy.sparse as sp
+    import scipy.sparse.csgraph as cg
+    meta = json.loads((HERE / "model" / "model.json").read_text(encoding="utf-8"))
+    d = HERE / "data" / "scores_cresci2017_test" / "neo4j"
+    out = {"f1": meta["metrics_random_split"]["f1"], "ci": meta.get("f1_ci"), "ece": meta["metrics_random_split"]["ece"],
+           "unseen": [min(meta["lofo_f1"].values()), max(meta["lofo_f1"].values())]}
+    if not (d / "nodes_account.csv").exists():
+        return out
+    n = pd.read_csv(d / "nodes_account.csv", dtype={"account_id": str})
+    r = pd.read_csv(d / "rels_account.csv", dtype={"src": str, "dst": str})
+    r = r[r.type.isin(["COPY", "SYNC"])]
+    ix = {a: i for i, a in enumerate(n.account_id)}
+    m = sp.coo_matrix((np.ones(len(r)), (r.src.map(ix), r.dst.map(ix))), shape=(len(n), len(n)))
+    _, comp = cg.connected_components(m + m.T, directed=False)
+    n["comp"] = comp
+    g = n.groupby("comp").agg(size=("account_id", "size"), true_bot=("label", "mean"))
+    farms = g[(g["size"] >= 5) & (g.true_bot >= 0.9)]
+    inside = n[n.comp.isin(farms.index)]
+    pred, lab = n.verdict == "BOT", n.label == 1
+    out.update({"n": int(len(n)), "correct": int((pred == lab).sum()), "fp": int((pred & ~lab).sum()), "fn": int((~pred & lab).sum()),
+                "bots": int(lab.sum()), "farms": int(len(farms)), "farm_accounts": int(farms["size"].sum()),
+                "farm_true_bots": int(inside.label.sum()), "farm_caught": int(((inside.verdict == "BOT") & (inside.label == 1)).sum()),
+                "farm_sizes": [int(x) for x in sorted(farms["size"], reverse=True)]})
+    return out
+
+
+def build(db: Path, out: Path, max_nodes: int = 520) -> Path:
+    con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
+    p = pd.read_sql("select c.user, c.text, c.ts, c.thread_id, c.account, t.title from comments c "
+                    "left join threads t on t.id = c.thread_id where coalesce(c.simulated, 0) = 0", con)
+    p["ts"] = np.where(p.ts > 1e11, p.ts / 1000, p.ts)
+
+    def created(a):
+        try:
+            return pd.Timestamp(json.loads(a).get("created")).timestamp()
+        except Exception:
+            return np.nan
+    p["created"] = p.account.map(created)
+    p["age_days"] = (p.ts - p.created) / 86400
+    p["t"] = p.text.fillna("").str.lower().map(lambda s: s.translate(CYR))
+    p["norm"] = p.text.map(_norm)
+    shared = p[p.norm.str.len() >= 6].groupby("norm").user.nunique()
+    p["copied"] = p.norm.map(shared).fillna(1) > 1
+    # bursts: same normalised text by ≥2 different accounts within 10 minutes
+    p = p.sort_values("ts")
+    burst = set()
+    for _, g in p[p.copied].groupby("norm"):
+        t, u, idx = g.ts.to_numpy(), g.user.to_numpy(), g.index.to_numpy()
+        for i in range(1, len(t)):
+            if t[i] - t[i - 1] <= 600 and u[i] != u[i - 1]:
+                burst.update([idx[i], idx[i - 1]])
+    p["burst"] = p.index.isin(burst)
+    pushes, members = [], {}
+    for name, rx in PUSHES.items():
+        g = p[p.t.str.contains(rx, regex=True)]
+        if g.empty:
+            continue
+        vc = g.groupby("norm").user.nunique().sort_values(ascending=False)
+        top = [(g[g.norm == k].text.iloc[0][:110], int(v)) for k, v in vc.head(3).items()]
+        acc = g.groupby("user").agg(copied=("copied", "max"), burst=("burst", "max"), age=("age_days", "min"))
+        new = float((acc.age < 180).mean())
+        pushes.append({"name": name, "comments": int(len(g)), "accounts": int(acc.shape[0]),
+                       "copy_accounts": int(acc.copied.sum()), "burst_accounts": int(acc.burst.sum()),
+                       "videos": int(g.thread_id.nunique()), "new_share": round(new, 3),
+                       "langs": g.text.map(_lang).value_counts().to_dict(), "examples": top,
+                       "targets": [(k[:70], int(v)) for k, v in g.title.value_counts().head(3).items()]})
+        members[name] = acc
+    pushes.sort(key=lambda d: -d["accounts"])
+    pushes = pushes[:10]
+    # graph: accounts per push (copy-paste accounts first), edges = posted the identical text
+    nodes, idx = [], {}
+    budget = max(18, max_nodes // max(1, len(pushes)))
+    for k, pu in enumerate(pushes):
+        acc = members[pu["name"]].copy()
+        acc["score"] = 100 * (0.55 * acc.copied + 0.30 * acc.burst + 0.15 * (acc.age < 180))
+        for u, r in acc.sort_values("score", ascending=False).head(budget).iterrows():
+            if u in idx:
+                continue
+            idx[u] = len(nodes)
+            nodes.append({"id": _pseudo(u), "k": k, "s": round(float(r.score), 0), "cp": bool(r.copied), "b": bool(r.burst),
+                          "new": bool(r.age < 180) if r.age == r.age else None})
+    links = []
+    sub = p[p.user.isin(idx) & p.copied]
+    for _, g in sub.groupby("norm"):
+        us = list(dict.fromkeys(g.user))[:25]
+        for i in range(len(us) - 1):
+            links.append({"s": idx[us[i]], "t": idx[us[i + 1]]})
+    # Kosovo: coordinated groups = same pro-Serbian text posted by >= 3 different accounts
+    serb = p[p.t.str.contains("|".join(f"(?:{r})" for r in PUSHES.values()), regex=True)]
+    grp = serb[serb.norm.str.len() >= 6].groupby("norm").user.nunique()
+    kgroups = grp[grp >= 3]
+    kosovo = {"groups": int(len(kgroups)), "group_accounts": int(serb[serb.norm.isin(kgroups.index)].user.nunique()),
+              "largest": int(kgroups.max()) if len(kgroups) else 0,
+              "bursts": int(serb[serb.burst].user.nunique())}
+    # motive clades: share of all comments, coordinated (copy-paste) part, and a daily timeline
+    p["day"] = pd.to_datetime(p.ts, unit="s").dt.strftime("%Y-%m-%d")
+    days = sorted(p.day.dropna().unique())[-45:]
+    motives, any_m = [], np.zeros(len(p), bool)
+    for name, (rx, col) in MOTIVES.items():
+        mm = p.t.str.contains(rx, regex=True).to_numpy()
+        any_m |= mm
+        g = p[mm]
+        motives.append({"name": name, "color": col, "comments": int(mm.sum()), "accounts": int(g.user.nunique()),
+                        "coordinated": int(g.copied.sum()), "pct_all": round(100 * mm.mean(), 2),
+                        "daily": [int(((g.day == d)).sum()) for d in days],
+                        "example": (g[g.copied].text.iloc[0] if g.copied.any() else (g.text.iloc[0] if len(g) else ""))[:120]})
+    tot = int(any_m.sum())
+    for mo in motives:
+        mo["pct_motive"] = round(100 * mo["comments"] / tot, 1) if tot else 0.0
+    motives.sort(key=lambda m: -m["comments"])
+    clade_block = {"motives": motives, "days": days, "with_motive": tot, "total": int(len(p))}
+    data = {"pushes": pushes, "nodes": nodes, "links": links[: max_nodes * 4], "kosovo": kosovo, "bench": bench_stats(), "clades": clade_block,
+            "stats": {"comments": int(len(p)), "accounts": int(p.user.nunique()), "videos": int(p.thread_id.nunique()),
+                      "in_pushes": int(sum(pu["accounts"] for pu in pushes)),
+                      "copy": int(sum(pu["copy_accounts"] for pu in pushes))}}
+    out.parent.mkdir(parents=True, exist_ok=True)
+    out.write_text(TEMPLATE.replace("__DATA__", json.dumps(data, ensure_ascii=False)), encoding="utf-8")
+    return out
+
+
+TEMPLATE = r"""<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2040%2044%22%20aria-label%3D%22KOD%20logo%22%20role%3D%22img%22%3E%3Cpath%20d%3D%22M20%202%20L36%208%20V21%20C36%2031%2029%2038.5%2020%2042%20C11%2038.5%204%2031%204%2021%20V8%20Z%22%20fill%3D%22%230b0f19%22/%3E%3Cpath%20d%3D%22M20%205.5%20L33%2010.4%20V21%20C33%2029.3%2027.4%2035.6%2020%2038.7%20C12.6%2035.6%207%2029.3%207%2021%20V10.4%20Z%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-opacity%3D%22.16%22/%3E%3Cline%20x1%3D%2213%22%20y1%3D%2217%22%20x2%3D%2227%22%20y2%3D%2215%22%20stroke%3D%22%23cbd5e1%22%20stroke-width%3D%221.6%22/%3E%3Cline%20x1%3D%2213%22%20y1%3D%2217%22%20x2%3D%2220%22%20y2%3D%2229%22%20stroke%3D%22%23cbd5e1%22%20stroke-width%3D%221.6%22/%3E%3Cline%20x1%3D%2227%22%20y1%3D%2215%22%20x2%3D%2220%22%20y2%3D%2229%22%20stroke%3D%22%23ef4444%22%20stroke-width%3D%221.8%22/%3E%3Ccircle%20cx%3D%2213%22%20cy%3D%2217%22%20r%3D%223.6%22%20fill%3D%22%23e5e7eb%22/%3E%3Ccircle%20cx%3D%2227%22%20cy%3D%2215%22%20r%3D%223.6%22%20fill%3D%22%23e5e7eb%22/%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2229%22%20r%3D%224.8%22%20fill%3D%22%23dc2626%22/%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2229%22%20r%3D%227.6%22%20fill%3D%22none%22%20stroke%3D%22%23dc2626%22%20stroke-opacity%3D%22.45%22%20stroke-width%3D%221.4%22/%3E%3C/svg%3E"><title>KOD · Kosova OSINT Defender</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
+<style>
+:root{--bg:#f4f5f7;--card:#fff;--line:#e5e7eb;--ink:#0b0f19;--mut:#6b7280}
+*{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+header{position:sticky;top:0;z-index:5;height:72px;display:flex;align-items:center;gap:22px;padding:0 26px;background:var(--card);border-bottom:1px solid var(--line)}
+h1{font-size:16px;margin:0;font-weight:700;letter-spacing:-.015em;white-space:nowrap}.sub{color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
+.tabs{display:flex;gap:6px;margin-left:18px}.tabs a{white-space:nowrap;font:600 12.5px Inter;padding:8px 12px;border-radius:8px;color:#374151;text-decoration:none;border:1px solid var(--line)}
+.tabs a.on{background:#0b0f19;color:#fff;border-color:#0b0f19}
+.kpis{display:flex;gap:26px;margin-left:auto}.kpi{text-align:right}.kpi b{display:block;font:700 19px/1.1 Inter;letter-spacing:-.02em}
+.kpi span{font-size:10.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
+main{display:grid;grid-template-columns:minmax(0,1fr) 460px;height:calc(100vh - 72px)}
+section.s{max-width:1180px;margin:0 auto;padding:64px 28px 8px}section.s h2{font-size:28px;letter-spacing:-.025em;margin:0 0 6px}
+section.s .lead{color:var(--mut);font-size:15px;max-width:760px;margin:0 0 26px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
+.tile{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+.tile .n{font:800 44px/1 Inter;letter-spacing:-.04em;font-variant-numeric:tabular-nums}.tile .l{font-weight:650;margin-top:8px}
+.tile .d{color:var(--mut);font-size:13px;margin-top:6px}.tile.dark{background:#0b0f19;color:#fff;border-color:#0b0f19}.tile.dark .d{color:#9ca3af}
+.tag{display:inline-block;font:700 10.5px Inter;letter-spacing:.07em;text-transform:uppercase;padding:4px 8px;border-radius:6px;margin-bottom:10px}
+.ok{background:#d1fae5;color:#065f46}.warn{background:#fef3c7;color:#92400e}
+.plain{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}
+.plain .tile b.k{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:6px}
+.sec li{margin:8px 0}footer{max-width:1180px;margin:0 auto;padding:40px 28px 60px;color:var(--mut);font-size:12.5px}
+#stage{position:relative;overflow:hidden}svg#g{width:100%;height:100%;display:block}
+.hlabel{font:700 12px Inter;fill:#111827;paint-order:stroke;stroke:#f4f5f7;stroke-width:4px}.hsub{font:500 11px Inter;fill:#6b7280;paint-order:stroke;stroke:#f4f5f7;stroke-width:4px}
+aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;padding:18px 22px}
+.card{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 10px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+.card:hover,.card.on{border-color:#111827;box-shadow:0 4px 14px #0b0f1914}
+.rank{font:800 20px Inter;color:#d1d5db;margin-right:10px;vertical-align:-2px}.nm{font-weight:700;font-size:14px}
+.facts{display:flex;flex-wrap:wrap;gap:6px 14px;margin:8px 0 6px;font-size:12px;color:#374151}.facts b{font-variant-numeric:tabular-nums}
+.q{font-size:12.5px;background:#f9fafb;border-left:3px solid #dc2626;padding:5px 9px;margin:5px 0;border-radius:0 6px 6px 0}
+.q span{color:var(--mut);font-size:11px;margin-left:6px}.tg{font-size:11.5px;color:var(--mut);margin-top:4px}
+.legend{position:absolute;right:20px;bottom:18px;background:#fffffff2;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--mut);max-width:330px}
+.ramp{width:240px;height:10px;border-radius:6px;margin:7px 0 4px;background:linear-gradient(90deg,#e5e7eb,#fca5a5 35%,#dc2626 62%,#7f1d1d 84%,#120202)}
+.note{font-size:12px;color:var(--mut);background:#f9fafb;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:14px}
+</style></head><body>
+<header><div style="display:flex;align-items:center;gap:11px"><svg class="kodlogo" viewBox="0 0 40 44" width="34" height="37" aria-label="KOD logo" role="img"><path d="M20 2 L36 8 V21 C36 31 29 38.5 20 42 C11 38.5 4 31 4 21 V8 Z" fill="#0b0f19"/><path d="M20 5.5 L33 10.4 V21 C33 29.3 27.4 35.6 20 38.7 C12.6 35.6 7 29.3 7 21 V10.4 Z" fill="none" stroke="#ffffff" stroke-opacity=".16"/><line x1="13" y1="17" x2="27" y2="15" stroke="#cbd5e1" stroke-width="1.6"/><line x1="13" y1="17" x2="20" y2="29" stroke="#cbd5e1" stroke-width="1.6"/><line x1="27" y1="15" x2="20" y2="29" stroke="#ef4444" stroke-width="1.8"/><circle cx="13" cy="17" r="3.6" fill="#e5e7eb"/><circle cx="27" cy="15" r="3.6" fill="#e5e7eb"/><circle cx="20" cy="29" r="4.8" fill="#dc2626"/><circle cx="20" cy="29" r="7.6" fill="none" stroke="#dc2626" stroke-opacity=".45" stroke-width="1.4"/></svg><div><h1 style="font:800 20px/1 Inter;letter-spacing:.02em;margin:0">KOD</h1><div style="font:600 11px/1.3 Inter;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap">Kosova OSINT Defender</div></div></div><div class="sub" id="sub" style="margin-left:4px;border-left:1px solid #e5e7eb;padding-left:16px"></div>
+<nav class="tabs"><a class="on" href="kosovo.html">Kosovo · pushes</a><a href="graph.html">Model proof · benchmark</a></nav>
+<div class="kpis" id="kpis"></div></header>
+<main><div id="stage"><svg id="g"></svg>
+<div class="legend"><b style="color:#0b0f19">Coordination score</b> — shade &amp; size<div class="ramp"></div>
+<div style="display:flex;justify-content:space-between;font:500 11px 'JetBrains Mono'"><span>0</span><span>50</span><span>100</span></div>
+<div style="margin-top:6px">Higher = posted word-for-word copies, in bursts with other accounts, from a brand-new channel. Lines join accounts that posted the identical text.</div></div></div>
+<aside id="side"></aside></main>
+<section class="s" id="motives"><h2>Motive clades · what is being pushed</h2>
+<p class="lead" id="mlead"></p>
+<div class="grid" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)"><div class="tile"><b class="k" style="display:block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:10px">Share of comments that carry a motive</b><div id="mbars"></div>
+<div class="d" style="margin-top:10px">Dark part of each bar = posted word-for-word by other accounts too (coordinated). A comment can carry more than one motive.</div></div>
+<div class="tile"><b class="k" style="display:block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:10px">Motive comments per day</b><svg id="mtime" width="100%" height="300"></svg><div id="mleg" class="d"></div></div></div></section>
+<section class="s" id="farms"><h2>Bot farms</h2><p class="lead">Where the truth is known we confirm. Where it is not yet known we detect, and we say which is which.</p><div class="grid" id="farmTiles"></div></section>
+<section class="s"><h2>How sure are we? In plain words</h2><p class="lead">Tested on accounts the model had never seen, against labels checked by humans.</p><div class="plain" id="plain"></div></section>
+<section class="s sec"><h2>How secure is it?</h2><div class="plain" id="secure"></div></section>
+<footer>KOD · Kosova OSINT Defender · one question per account: is it a bot? · trained model: LightGBM + relational graph network · benchmark: Cresci-2017 (human-labelled) · Kosovo data: public YouTube comments via the official API, authors pseudonymised. It measures automation and coordination; it never attributes activity to a state, group or person.</footer>
+<script>
+const D = __DATA__, S = D.stats;
+const shade = d3.scaleLinear().domain([0, 30, 55, 80, 100]).range(["#e5e7eb", "#fca5a5", "#dc2626", "#7f1d1d", "#120202"]).clamp(true);
+document.getElementById("sub").textContent = `${S.comments.toLocaleString()} real comments · ${S.accounts.toLocaleString()} accounts · ${S.videos} Kosovo/Serbia videos · authors pseudonymised`;
+document.getElementById("kpis").innerHTML = [[S.in_pushes.toLocaleString(), "accounts pushing"], [S.copy.toLocaleString(), "copy-paste accounts"], [D.pushes.length, "pushes found"]]
+  .map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("");
+const svg = d3.select("#g"), root = svg.append("g"), W = () => svg.node().clientWidth, H = () => svg.node().clientHeight;
+const zoom = d3.zoom().scaleExtent([0.3, 5]).on("zoom", (e) => root.attr("transform", e.transform)); svg.call(zoom);
+const gH = root.append("g"), gL = root.append("g"), gN = root.append("g"), gT = root.append("g");
+const n = D.pushes.length, cx = (k) => W() / 2 + Math.cos(2 * Math.PI * k / n - 1.57) * W() * 0.33, cy = (k) => H() / 2 + Math.sin(2 * Math.PI * k / n - 1.57) * H() * 0.34;
+const nodes = D.nodes.map((d) => ({ ...d })), links = D.links.map((l) => ({ source: l.s, target: l.t }));
+const link = gL.selectAll("line").data(links).join("line").attr("stroke", "#dc2626").attr("stroke-opacity", 0.18).attr("stroke-width", 1);
+const node = gN.selectAll("circle").data(nodes).join("circle").attr("r", (d) => 4.5 + d.s / 14).attr("fill", (d) => shade(d.s)).attr("stroke", "#fff").attr("stroke-width", 1.2);
+d3.forceSimulation(nodes).force("link", d3.forceLink(links).distance(14).strength((l) => l.source.k === l.target.k ? 0.15 : 0))
+  .force("charge", d3.forceManyBody().strength(-10)).force("x", d3.forceX((d) => cx(d.k)).strength(0.2)).force("y", d3.forceY((d) => cy(d.k)).strength(0.2))
+  .force("collide", d3.forceCollide((d) => 5.5 + d.s / 14)).on("tick", tick).on("end", fit);
+function tick() {
+  link.attr("x1", (l) => l.source.x).attr("y1", (l) => l.source.y).attr("x2", (l) => l.target.x).attr("y2", (l) => l.target.y);
+  node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+  const g = d3.group(nodes, (d) => d.k);
+  gH.selectAll("path").data(D.pushes).join("path").attr("fill", "#dc262606").attr("stroke", "#dc262633").attr("stroke-width", 1.2)
+    .attr("d", (p, k) => { const ps = (g.get(k) || []).flatMap((d) => [[d.x - 12, d.y - 12], [d.x + 12, d.y - 12], [d.x - 12, d.y + 12], [d.x + 12, d.y + 12]]); const h = ps.length > 2 && d3.polygonHull(ps); return h ? "M" + h.join("L") + "Z" : null; });
+  gT.selectAll("g").data(D.pushes).join((en) => { const t = en.append("g"); t.append("text").attr("class", "hlabel"); t.append("text").attr("class", "hsub").attr("dy", 15); return t; })
+    .attr("transform", (p, k) => { const ps = g.get(k) || []; return ps.length ? `translate(${d3.mean(ps, (d) => d.x)},${d3.min(ps, (d) => d.y) - 24})` : "translate(-999,-999)"; })
+    .call((t) => { t.select(".hlabel").attr("text-anchor", "middle").text((p, k) => `#${k + 1} ${p.name}`);
+      t.select(".hsub").attr("text-anchor", "middle").text((p) => `${p.accounts} accounts · ${p.copy_accounts} copy-paste`); });
+}
+function fit() { const b = root.node().getBBox(); const k = Math.min(W() / (b.width + 80), H() / (b.height + 80), 1.4);
+  svg.transition().duration(700).call(zoom.transform, d3.zoomIdentity.translate(W() / 2 - k * (b.x + b.width / 2), H() / 2 - k * (b.y + b.height / 2)).scale(k)); }
+const pct = (x) => Math.round(100 * x) + "%";
+document.getElementById("side").innerHTML = `<div class="note"><b style="color:#111827">How to read this.</b> Each card is a narrative pushed in comments under Kosovo/Serbia videos, ranked by how many accounts push it. <b>Copy-paste</b> = accounts that posted the identical text as other accounts. <b>Bursts</b> = same text from different accounts within 10 minutes. These are coordination signals for an analyst; the page does not attribute them to any state, and it does not show a bot % because the bot model is validated on the benchmark, not yet on YouTube.</div>` +
+  D.pushes.map((p, k) => `<div class="card" data-k="${k}"><div><span class="rank">${k + 1}</span><span class="nm">${p.name}</span></div>
+  <div class="facts"><span><b>${p.accounts}</b> accounts</span><span><b>${p.comments}</b> comments</span><span><b>${p.copy_accounts}</b> copy-paste</span><span><b>${p.burst_accounts}</b> in bursts</span><span><b>${pct(p.new_share)}</b> brand-new channels</span><span><b>${p.videos}</b> videos</span></div>
+  ${p.examples.map(([t, c]) => `<div class="q">${t.replace(/</g, "&lt;")}<span>${c} account${c > 1 ? "s" : ""}</span></div>`).join("")}
+  <div class="tg">Aimed at: ${p.targets.map(([t, c]) => `${t.replace(/</g, "&lt;")} (${c})`).join(" · ")}</div>
+  <div class="tg">Languages: ${Object.entries(p.langs).map(([l, c]) => `${l} ${c}`).join(" · ")}</div></div>`).join("");
+document.querySelectorAll(".card").forEach((el) => el.onclick = () => { const k = +el.dataset.k;
+  document.querySelectorAll(".card").forEach((c) => c.classList.toggle("on", c === el));
+  node.attr("opacity", (d) => d.k === k ? 1 : 0.12); link.attr("stroke-opacity", (l) => l.source.k === k ? 0.5 : 0.03); });
+svg.on("click", () => { document.querySelectorAll(".card").forEach((c) => c.classList.remove("on")); node.attr("opacity", 1); link.attr("stroke-opacity", 0.18); });
+
+const C = D.clades, mx = d3.max(C.motives, (m) => m.pct_motive) || 1;
+document.getElementById("mlead").innerHTML = `${C.with_motive.toLocaleString()} of ${C.total.toLocaleString()} real comments (${(100 * C.with_motive / C.total).toFixed(1)}%) carry at least one motive. Each clade is a fixed definition, measured in the data: if a motive barely appears, it shows as barely there.`;
+document.getElementById("mbars").innerHTML = C.motives.map((m) => {
+  const w = 100 * m.pct_motive / mx, cw = m.comments ? w * m.coordinated / m.comments : 0;
+  return `<div style="display:grid;grid-template-columns:190px 1fr 92px;gap:10px;align-items:center;margin:9px 0" title="${m.example.replace(/"/g, "&quot;")}">
+   <div style="font-size:12.5px;font-weight:600">${m.name}</div>
+   <div style="height:16px;background:#f3f4f6;border-radius:4px;position:relative;overflow:hidden"><div style="position:absolute;inset:0 auto 0 0;width:${w}%;background:${m.color};opacity:.35"></div><div style="position:absolute;inset:0 auto 0 0;width:${cw}%;background:${m.color}"></div></div>
+   <div style="font:600 12.5px 'JetBrains Mono';text-align:right">${m.pct_motive.toFixed(1)}%<span style="color:#9ca3af;font-weight:500"> · ${m.comments}</span></div></div>`; }).join("");
+(() => {
+  const el = d3.select("#mtime"), Wt = el.node().clientWidth || 480, Ht = 300, mL = 34, mB = 26, top = C.motives.filter((m) => m.comments).slice(0, 6);
+  const rows = C.days.map((d, i) => Object.fromEntries([["day", d], ...top.map((m) => [m.name, m.daily[i]])]));
+  const st = d3.stack().keys(top.map((m) => m.name))(rows), x = d3.scaleBand().domain(C.days).range([mL, Wt - 6]).padding(0.15);
+  const y = d3.scaleLinear().domain([0, d3.max(st, (l) => d3.max(l, (v) => v[1])) || 1]).nice().range([Ht - mB, 8]);
+  el.append("g").attr("transform", `translate(${mL},0)`).call(d3.axisLeft(y).ticks(5).tickSize(-(Wt - mL - 6))).call((g) => g.selectAll("line").attr("stroke", "#eef0f3")).call((g) => g.select(".domain").remove()).call((g) => g.selectAll("text").attr("fill", "#6b7280").attr("font-size", 10));
+  el.append("g").selectAll("g").data(st).join("g").attr("fill", (l) => top.find((m) => m.name === l.key).color)
+    .selectAll("rect").data((l) => l).join("rect").attr("x", (v) => x(v.data.day)).attr("width", x.bandwidth()).attr("y", (v) => y(v[1])).attr("height", (v) => y(v[0]) - y(v[1])).attr("rx", 1.5);
+  const ticks = C.days.filter((d, i) => i % Math.ceil(C.days.length / 6) === 0);
+  el.append("g").attr("transform", `translate(0,${Ht - mB})`).call(d3.axisBottom(x).tickValues(ticks).tickFormat((d) => d.slice(5))).call((g) => g.select(".domain").attr("stroke", "#e5e7eb")).call((g) => g.selectAll("text").attr("fill", "#6b7280").attr("font-size", 10));
+  document.getElementById("mleg").innerHTML = top.map((m) => `<span style="display:inline-flex;align-items:center;gap:5px;margin:6px 12px 0 0"><i style="width:10px;height:10px;border-radius:3px;background:${m.color};display:inline-block"></i>${m.name}</span>`).join("");
+})();
+const B = D.bench, K = D.kosovo, P = (x, d = 1) => (100 * x).toFixed(d) + "%";
+document.getElementById("farmTiles").innerHTML = (B.farms != null ? `
+ <div class="tile dark"><span class="tag ok">Confirmed · ground truth</span><div class="n">${B.farms}</div><div class="l">bot farms confirmed</div>
+  <div class="d">Groups of 5+ accounts that copy-paste or post in sync, at least 90% of them truly bots by human labels. Sizes: ${B.farm_sizes.join(", ")} accounts.</div></div>
+ <div class="tile"><span class="tag ok">Confirmed · ground truth</span><div class="n">${B.farm_caught.toLocaleString()} / ${B.farm_true_bots.toLocaleString()}</div><div class="l">farm bots caught</div>
+  <div class="d">Inside those farms the model flagged ${P(B.farm_caught / B.farm_true_bots)} of the real bots, on accounts it never saw in training.</div></div>` : "") + `
+ <div class="tile"><span class="tag warn">Detected · Kosovo YouTube</span><div class="n">${K.groups}</div><div class="l">coordinated pro-Serbian groups</div>
+  <div class="d">The same pro-Serbian text posted by 3+ different accounts. ${K.group_accounts} accounts involved; the largest group has ${K.largest}. ${K.bursts} accounts posted identical text within 10 minutes of each other.</div></div>
+ <div class="tile"><span class="tag warn">Next: confirm</span><div class="n">2</div><div class="l">analysts to confirm the Kosovo groups</div>
+  <div class="d">Two people label a blind sample; the tool then reports a Kosovo accuracy with its margin. Until then these are leads, not verdicts.</div></div>`;
+document.getElementById("plain").innerHTML = `
+ <div class="tile"><b class="k">How often is it right?</b><div class="n">${(B.correct ?? 0).toLocaleString()} / ${(B.n ?? 0).toLocaleString()}</div>
+  <div class="d">accounts judged correctly. It wrongly called <b>${B.fp}</b> real people bots and missed <b>${B.fn}</b> bots. Score (F1): <b>${B.f1.toFixed(3)}</b>, where 1.000 is perfect.</div></div>
+ <div class="tile"><b class="k">Margin for mistake</b><div class="n">${(100 * B.ci[0]).toFixed(1)}–${(100 * B.ci[1]).toFixed(1)}%</div>
+  <div class="d">We re-tested on 1,000 random re-draws of the test accounts. In 95% of them the score stayed inside this range. A narrow range means a stable result, not luck.</div></div>
+ <div class="tile"><b class="k">Does "80% bot" mean 80%?</b><div class="n">± ${(100 * B.ece).toFixed(1)} pts</div>
+  <div class="d">That is the "calibration error". When the model says 80%, about 80 of 100 such accounts really are bots. On average it is off by less than one percentage point.</div></div>
+ <div class="tile"><b class="k">New kinds of bots?</b><div class="n">${(100 * B.unseen[0]).toFixed(1)}–${(100 * B.unseen[1]).toFixed(1)}%</div>
+  <div class="d">We hid one whole bot type during training and tested on it, five times over. It still scored this well on bots it had never seen. This is the honest number.</div></div>
+ <div class="tile"><b class="k">What it does not prove yet</b><div class="n" style="font-size:30px">Kosovo accuracy</div>
+  <div class="d">The scores above come from human-labelled Twitter accounts. Kosovo YouTube accounts are different (often one comment each), so their accuracy is measured once analysts label a sample.</div></div>`;
+document.getElementById("secure").innerHTML = `
+ <div class="tile"><b class="k">People's privacy</b><div class="d" style="font-size:14px;color:#111827"><ul style="padding-left:18px;margin:0">
+  <li>Every author is replaced by a one-way keyed code before storage; names are dropped.</li><li>Pages like this one never contain real account IDs.</li><li>Only public comments, through the official YouTube API.</li></ul></div></div>
+ <div class="tile"><b class="k">Access</b><div class="d" style="font-size:14px;color:#111827"><ul style="padding-left:18px;margin:0">
+  <li>Stored data and analyst tools need a secret analyst key; keys never live in the code.</li><li>Public endpoints only compute on data you send; they read nothing stored.</li><li>Everything runs on our own model: no data is sent to outside AI services.</li></ul></div></div>
+ <div class="tile"><b class="k">Decisions</b><div class="d" style="font-size:14px;color:#111827"><ul style="padding-left:18px;margin:0">
+  <li>The tool says "bot or not" with a probability and its reasons; a human decides what happens next.</li><li>It never names a state, group or person behind an account.</li>
+  <li>Known gaps, said openly: no rate limiting on public endpoints yet; the free hosting sleeps when idle.</li></ul></div></div>`;
+
+</script></body></html>
+"""
+
+
+def main():
+    ap = argparse.ArgumentParser()
+    ap.add_argument("--db", default=str(HERE / "data" / "youtube_10k.db"))
+    ap.add_argument("--out", default=str(HERE.parent / "frontend" / "kosovo.html"))
+    a = ap.parse_args()
+    print(build(Path(a.db), Path(a.out)))
+
+
+if __name__ == "__main__":
+    main()

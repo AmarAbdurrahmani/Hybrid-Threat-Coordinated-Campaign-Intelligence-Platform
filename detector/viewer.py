@@ -118,7 +118,7 @@ def build(out: Path, data: str = "cresci2017", per_clade: int = 42, max_nodes: i
 
 TEMPLATE = r"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Bot detector · decision graph</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2040%2044%22%20aria-label%3D%22KOD%20logo%22%20role%3D%22img%22%3E%3Cpath%20d%3D%22M20%202%20L36%208%20V21%20C36%2031%2029%2038.5%2020%2042%20C11%2038.5%204%2031%204%2021%20V8%20Z%22%20fill%3D%22%230b0f19%22/%3E%3Cpath%20d%3D%22M20%205.5%20L33%2010.4%20V21%20C33%2029.3%2027.4%2035.6%2020%2038.7%20C12.6%2035.6%207%2029.3%207%2021%20V10.4%20Z%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-opacity%3D%22.16%22/%3E%3Cline%20x1%3D%2213%22%20y1%3D%2217%22%20x2%3D%2227%22%20y2%3D%2215%22%20stroke%3D%22%23cbd5e1%22%20stroke-width%3D%221.6%22/%3E%3Cline%20x1%3D%2213%22%20y1%3D%2217%22%20x2%3D%2220%22%20y2%3D%2229%22%20stroke%3D%22%23cbd5e1%22%20stroke-width%3D%221.6%22/%3E%3Cline%20x1%3D%2227%22%20y1%3D%2215%22%20x2%3D%2220%22%20y2%3D%2229%22%20stroke%3D%22%23ef4444%22%20stroke-width%3D%221.8%22/%3E%3Ccircle%20cx%3D%2213%22%20cy%3D%2217%22%20r%3D%223.6%22%20fill%3D%22%23e5e7eb%22/%3E%3Ccircle%20cx%3D%2227%22%20cy%3D%2215%22%20r%3D%223.6%22%20fill%3D%22%23e5e7eb%22/%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2229%22%20r%3D%224.8%22%20fill%3D%22%23dc2626%22/%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2229%22%20r%3D%227.6%22%20fill%3D%22none%22%20stroke%3D%22%23dc2626%22%20stroke-opacity%3D%22.45%22%20stroke-width%3D%221.4%22/%3E%3C/svg%3E"><title>KOD · Kosova OSINT Defender · model proof</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <style>
@@ -127,7 +127,7 @@ TEMPLATE = r"""<!doctype html>
 header{height:72px;display:flex;align-items:center;gap:22px;padding:0 26px;background:var(--card);border-bottom:1px solid var(--line)}
 .brand{display:flex;align-items:center;gap:12px}.logo{width:34px;height:34px;border-radius:9px;background:#0b0f19;display:grid;place-items:center}
 .logo i{width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,#fca5a5,#dc2626 55%,#1a0505)}
-h1{font-size:17px;margin:0;font-weight:700;letter-spacing:-.015em}.sub{color:var(--mut);font-size:12.5px}
+h1{font-size:16px;margin:0;font-weight:700;letter-spacing:-.015em;white-space:nowrap}.sub{color:var(--mut);font-size:12.5px}
 .kpis{display:flex;gap:26px;margin-left:auto}.kpi{text-align:right}.kpi b{display:block;font:700 19px/1.1 Inter;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
 .kpi span{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
 button.run{font:600 13px Inter;border:0;border-radius:9px;padding:11px 18px;background:#0b0f19;color:#fff;cursor:pointer;box-shadow:0 1px 2px #0003}
@@ -151,7 +151,8 @@ h2{font-size:15px;margin:0 0 4px;font-weight:700;letter-spacing:-.01em}h3{font-s
 .tip{position:absolute;pointer-events:none;background:#0b0f19;color:#fff;font:500 12px Inter;padding:7px 10px;border-radius:7px;opacity:0;white-space:nowrap;box-shadow:0 6px 18px #0003}
 @media(max-width:980px){main{grid-template-columns:1fr;grid-template-rows:62vh auto}.kpis{display:none}}
 </style></head><body>
-<header><div class="brand"><div class="logo"><i></i></div><div><h1>Is this account a bot?</h1><div class="sub" id="sub"></div></div></div>
+<header><div style="display:flex;align-items:center;gap:11px"><svg class="kodlogo" viewBox="0 0 40 44" width="34" height="37" aria-label="KOD logo" role="img"><path d="M20 2 L36 8 V21 C36 31 29 38.5 20 42 C11 38.5 4 31 4 21 V8 Z" fill="#0b0f19"/><path d="M20 5.5 L33 10.4 V21 C33 29.3 27.4 35.6 20 38.7 C12.6 35.6 7 29.3 7 21 V10.4 Z" fill="none" stroke="#ffffff" stroke-opacity=".16"/><line x1="13" y1="17" x2="27" y2="15" stroke="#cbd5e1" stroke-width="1.6"/><line x1="13" y1="17" x2="20" y2="29" stroke="#cbd5e1" stroke-width="1.6"/><line x1="27" y1="15" x2="20" y2="29" stroke="#ef4444" stroke-width="1.8"/><circle cx="13" cy="17" r="3.6" fill="#e5e7eb"/><circle cx="27" cy="15" r="3.6" fill="#e5e7eb"/><circle cx="20" cy="29" r="4.8" fill="#dc2626"/><circle cx="20" cy="29" r="7.6" fill="none" stroke="#dc2626" stroke-opacity=".45" stroke-width="1.4"/></svg><div><h1 style="font:800 20px/1 Inter;letter-spacing:.02em;margin:0">KOD</h1><div style="font:600 11px/1.3 Inter;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap">Kosova OSINT Defender</div></div></div><div class="sub" id="sub" style="margin-left:4px;border-left:1px solid #e5e7eb;padding-left:16px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:420px"></div>
+<nav style="display:flex;gap:6px;margin-left:14px"><a href="kosovo.html" style="font:600 12.5px Inter;padding:8px 12px;border-radius:8px;color:#374151;text-decoration:none;border:1px solid #e5e7eb">Kosovo · pushes</a><a href="graph.html" style="font:600 12.5px Inter;padding:8px 12px;border-radius:8px;background:#0b0f19;color:#fff;text-decoration:none">Model proof · benchmark</a></nav>
 <div class="kpis" id="kpis"></div><button class="run" id="run">▶ Run detector</button></header>
 <main><div id="stage"><svg id="g"></svg><div class="status" id="status"></div><div class="tip" id="tip"></div>
 <div class="legend"><b style="color:#0b0f19">BOT probability</b> — shade &amp; size<div class="ramp"></div><div class="rl"><span>0%</span><span>50%</span><span>100%</span></div>
@@ -162,7 +163,7 @@ const D = __DATA__, S = D.stats;
 const shade = d3.scaleLinear().domain([0, 35, 62, 84, 100]).range(["#e5e7eb", "#fca5a5", "#dc2626", "#7f1d1d", "#120202"]).clamp(true);
 const R = (p) => 5 + 9 * Math.pow(p / 100, 1.2), f3 = (x) => x == null ? "–" : (+x).toFixed(3);
 const CL = new Map(D.clades.map((c, i) => [c.id, { ...c, i }]));
-document.getElementById("sub").textContent = `Held-out benchmark accounts the model never trained on · ${D.nodes.length} of ${S.n.toLocaleString()} shown · ${D.clades.length} motive clades`;
+document.getElementById("sub").textContent = `Is this account a bot? · held-out benchmark accounts the model never trained on · ${D.nodes.length} of ${S.n.toLocaleString()} shown · ${D.clades.length} motive clades`;
 const kp = document.getElementById("kpis");
 kp.innerHTML = [[`${f3(S.f1)}`, "F1 held-out"], [S.unseen ? `${f3(S.unseen[0])}–${f3(S.unseen[1]).slice(1)}` : "–", "F1 unseen bot types"],
   [`${(100 * S.ece).toFixed(1)} pts`, "calibration error"], [`<em id="flag" style="font-style:normal">0</em> / ${S.n.toLocaleString()}`, "flagged BOT"]]
