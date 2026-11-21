@@ -5853,7 +5853,7 @@
   }
  },
  "checks": {
-  "generated": "2026-11-21 20:52 UTC",
+  "generated": "2026-11-21 20:58 UTC",
   "groups": [
    {
     "name": "Security",
@@ -5920,8 +5920,13 @@
      },
      {
       "name": "Live site sends security headers",
-      "status": "FAIL",
-      "detail": "request failed: <urlopen error timed out>"
+      "status": "PASS",
+      "detail": "https://htccip-graph-yll3.vercel.app/: content-security-policy, referrer-policy, x-content-type-options, x-frame-options"
+     },
+     {
+      "name": "Live site served over HTTPS",
+      "status": "PASS",
+      "detail": "HTTP 200"
      }
     ]
    },
@@ -5991,12 +5996,12 @@
      {
       "name": "Detector test suite",
       "status": "PASS",
-      "detail": "43 passed, 1 warning in 9.43s"
+      "detail": "43 passed, 1 warning in 13.56s"
      },
      {
       "name": "Backend test suite",
       "status": "PASS",
-      "detail": "32 passed, 1 warning in 5.27s"
+      "detail": "32 passed, 1 warning in 5.48s"
      }
     ]
    }

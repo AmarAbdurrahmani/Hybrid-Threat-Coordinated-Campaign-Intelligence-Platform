@@ -3,149 +3,73 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>HTCCIP · Coordinated Account Intelligence</title>
-<meta name="description" content="Real Kosovo–Serbia YouTube comments, pseudonymised, scored for coordination and explored as a graph.">
+<title>HTCCIP · Bot family map</title>
+<meta name="description" content="Bot families found in real Kosovo–Serbia YouTube comments, grouped by what they talk about.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;700&display=swap">
 <link rel="stylesheet" href="style.css">
 </head>
 <body>
-<nav class="top">
-  <a class="brand" href="#top">HTCCIP</a>
-  <div class="links">
-    <a href="#found">Found</a><a href="#families">Families</a><a href="#top10">Top 10</a><a href="#trust">Can we trust it?</a><a href="#full">Full analysis</a>
-  </div>
-</nav>
+<div class="app">
+  <header class="bar">
+    <div class="brand"><span class="logo"></span><b>HTCCIP</b><small>Coordinated-account intelligence · Kosovo</small></div>
+    <nav class="tabs" id="tabs">
+      <button data-v="families" class="on" type="button">Bot families</button>
+      <button data-v="accounts" type="button">Top 10 accounts</button>
+      <button data-v="model" type="button">The model</button>
+      <button data-v="checks" type="button">Checks</button>
+    </nav>
+    <div class="live" id="live"></div>
+  </header>
 
-<header id="top" class="hero wrap">
-  <p class="eyebrow">Challenge 01 · AI-powered OSINT &amp; hybrid threat intelligence</p>
-  <h1>Who is acting together in Kosovo's comment sections?</h1>
-  <p class="lede">We read <b id="h-comments"></b> real YouTube comments on Kosovo–Serbia videos and looked for accounts that post the same words at the same moments.</p>
-</header>
+  <div class="strip" id="strip"></div>
 
-<section id="found" class="wrap">
-  <h2>What we found</h2>
-  <p class="sub">Sorted by how sure we are. Coordination evidence is not proof: a human confirms before anyone acts.</p>
-  <div class="found" id="foundrow"></div>
-</section>
-
-<section id="families" class="wrap">
-  <h2 id="famtitle">Bot families</h2>
-  <div class="legend10"><span>⚪ one bubble = one family of linked accounts</span><span>number = accounts in it</span><span>bigger = more accounts</span><span>darker = more bot-like</span><span>circle = what they talk about</span><span>👆 tap a bubble</span></div>
-  <div class="ten">
-    <div class="bubbles"><svg id="clades" role="img" aria-label="All bot families grouped by topic"></svg></div>
-    <article class="pick" id="cpick" aria-live="polite"></article>
-  </div>
-</section>
-
-<section id="top10" class="wrap">
-  <h2>The 10 most bot-like accounts</h2>
-  <div class="legend10"><span><i class="big"></i> bigger = more bot-like</span><span><i class="near"></i><i class="near"></i> close together = same group</span><span>icon = what it talks about</span><span>👆 tap a bubble</span></div>
-  <div class="ten">
-    <div class="bubbles"><svg id="bubbles" role="img" aria-label="Top 10 accounts as bubbles"></svg></div>
-    <article class="pick" id="pick" aria-live="polite"></article>
-  </div>
-</section>
-
-<section id="trust" class="wrap">
-  <h2>Can we trust it?</h2>
-  <div class="trust" id="trustrow"></div>
-</section>
-
-<details id="full" class="wrap full">
-<summary>Show the full analysis: pipeline, graph browser, model, all checks</summary>
-<div class="kpis" id="kpis"></div>
-
-<section id="pipeline" class="wrap">
-  <h2>The pipeline, with real counts</h2>
-  <p class="sub">One run, end to end. Click a stage to see why it exists, how it works and its real numbers.</p>
-  <div class="pipe" id="pipe"></div>
-  <div class="stage card" id="stage" aria-live="polite"></div>
-</section>
-
-<section id="graph" class="wrap">
-  <h2>Graph browser</h2>
-  <p class="sub">Run a query to load a slice of the graph. Drag nodes, scroll to zoom, click a node or relationship for its properties, click a label to hide it.</p>
-  <div class="browser">
-    <aside class="queries">
-      <div class="qhead">Saved queries</div>
-      <div id="qlist"></div>
-    </aside>
-    <div class="frame">
-      <div class="frame-bar">
-        <span class="prompt">neo4j$</span>
-        <code id="cypher"></code>
-        <span class="took" id="took"></span>
-      </div>
-      <div class="frame-body">
-        <div class="viewtabs" role="tablist">
-          <button class="vt on" data-view="graph" role="tab">Graph</button>
-          <button class="vt" data-view="table" role="tab">Table</button>
-          <button class="vt" data-view="json" role="tab">Text</button>
+  <main>
+    <section id="v-families" class="view on">
+      <div class="stage">
+        <div class="stage-head">
+          <h1 id="famtitle">Bot families</h1>
+          <p>Accounts that post the same lines or keep showing up together. One bubble is one family, the number is how many accounts are in it, and families sit inside the topic they talk about. Tap a bubble.</p>
         </div>
-        <div class="canvas-wrap">
-          <div class="overview" id="overview"></div>
-          <svg id="svg" aria-label="Graph result"></svg>
-          <div class="tableview" id="tableview" hidden></div>
-          <pre class="jsonview" id="jsonview" hidden></pre>
-          <aside class="props" id="props"></aside>
-        </div>
-        <div class="frame-foot" id="foot"></div>
+        <div class="mapwrap"><svg id="map" role="img" aria-label="Bot families grouped by topic"></svg></div>
+        <div class="topics" id="topics"></div>
       </div>
-    </div>
-  </div>
-</section>
+      <aside class="dossier" id="dossier"></aside>
+    </section>
 
-<section id="model" class="wrap">
-  <h2>What the bot model learned</h2>
-  <p class="sub" id="modelsub"></p>
-  <div class="two">
-    <div class="card">
-      <h3>All instruments, strongest first</h3>
-      <p class="note">Every indicator the model uses and its share of the evidence, learned from human-labelled accounts. Nobody typed these numbers.</p>
-      <div id="weights" class="bars"></div>
-    </div>
-    <div class="card">
-      <h3>Benchmark results</h3>
-      <table class="kv" id="bench"></table>
-      <h3 class="mt">Learned link weights</h3>
-      <p class="note">How much a link to another account counts, per link type (graph neural network gates).</p>
-      <div id="gates" class="bars"></div>
-      <p class="warn" id="transfer"></p>
-    </div>
-  </div>
-  <div class="two mt">
-    <div class="card">
-      <h3>Confidence: what does "X% bot" actually mean?</h3>
-      <p class="note" id="confnote"></p>
-      <table class="kv conf" id="conf"></table>
-    </div>
-    <div class="card">
-      <h3>How much we tested</h3>
-      <p class="note">Accounts with known true labels that the models were scored on but never trained on.</p>
-      <table class="kv" id="tested"></table>
-      <p class="note mt" id="stress"></p>
-    </div>
-  </div>
-</section>
+    <section id="v-accounts" class="view">
+      <div class="pad">
+        <h1>The 10 most bot-like accounts</h1>
+        <p class="lede">Ranked by coordination evidence. Shown as letters: names are never stored. A sign of coordination is not proof, so a human checks before anyone acts.</p>
+        <div class="cards" id="cards"></div>
+      </div>
+    </section>
 
-<section id="checks" class="wrap">
-  <h2>Security and sanity checks</h2>
-  <p class="sub" id="checksub"></p>
-  <div class="checks" id="checklist"></div>
-  <div class="card mt" id="selftest-card">
-    <h3>Browser self-test <button class="gobtn" id="selftest-run" type="button">Run self-test now</button></h3>
-    <p class="note">Runs every saved query in this page, renders it, and checks that it returns nodes and relationships, that nothing is dangling, and that no account is captioned with a raw hash.</p>
-    <div id="selftest"></div>
-  </div>
-</section>
+    <section id="v-model" class="view">
+      <div class="pad">
+        <h1>The bot model</h1>
+        <p class="lede" id="modellede"></p>
+        <div class="cols">
+          <div class="panel"><h2>All instruments, strongest first</h2><p class="hint">Share of the evidence each indicator carries. Learned from labelled accounts, not set by hand.</p><div class="bars two" id="weights"></div></div>
+          <div class="stack">
+            <div class="panel"><h2>When it says “bot”, is it right?</h2><p class="hint" id="confhint"></p><table class="tbl" id="conf"></table></div>
+            <div class="panel"><h2>Benchmark</h2><table class="tbl" id="bench"></table></div>
+            <div class="panel"><h2>How much we tested</h2><table class="tbl" id="tested"></table><p class="hint" id="stress"></p></div>
+            <div class="panel warn"><h2>Limit we state openly</h2><p id="transfer"></p></div>
+          </div>
+        </div>
+      </div>
+    </section>
 
-</details>
-
-<footer class="wrap foot">
-  <p>Scores are indicators of coordination for a human analyst. They are never attribution: the platform measures behaviour, not identity or sponsor. Accounts appear only as letters or keyed hashes; no names or channel IDs are stored. Only the 10 example comments above are shown, shortened.</p>
-</footer>
-
+    <section id="v-checks" class="view">
+      <div class="pad">
+        <h1 id="checktitle">Checks</h1>
+        <p class="lede" id="checklede"></p>
+        <div class="cols three" id="checklist"></div>
+      </div>
+    </section>
+  </main>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
 <script src="app.js"></script>
 </body>
