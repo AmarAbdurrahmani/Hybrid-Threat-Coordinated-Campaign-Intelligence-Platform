@@ -102,6 +102,23 @@ def bench_stats() -> dict:
                 "bots": int(lab.sum()), "farms": int(len(farms)), "farm_accounts": int(farms["size"].sum()),
                 "farm_true_bots": int(inside.label.sum()), "farm_caught": int(((inside.verdict == "BOT") & (inside.label == 1)).sum()),
                 "farm_sizes": [int(x) for x in sorted(farms["size"], reverse=True)]})
+    # confidence tiers on held-out accounts, and how often each tier was really a bot
+    sc = pd.read_csv(HERE / "data" / "scores_cresci2017_test" / "scores.csv")
+    tiers = []
+    for lo, hi, nm in [(99.5, 101, "100% (≥ 99.5%)"), (70, 99.5, "70 – 99.5%"), (50, 70, "50 – 70%"), (0, 50, "below 50% (not bot)")]:
+        t = sc[(sc.bot_probability >= lo) & (sc.bot_probability < hi)]
+        tiers.append({"name": nm, "n": int(len(t)), "true": round(100 * float(t.label.mean()), 1) if len(t) else None, "bots": int(t.label.sum())})
+    hi70 = sc[sc.bot_probability >= 70]
+    out.update({"tiers": tiers, "n70": int(len(hi70)), "true70": round(100 * float(hi70.label.mean()), 1)})
+    # how much data stands behind the model
+    try:
+        from . import datasets, evaluate as E
+        acc, posts = datasets.load("cresci2017")
+        acc = acc[acc.account_id.isin(set(posts.account_id))]
+        _, _, te = E.split_stratified(acc, test=0.2, val=0.1, seed=0)
+        out.update({"train_posts": int(len(posts)), "train_accounts": int(len(acc)), "test_posts": int(posts.account_id.isin(set(te)).sum())})
+    except Exception:
+        pass
     return out
 
 
@@ -246,6 +263,17 @@ aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;pad
 <div style="display:flex;justify-content:space-between;font:500 11px 'JetBrains Mono'"><span>0</span><span>50</span><span>100</span></div>
 <div style="margin-top:6px">Higher = posted word-for-word copies, in bursts with other accounts, from a brand-new channel. Lines join accounts that posted the identical text.</div></div></div>
 <aside id="side"></aside></main>
+<section class="s" id="numbers"><h2>By the numbers</h2>
+<p class="lead">A trained model, not a rule list. It learns every weight from labelled accounts and is tested on accounts it has never seen.</p>
+<div class="grid" id="numTiles"></div>
+<div class="grid" style="grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);margin-top:14px">
+<div class="tile"><b class="k" style="display:block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:12px">How many bots, how sure, how much to trust it</b><div id="tiers"></div>
+<div class="d" style="margin-top:10px">"Truly bots" = checked against human labels on held-out accounts. The higher the confidence, the more often it is right: that is what a calibrated model looks like.</div></div>
+<div class="tile"><b class="k" style="display:block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:12px">Gets better with every labelled batch</b>
+<ol style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.6"><li><b>Collect</b> public comments through the official APIs.</li><li><b>Label</b>: two analysts mark a blind sample bot / human.</li>
+<li><b>Retrain</b> LightGBM + the graph network on all labels so far.</li><li><b>Prove</b> on held-out accounts. A new model replaces the old one only if it scores better.</li></ol>
+<div class="d" style="margin-top:10px">The Kosovo labelling sheet is the next batch, which turns Kosovo leads into confirmed numbers.</div></div></div>
+<div class="tile" style="margin-top:14px"><b class="k" style="display:block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:10px">Main sources</b><div id="sources" class="plain"></div></div></section>
 <section class="s" id="motives"><h2>Motive clades · what is being pushed</h2>
 <p class="lead" id="mlead"></p>
 <div class="grid" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)"><div class="tile"><b class="k" style="display:block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:10px">Share of comments that carry a motive</b><div id="mbars"></div>
@@ -296,6 +324,27 @@ document.querySelectorAll(".card").forEach((el) => el.onclick = () => { const k 
   node.attr("opacity", (d) => d.k === k ? 1 : 0.12); link.attr("stroke-opacity", (l) => l.source.k === k ? 0.5 : 0.03); });
 svg.on("click", () => { document.querySelectorAll(".card").forEach((c) => c.classList.remove("on")); node.attr("opacity", 1); link.attr("stroke-opacity", 0.18); });
 
+
+(() => {
+  const B = D.bench, fmt = (x) => (x ?? 0).toLocaleString();
+  document.getElementById("numTiles").innerHTML = [
+    [fmt(B.train_posts), "posts the model learned from", `${fmt(B.train_accounts)} human-labelled accounts`],
+    [fmt(B.test_posts), "posts in the blind test", `${fmt(B.n)} accounts it had never seen`],
+    [fmt(S.comments), "real Kosovo/Serbia comments analysed", `${fmt(S.accounts)} accounts · ${S.videos} videos`],
+    [`${fmt(B.n70)}`, "bots found at 70%+ confidence", `${B.true70}% of them truly bots`]]
+    .map(([n, l, d], i) => `<div class="tile${i === 3 ? " dark" : ""}"><div class="n">${n}</div><div class="l">${l}</div><div class="d">${d}</div></div>`).join("");
+  document.getElementById("tiers").innerHTML = `<div style="display:grid;grid-template-columns:150px 90px 1fr 70px;gap:8px 12px;align-items:center;font-size:13px">
+    <div class="d" style="margin:0">Model says</div><div class="d" style="margin:0">Accounts</div><div class="d" style="margin:0">Truly bots (trust)</div><div></div>` +
+    B.tiers.map((t) => `<div style="font-weight:650">${t.name}</div><div style="font:600 13px 'JetBrains Mono'">${t.n.toLocaleString()}</div>
+     <div style="height:14px;background:#f3f4f6;border-radius:4px;overflow:hidden"><div style="height:100%;width:${t.true ?? 0}%;background:${shade(t.true ?? 0)}"></div></div>
+     <div style="font:600 13px 'JetBrains Mono';text-align:right">${t.true == null ? "–" : t.true.toFixed(1) + "%"}</div>`).join("") + `</div>`;
+  document.getElementById("sources").innerHTML = [
+    ["Cresci-2017 bot benchmark", "Indiana University Bot Repository. 14,368 human-labelled accounts: genuine users plus fake followers, social spambots and traditional spambots. Training and blind test."],
+    ["YouTube Data API v3", "Official API, public comments only. 69 Kosovo/Serbia videos, 10,275 comments, authors pseudonymised before storage."],
+    ["Account-profile network", "Our second model (5 public profile counts), trained on 11 Bot Repository datasets with 3 kept fully separate for testing; live at /api/bot/account."],
+    ["Narrative lexicon", "Our Albanian, Serbian (Latin + Cyrillic) and English patterns for the motive clades on this page."]]
+    .map(([t, d]) => `<div><div style="font-weight:700;font-size:13.5px">${t}</div><div class="d">${d}</div></div>`).join("");
+})();
 const C = D.clades, mx = d3.max(C.motives, (m) => m.pct_motive) || 1;
 document.getElementById("mlead").innerHTML = `${C.with_motive.toLocaleString()} of ${C.total.toLocaleString()} real comments (${(100 * C.with_motive / C.total).toFixed(1)}%) carry at least one motive. Each clade is a fixed definition, measured in the data: if a motive barely appears, it shows as barely there.`;
 document.getElementById("mbars").innerHTML = C.motives.map((m) => {
