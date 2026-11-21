@@ -266,11 +266,11 @@ def build(db: Path, out: Path, max_nodes: int = 520) -> Path:
 
 TEMPLATE = r"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<link rel="icon" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2040%2044%22%20aria-label%3D%22KOD%20logo%22%20role%3D%22img%22%3E%3Cpath%20d%3D%22M20%202%20L36%208%20V21%20C36%2031%2029%2038.5%2020%2042%20C11%2038.5%204%2031%204%2021%20V8%20Z%22%20fill%3D%22%230b0f19%22/%3E%3Cpath%20d%3D%22M20%205.5%20L33%2010.4%20V21%20C33%2029.3%2027.4%2035.6%2020%2038.7%20C12.6%2035.6%207%2029.3%207%2021%20V10.4%20Z%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-opacity%3D%22.16%22/%3E%3Cline%20x1%3D%2213%22%20y1%3D%2217%22%20x2%3D%2227%22%20y2%3D%2215%22%20stroke%3D%22%23cbd5e1%22%20stroke-width%3D%221.6%22/%3E%3Cline%20x1%3D%2213%22%20y1%3D%2217%22%20x2%3D%2220%22%20y2%3D%2229%22%20stroke%3D%22%23cbd5e1%22%20stroke-width%3D%221.6%22/%3E%3Cline%20x1%3D%2227%22%20y1%3D%2215%22%20x2%3D%2220%22%20y2%3D%2229%22%20stroke%3D%22%23ef4444%22%20stroke-width%3D%221.8%22/%3E%3Ccircle%20cx%3D%2213%22%20cy%3D%2217%22%20r%3D%223.6%22%20fill%3D%22%23e5e7eb%22/%3E%3Ccircle%20cx%3D%2227%22%20cy%3D%2215%22%20r%3D%223.6%22%20fill%3D%22%23e5e7eb%22/%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2229%22%20r%3D%224.8%22%20fill%3D%22%23dc2626%22/%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2229%22%20r%3D%227.6%22%20fill%3D%22none%22%20stroke%3D%22%23dc2626%22%20stroke-opacity%3D%22.45%22%20stroke-width%3D%221.4%22/%3E%3C/svg%3E"><title>KOD · Kosova OSINT Defender</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg%20viewBox%3D%220%200%2040%2044%22%20aria-label%3D%22Angry%20Birds%20logo%22%20role%3D%22img%22%3E%3Cpath%20d%3D%22M20%202%20L36%208%20V21%20C36%2031%2029%2038.5%2020%2042%20C11%2038.5%204%2031%204%2021%20V8%20Z%22%20fill%3D%22%230b0f19%22/%3E%3Cpath%20d%3D%22M20%205.5%20L33%2010.4%20V21%20C33%2029.3%2027.4%2035.6%2020%2038.7%20C12.6%2035.6%207%2029.3%207%2021%20V10.4%20Z%22%20fill%3D%22none%22%20stroke%3D%22%23ffffff%22%20stroke-opacity%3D%22.16%22/%3E%3Cline%20x1%3D%2213%22%20y1%3D%2217%22%20x2%3D%2227%22%20y2%3D%2215%22%20stroke%3D%22%23cbd5e1%22%20stroke-width%3D%221.6%22/%3E%3Cline%20x1%3D%2213%22%20y1%3D%2217%22%20x2%3D%2220%22%20y2%3D%2229%22%20stroke%3D%22%23cbd5e1%22%20stroke-width%3D%221.6%22/%3E%3Cline%20x1%3D%2227%22%20y1%3D%2215%22%20x2%3D%2220%22%20y2%3D%2229%22%20stroke%3D%22%23ef4444%22%20stroke-width%3D%221.8%22/%3E%3Ccircle%20cx%3D%2213%22%20cy%3D%2217%22%20r%3D%223.6%22%20fill%3D%22%23e5e7eb%22/%3E%3Ccircle%20cx%3D%2227%22%20cy%3D%2215%22%20r%3D%223.6%22%20fill%3D%22%23e5e7eb%22/%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2229%22%20r%3D%224.8%22%20fill%3D%22%23dc2626%22/%3E%3Ccircle%20cx%3D%2220%22%20cy%3D%2229%22%20r%3D%227.6%22%20fill%3D%22none%22%20stroke%3D%22%23dc2626%22%20stroke-opacity%3D%22.45%22%20stroke-width%3D%221.4%22/%3E%3C/svg%3E"><title>Angry Birds @ Ministria e Mbrojtjes</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <style>
-:root{--bg:#f4f5f7;--card:#fff;--line:#e5e7eb;--ink:#0b0f19;--mut:#6b7280;--kblue:#244aa5;--kgold:#d0a650;--knavy:#13235b}
+:root{--bg:#edf2f7;--card:#fff;--line:#e5e7eb;--ink:#161616;--mut:#6b7280;--kblue:#04408b;--kgold:#d2ab67;--knavy:#032f66}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
 header{position:sticky;top:0;z-index:5;height:72px;border-top:3px solid var(--kgold);display:flex;align-items:center;gap:22px;padding:0 26px;background:var(--card);border-bottom:1px solid var(--line)}
 h1{font-size:16px;margin:0;font-weight:700;letter-spacing:-.015em;white-space:nowrap}.sub{color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
@@ -280,7 +280,7 @@ h1{font-size:16px;margin:0;font-weight:700;letter-spacing:-.015em;white-space:no
 .kpi span{font-size:10.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
 main{display:grid;grid-template-columns:minmax(0,1fr) 440px;height:calc(100vh - 150px);min-height:520px;border-bottom:1px solid var(--line)}
 .card .q,.card .tg{display:none}.card.on .q,.card.on .tg{display:block}.card .more{font-size:11.5px;color:#6b7280;margin-top:4px}.card.on .more{display:none}
-.scrollcue{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:#0b0f19;color:#fff;font:600 12px Inter;padding:8px 14px;border-radius:999px;text-decoration:none;box-shadow:0 6px 18px #0b0f1930}
+.scrollcue{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:#04408b;color:#fff;font:600 12px Inter;padding:8px 14px;border-radius:999px;text-decoration:none;box-shadow:0 6px 18px #0b0f1930}
 .zoomhint{position:absolute;right:16px;top:12px;font-size:11.5px;color:#6b7280;background:#ffffffd9;border:1px solid var(--line);border-radius:7px;padding:4px 8px}
 section.s{max-width:1180px;margin:0 auto;padding:64px 28px 8px}section.s h2{font-size:28px;letter-spacing:-.025em;margin:0 0 6px}
 section.s .lead{color:var(--mut);font-size:15px;max-width:760px;margin:0 0 26px}
@@ -294,7 +294,7 @@ section.s .lead{color:var(--mut);font-size:15px;max-width:760px;margin:0 0 26px}
 .plain .tile b.k{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:6px}
 .sec li{margin:8px 0}.chipx{background:#f3f4f6;border-radius:999px;padding:4px 10px;color:#374151}footer{max-width:1180px;margin:0 auto;padding:40px 28px 60px;color:var(--mut);font-size:12.5px}
 #stage{position:relative;overflow:hidden}svg#g{width:100%;height:100%;display:block}
-.hlabel{font:700 12px Inter;fill:#111827;paint-order:stroke;stroke:#f4f5f7;stroke-width:4px}.hsub{font:500 11px Inter;fill:#6b7280;paint-order:stroke;stroke:#f4f5f7;stroke-width:4px}
+.hlabel{font:700 12px Inter;fill:#111827;paint-order:stroke;stroke:#edf2f7;stroke-width:4px}.hsub{font:500 11px Inter;fill:#6b7280;paint-order:stroke;stroke:#edf2f7;stroke-width:4px}
 aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;padding:18px 22px}
 .card{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin:0 0 10px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
 .card:hover,.card.on{border-color:#111827;box-shadow:0 4px 14px #0b0f1914}
@@ -306,7 +306,7 @@ aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;pad
 .ramp{width:240px;height:10px;border-radius:6px;margin:7px 0 4px;background:linear-gradient(90deg,#e5e7eb,#fca5a5 35%,#dc2626 62%,#7f1d1d 84%,#120202)}
 .note{font-size:12px;color:var(--mut);background:#f9fafb;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:14px}
 </style></head><body>
-<header><div style="display:flex;align-items:center;gap:11px"><svg class="kodlogo" viewBox="0 0 40 44" width="34" height="37" aria-label="KOD logo" role="img"><path d="M20 2 L36 8 V21 C36 31 29 38.5 20 42 C11 38.5 4 31 4 21 V8 Z" fill="#244aa5"/><path d="M20 5.5 L33 10.4 V21 C33 29.3 27.4 35.6 20 38.7 C12.6 35.6 7 29.3 7 21 V10.4 Z" fill="none" stroke="#ffffff" stroke-opacity=".16"/><line x1="13" y1="17" x2="27" y2="15" stroke="#cbd5e1" stroke-width="1.6"/><line x1="13" y1="17" x2="20" y2="29" stroke="#cbd5e1" stroke-width="1.6"/><line x1="27" y1="15" x2="20" y2="29" stroke="#ef4444" stroke-width="1.8"/><circle cx="13" cy="17" r="3.6" fill="#e5e7eb"/><circle cx="27" cy="15" r="3.6" fill="#e5e7eb"/><circle cx="20" cy="29" r="4.8" fill="#dc2626"/><circle cx="20" cy="29" r="7.6" fill="none" stroke="#dc2626" stroke-opacity=".45" stroke-width="1.4"/></svg><div><h1 style="font:800 20px/1 Inter;letter-spacing:.02em;margin:0">KOD</h1><div style="font:600 11px/1.3 Inter;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap">Kosova OSINT Defender</div></div></div><div style="margin-left:6px;border-left:1px solid #e5e7eb;padding-left:18px;display:flex;align-items:center"><img src="mod-logo.png" alt="Republika e Kosovës · Ministria e Mbrojtjes" style="height:44px;width:auto;display:block"></div>
+<header><div style="display:flex;align-items:center;gap:11px"><svg class="kodlogo" viewBox="0 0 40 44" width="34" height="37" aria-label="Angry Birds logo" role="img"><path d="M20 2 L36 8 V21 C36 31 29 38.5 20 42 C11 38.5 4 31 4 21 V8 Z" fill="#04408b"/><path d="M20 5.5 L33 10.4 V21 C33 29.3 27.4 35.6 20 38.7 C12.6 35.6 7 29.3 7 21 V10.4 Z" fill="none" stroke="#ffffff" stroke-opacity=".16"/><line x1="13" y1="17" x2="27" y2="15" stroke="#cbd5e1" stroke-width="1.6"/><line x1="13" y1="17" x2="20" y2="29" stroke="#cbd5e1" stroke-width="1.6"/><line x1="27" y1="15" x2="20" y2="29" stroke="#ef4444" stroke-width="1.8"/><circle cx="13" cy="17" r="3.6" fill="#e5e7eb"/><circle cx="27" cy="15" r="3.6" fill="#e5e7eb"/><circle cx="20" cy="29" r="4.8" fill="#dc2626"/><circle cx="20" cy="29" r="7.6" fill="none" stroke="#dc2626" stroke-opacity=".45" stroke-width="1.4"/></svg><div><h1 style="font:800 19px/1.05 Inter;letter-spacing:-.01em;margin:0;color:#04408b;white-space:nowrap">Angry Birds</h1><div style="font:700 11px/1.3 Inter;color:#d2ab67;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap">@ Ministria e Mbrojtjes</div></div></div><div style="margin-left:6px;border-left:1px solid #e5e7eb;padding-left:18px;display:flex;align-items:center"><img src="mod-logo.png" alt="Republika e Kosovës · Ministria e Mbrojtjes" style="height:44px;width:auto;display:block"></div>
 
 </header>
 <main><div id="stage"><svg id="g"></svg><a class="scrollcue" href="#numbers">Scroll for motives, bot farms &amp; accuracy ↓</a><div class="zoomhint">Ctrl + scroll to zoom · drag to pan</div>
@@ -342,11 +342,11 @@ aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;pad
 <p class="lead" style="font-size:16px">Built and proven on Kosovo. The same trained detector, account graph and motive clades apply wherever coordinated accounts fight for opinion.</p>
 <div id="thCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px"></div>
 <div class="tile" style="margin-top:16px;padding:22px 24px">
- <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><b style="font-size:16px">How each theatre shows up in KOD’s signals</b>
+ <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><b style="font-size:16px">How each theatre shows up in our signals</b>
  <span class="d" style="margin:0">Lines = the signal that reveals that theatre’s campaigns · hover a theatre · <b style="color:#065f46">live</b> = working today · <b style="color:#92400e">next</b> = on the roadmap</span></div>
  <svg id="thGraph" width="100%" height="460" style="display:block;margin-top:10px"></svg></div>
 </section>
-<footer>KOD · Kosova OSINT Defender · built for Ministria e Mbrojtjes · hackathon prototype · one question per account: is it a bot? · trained model: LightGBM + relational graph network · benchmark: Cresci-2017 (human-labelled) · Kosovo data: public YouTube comments via the official API, authors pseudonymised. It measures automation and coordination; it never attributes activity to a state, group or person.</footer>
+<footer>Angry Birds @ Ministria e Mbrojtjes · hackathon prototype · one question per account: is it a bot? · trained model: LightGBM + relational graph network · benchmark: Cresci-2017 (human-labelled) · Kosovo data: public YouTube comments via the official API, authors pseudonymised. It measures automation and coordination; it never attributes activity to a state, group or person.</footer>
 <script>
 const D = __DATA__, S = D.stats;
 const shade = d3.scaleLinear().domain([0, 30, 55, 80, 100]).range(["#e5e7eb", "#fca5a5", "#dc2626", "#7f1d1d", "#120202"]).clamp(true);
@@ -468,11 +468,11 @@ function bindCards() {
 }
 function showAccount(d) {
   const nb = new Set([d]); links.forEach((l) => { if (l.source === d) nb.add(l.target); if (l.target === d) nb.add(l.source); });
-  node.attr("opacity", (n) => nb.has(n) ? 1 : 0.12).attr("stroke", (n) => n === d ? "#244aa5" : "#fff").attr("stroke-width", (n) => n === d ? 3 : 1.2);
+  node.attr("opacity", (n) => nb.has(n) ? 1 : 0.12).attr("stroke", (n) => n === d ? "#04408b" : "#fff").attr("stroke-width", (n) => n === d ? 3 : 1.2);
   link.attr("stroke-opacity", (l) => l.source === d || l.target === d ? 0.7 : 0.03);
   const parts = [["Posted word-for-word copies", d.cp, 55], ["In a 10-minute burst with others", d.b, 30], ["Channel under 6 months old", d.new, 15]];
   const ageTxt2 = d.age == null ? "unknown" : d.age < 31 ? `${d.age} days` : d.age < 365 ? `${Math.round(d.age / 30.4)} months` : `${(d.age / 365).toFixed(1)} years`;
-  document.getElementById("side").innerHTML = `<a href="#" id="home" style="font:600 12.5px Inter;color:#244aa5;text-decoration:none">← all pushes</a>
+  document.getElementById("side").innerHTML = `<a href="#" id="home" style="font:600 12.5px Inter;color:#04408b;text-decoration:none">← all pushes</a>
    <div style="display:flex;gap:12px;align-items:center;margin:14px 0 6px">${avatar(d.id, 46)}<div><div style="font:700 15px 'JetBrains Mono'">${d.id}</div>
    <div class="muted" style="font-size:12.5px;color:#6b7280">pseudonymised YouTube author · ${d.n} comment${d.n > 1 ? "s" : ""} in the data</div></div></div>
    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0">
@@ -494,7 +494,7 @@ const B = D.bench, K = D.kosovo, P = (x, d = 1) => (100 * x).toFixed(d) + "%";
 (() => {
   const F = (cc, h = 26) => `<img src="https://flagcdn.com/h40/${cc}.png" alt="${cc.toUpperCase()}" style="height:${h}px;border-radius:4px;box-shadow:0 0 0 1px #0b0f1922">`;
   const TH = [
-    { id: "xk", name: "Kosovo – Serbia", sub: "proven here", flags: ["xk", "rs"], col: "#244aa5",
+    { id: "xk", name: "Kosovo – Serbia", sub: "proven here", flags: ["xk", "rs"], col: "#04408b",
       text: `${D.kosovo.groups} coordinated pro-Serbian copy groups and ${D.pushes.length} narrative pushes found in ${D.stats.comments.toLocaleString()} real comments.`, sig: ["copy", "sync", "fresh", "motive"] },
     { id: "ua", name: "Ukraine – Russia", sub: "“Doppelganger” type", flags: ["ua", "ru"], col: "#0057b7",
       text: "Cloned-media and bot-amplification networks.", sig: ["links", "copy", "paid", "cross"] },
