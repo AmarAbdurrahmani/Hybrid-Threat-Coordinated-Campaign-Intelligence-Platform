@@ -192,6 +192,26 @@ def build(db: Path, out: Path, max_nodes: int = 520) -> Path:
         nd["n"] = int(len(mine))
         nd["pk"] = [pk[name] for name in pk if u in in_push.get(name, ())]
         nd["partners"] = int(max([int(shared.get(x, 1)) for x in mine.norm] + [1]) - 1)
+        vids = int(mine.thread_id.nunique())
+        copies = nd["partners"] + 1
+        comps = []
+        if copies > 1:
+            comps.append(["Word-for-word copies", round(40 * min(1.0, np.log(copies) / np.log(51)), 1),
+                          f"its text was posted by {copies} accounts"])
+        if nd["b"]:
+            comps.append(["Burst with other accounts", 25.0, "same text from another account within 10 minutes"])
+        a = nd["age"]
+        if a is not None and a < 365:
+            pts = 15.0 if a < 30 else 9.0 if a < 180 else 4.0
+            comps.append(["Fresh channel", pts, f"channel {a} days old when it commented"])
+        if nd["fol"] == 0:
+            comps.append(["No audience", 5.0, "0 subscribers"])
+        if vids > 1:
+            comps.append(["Repeated across videos", round(min(10.0, 2.5 * (vids - 1)), 1), f"commented under {vids} different videos"])
+        if len(nd["pk"]) >= 2:
+            comps.append(["Several narratives", 5.0, f"part of {len(nd['pk'])} pushes"])
+        nd["comps"] = comps
+        nd["s"] = round(min(100.0, sum(c[1] for c in comps)), 1)
     links = []
     sub = p[p.user.isin(idx) & p.copied]
     idx = {u: i for i, u in enumerate(idx)} if False else idx
@@ -304,13 +324,13 @@ aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;pad
 .ramp{width:240px;height:10px;border-radius:6px;margin:7px 0 4px;background:linear-gradient(90deg,#e5e7eb,#fca5a5 35%,#dc2626 62%,#7f1d1d 84%,#120202)}
 .note{font-size:12px;color:var(--mut);background:#f9fafb;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:14px}
 </style></head><body>
-<header><div style="display:flex;align-items:center;gap:11px"><svg class="kodlogo" viewBox="0 0 40 44" width="34" height="37" aria-label="Angry Birds logo" role="img"><path d="M20 2 L36 8 V21 C36 31 29 38.5 20 42 C11 38.5 4 31 4 21 V8 Z" fill="#04408b"/><path d="M20 5.5 L33 10.4 V21 C33 29.3 27.4 35.6 20 38.7 C12.6 35.6 7 29.3 7 21 V10.4 Z" fill="none" stroke="#ffffff" stroke-opacity=".16"/><line x1="13" y1="17" x2="27" y2="15" stroke="#cbd5e1" stroke-width="1.6"/><line x1="13" y1="17" x2="20" y2="29" stroke="#cbd5e1" stroke-width="1.6"/><line x1="27" y1="15" x2="20" y2="29" stroke="#ef4444" stroke-width="1.8"/><circle cx="13" cy="17" r="3.6" fill="#e5e7eb"/><circle cx="27" cy="15" r="3.6" fill="#e5e7eb"/><circle cx="20" cy="29" r="4.8" fill="#dc2626"/><circle cx="20" cy="29" r="7.6" fill="none" stroke="#dc2626" stroke-opacity=".45" stroke-width="1.4"/></svg><div><h1 style="font:800 19px/1.05 Inter;letter-spacing:-.01em;margin:0;color:#04408b;white-space:nowrap">Angry Birds</h1><div style="font:700 11px/1.3 Inter;color:#d2ab67;letter-spacing:.05em;text-transform:uppercase;white-space:nowrap">@ Ministria e Mbrojtjes</div></div></div><div style="margin-left:6px;border-left:1px solid #e5e7eb;padding-left:18px;display:flex;align-items:center"><img src="mod-logo.png" alt="Republika e Kosovës · Ministria e Mbrojtjes" style="height:44px;width:auto;display:block"></div>
+<header><div style="display:flex;align-items:center;gap:11px"><svg class="kodlogo" viewBox="0 0 40 44" width="48" height="53" aria-label="Angry Birds logo" role="img"><path d="M20 2 L36 8 V21 C36 31 29 38.5 20 42 C11 38.5 4 31 4 21 V8 Z" fill="#04408b"/><path d="M20 5.5 L33 10.4 V21 C33 29.3 27.4 35.6 20 38.7 C12.6 35.6 7 29.3 7 21 V10.4 Z" fill="none" stroke="#ffffff" stroke-opacity=".16"/><line x1="13" y1="17" x2="27" y2="15" stroke="#cbd5e1" stroke-width="1.6"/><line x1="13" y1="17" x2="20" y2="29" stroke="#cbd5e1" stroke-width="1.6"/><line x1="27" y1="15" x2="20" y2="29" stroke="#ef4444" stroke-width="1.8"/><circle cx="13" cy="17" r="3.6" fill="#e5e7eb"/><circle cx="27" cy="15" r="3.6" fill="#e5e7eb"/><circle cx="20" cy="29" r="4.8" fill="#dc2626"/><circle cx="20" cy="29" r="7.6" fill="none" stroke="#dc2626" stroke-opacity=".45" stroke-width="1.4"/></svg><div><h1 style="font:800 26px/1 Inter;letter-spacing:-.02em;margin:0;color:#04408b;white-space:nowrap">Angry Birds</h1></div></div><div style="margin-left:6px;border-left:1px solid #e5e7eb;padding-left:18px;display:flex;align-items:center"><img src="mod-logo.png" alt="Republika e Kosovës · Ministria e Mbrojtjes" style="height:44px;width:auto;display:block"></div>
 
 </header>
 <main><div id="stage"><svg id="g"></svg><a class="scrollcue" href="#numbers">Scroll for motives, bot farms &amp; accuracy ↓</a><div class="zoomhint">Ctrl + scroll to zoom · drag to pan</div>
 <div class="legend"><b style="color:#0b0f19">Coordination score</b> — shade &amp; size<div class="ramp"></div>
 <div style="display:flex;justify-content:space-between;font:500 11px 'JetBrains Mono'"><span>0</span><span>50</span><span>100</span></div>
-<div style="margin-top:6px">Higher = posted word-for-word copies, in bursts with other accounts, from a brand-new channel. Lines join accounts that posted the identical text.</div></div></div>
+<div style="margin-top:6px">Coordination likelihood per account: copies, bursts, fresh channel, no audience, repetition across videos and narratives. Lines join accounts that posted the identical text.</div></div></div>
 <aside id="side"></aside></main>
 <section class="s" id="numbers"><h2>By the numbers</h2>
 <p class="lead">A trained model, not a rule list. It learns every weight from labelled accounts and is tested on accounts it has never seen.</p>
@@ -468,22 +488,29 @@ function showAccount(d) {
   const nb = new Set([d]); links.forEach((l) => { if (l.source === d) nb.add(l.target); if (l.target === d) nb.add(l.source); });
   node.attr("opacity", (n) => nb.has(n) ? 1 : 0.12).attr("stroke", (n) => n === d ? "#04408b" : "#fff").attr("stroke-width", (n) => n === d ? 3 : 1.2);
   link.attr("stroke-opacity", (l) => l.source === d || l.target === d ? 0.7 : 0.03);
-  const parts = [["Posted word-for-word copies", d.cp, 55], ["In a 10-minute burst with others", d.b, 30], ["Channel under 6 months old", d.new, 15]];
+  const COL = { "Word-for-word copies": "#991b1b", "Burst with other accounts": "#dc2626", "Fresh channel": "#d2ab67", "No audience": "#9ca3af", "Repeated across videos": "#04408b", "Several narratives": "#6b21a8" };
+  const level = d.s >= 70 ? ["HIGH coordination", "#991b1b", "#fee2e2"] : d.s >= 40 ? ["MEDIUM coordination", "#92400e", "#fef3c7"] : d.s > 0 ? ["LOW coordination", "#065f46", "#d1fae5"] : ["NO coordination signal", "#374151", "#f3f4f6"];
   const ageTxt2 = d.age == null ? "unknown" : d.age < 31 ? `${d.age} days` : d.age < 365 ? `${Math.round(d.age / 30.4)} months` : `${(d.age / 365).toFixed(1)} years`;
   document.getElementById("side").innerHTML = `<a href="#" id="home" style="font:600 12.5px Inter;color:#04408b;text-decoration:none">← all pushes</a>
    <div style="display:flex;gap:12px;align-items:center;margin:14px 0 6px">${avatar(d.id, 46)}<div><div style="font:700 15px 'JetBrains Mono'">${d.id}</div>
    <div class="muted" style="font-size:12.5px;color:#6b7280">pseudonymised YouTube author · ${d.n} comment${d.n > 1 ? "s" : ""} in the data</div></div></div>
+   <div style="margin:16px 0 6px;display:flex;align-items:flex-end;gap:12px"><div style="font:800 84px/0.85 Inter;letter-spacing:-.05em;color:${shade(Math.max(d.s, 45))}">${d.s.toFixed(1)}%</div>
+    <span style="font:700 11px Inter;letter-spacing:.06em;padding:5px 9px;border-radius:7px;background:${level[2]};color:${level[1]};margin-bottom:6px">${level[0]}</span></div>
+   <div style="font-size:12.5px;color:#6b7280;margin-bottom:10px">coordination likelihood: the sum of the weighted criteria below</div>
+   <div style="display:flex;height:16px;border-radius:5px;overflow:hidden;background:#f3f4f6">${d.comps.map(([l, v]) => `<div title="${l} +${v}" style="width:${v}%;background:${COL[l] || "#6b7280"}"></div>`).join("")}</div>
+   <div style="margin:10px 0 4px">${d.comps.length ? d.comps.map(([l, v, why]) => `<div style="display:grid;grid-template-columns:12px 1fr auto;gap:8px;align-items:start;font-size:13px;margin:7px 0">
+     <span style="width:10px;height:10px;border-radius:3px;margin-top:4px;background:${COL[l] || "#6b7280"}"></span><div><b>${l}</b><div style="font-size:11.5px;color:#6b7280">${why}</div></div>
+     <b style="font-family:'JetBrains Mono';color:#991b1b">+${v}</b></div>`).join("") + `<div style="display:flex;justify-content:space-between;border-top:1px solid #e5e7eb;padding-top:7px;font-weight:700;font-size:13px"><span>Total</span><span style="font-family:'JetBrains Mono'">${d.s.toFixed(1)}%</span></div>`
+     : '<div style="font-size:13px;color:#6b7280">None of the coordination criteria apply to this account.</div>'}</div>
    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0">
-    ${[[d.s.toFixed(0), "coordination score"], [ageTxt2, "channel age"], [d.fol == null ? "hidden" : d.fol.toLocaleString(), "subscribers"]].map(([v, l]) => `<div style="background:#f9fafb;border:1px solid #eef0f3;border-radius:9px;padding:9px 10px"><div style="font:700 18px Inter">${v}</div><div style="font-size:11px;color:#6b7280">${l}</div></div>`).join("")}</div>
-   <div style="font:600 11px Inter;text-transform:uppercase;letter-spacing:.07em;color:#6b7280;margin:16px 0 8px">Why this score</div>
-   ${parts.map(([l, on, w]) => `<div style="display:flex;justify-content:space-between;font-size:13px;margin:5px 0"><span>${on ? "●" : "○"} ${l}</span><b style="font-family:'JetBrains Mono';color:${on ? "#b91c1c" : "#9ca3af"}">${on ? "+" + w : "0"}</b></div>`).join("")}
+    ${[[d.n, "comments in the data"], [ageTxt2, "channel age"], [d.fol == null ? "hidden" : d.fol.toLocaleString(), "subscribers"]].map(([v, l]) => `<div style="background:#f9fafb;border:1px solid #eef0f3;border-radius:9px;padding:9px 10px"><div style="font:700 18px Inter">${v}</div><div style="font-size:11px;color:#6b7280">${l}</div></div>`).join("")}</div>
    <div style="font-size:12px;color:#6b7280;margin-top:4px">${d.partners ? `Shares a text with <b style="color:#111827">${d.partners}</b> other account${d.partners > 1 ? "s" : ""}.` : "No other account posted its texts."}</div>
    <div style="font:600 11px Inter;text-transform:uppercase;letter-spacing:.07em;color:#6b7280;margin:16px 0 8px">Pushes it is part of</div>
    <div style="display:flex;flex-wrap:wrap;gap:6px">${d.pk.map((k) => `<span class="chipx">#${k + 1} ${D.pushes[k].name}</span>`).join("")}</div>
    <div style="font:600 11px Inter;text-transform:uppercase;letter-spacing:.07em;color:#6b7280;margin:16px 0 4px">Its comments</div>
    ${d.cm.map(([t, when, vid, c]) => `<div style="border-top:1px solid #f3f4f6;padding:9px 0"><div style="font-size:11.5px;color:#6b7280">${when} · under “${vid.replace(/</g, "&lt;")}”</div>
      <div style="font-size:13.5px;margin-top:3px;overflow-wrap:anywhere">${t.replace(/</g, "&lt;")}</div>${c > 1 ? `<div style="font-size:11.5px;color:#b91c1c;font-weight:600;margin-top:2px">posted word-for-word by ${c} accounts</div>` : ""}</div>`).join("")}
-   <p style="font-size:11.5px;color:#6b7280;margin-top:14px">A coordination score is a lead for an analyst, not a verdict that the account is a bot.</p>`;
+   <p style="font-size:11.5px;color:#6b7280;margin-top:14px">Weights: copies up to 40 (grows with the number of copying accounts), burst 25, fresh channel up to 15, repeated across videos up to 10, no audience 5, several narratives 5. Coordination is a lead for an analyst, not proof that the account is a bot: the bot model is validated on the benchmark, not yet on YouTube.</p>`;
   document.getElementById("home").onclick = (e) => { e.preventDefault(); goHome(); };
 }
 function goHome() { document.getElementById("side").innerHTML = sideHome; bindCards(); node.attr("opacity", 1).attr("stroke", "#fff").attr("stroke-width", 1.2); link.attr("stroke-opacity", 0.18); }
