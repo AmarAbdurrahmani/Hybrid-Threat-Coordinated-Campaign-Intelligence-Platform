@@ -193,20 +193,50 @@ def build(db: Path, out: Path, max_nodes: int = 520) -> Path:
     # motive clades: share of all comments, coordinated (copy-paste) part, and a daily timeline
     p["day"] = pd.to_datetime(p.ts, unit="s").dt.strftime("%Y-%m-%d")
     days = sorted(p.day.dropna().unique())[-45:]
+    def followers(a):
+        try:
+            return json.loads(a).get("followers")
+        except Exception:
+            return None
+    p["followers"] = p.account.map(followers)
+    p["copies"] = p.norm.map(shared).fillna(1).astype(int)
+    M = np.column_stack([p.t.str.contains(rx, regex=True).to_numpy() for rx, _ in MOTIVES.values()])
+    anyrow = M.any(axis=1)
+    # volatility 1: 95% range of each motive's share (bootstrap over comments that carry a motive)
+    rng = np.random.default_rng(0)
+    Mm = M[anyrow]
+    boot = np.array([Mm[rng.integers(0, len(Mm), len(Mm))].sum(0) / len(Mm) for _ in range(500)]) if len(Mm) else np.zeros((1, M.shape[1]))
+    lo, hi = np.percentile(boot, 2.5, axis=0), np.percentile(boot, 97.5, axis=0)
+    # volatility 2: day-to-day swing of the share, on days with enough motive comments
+    pd_any = p[anyrow].groupby("day").size()
+    busy = pd_any[pd_any >= 15].index
     motives, any_m = [], np.zeros(len(p), bool)
-    for name, (rx, col) in MOTIVES.items():
-        mm = p.t.str.contains(rx, regex=True).to_numpy()
+    for j, (name, (rx, col)) in enumerate(MOTIVES.items()):
+        mm = M[:, j]
         any_m |= mm
         g = p[mm]
+        daily_share = (g.groupby("day").size().reindex(busy).fillna(0) / pd_any.reindex(busy)) if len(busy) else pd.Series(dtype=float)
+        cv = float(daily_share.std() / daily_share.mean()) if len(daily_share) > 2 and daily_share.mean() > 0 else None
+        acc = g.groupby("user").agg(age=("age_days", "min"), fol=("followers", "max"))
+        ex = g.sort_values(["copies", "ts"], ascending=[False, False]).drop_duplicates("norm").head(6)
+        evidence = [{"who": _pseudo(r.user), "text": str(r.text)[:240], "age": None if r.age_days != r.age_days else int(r.age_days),
+                     "fol": None if r.followers is None or r.followers != r.followers else int(r.followers), "copies": int(r.copies),
+                     "day": r.day, "video": str(r.title or "")[:70]} for r in ex.itertuples()]
+        profile = {"new180": round(float((acc.age < 180).mean()), 3) if len(acc) else 0, "new365": round(float((acc.age < 365).mean()), 3) if len(acc) else 0,
+                   "median_age_y": round(float(acc.age.median()) / 365, 1) if acc.age.notna().any() else None,
+                   "median_fol": int(acc.fol.median()) if acc.fol.notna().any() else None,
+                   "zero_fol": round(float((acc.fol == 0).mean()), 3) if acc.fol.notna().any() else None}
         motives.append({"name": name, "color": col, "comments": int(mm.sum()), "accounts": int(g.user.nunique()),
                         "coordinated": int(g.copied.sum()), "pct_all": round(100 * mm.mean(), 2),
                         "daily": [int(((g.day == d)).sum()) for d in days],
-                        "example": (g[g.copied].text.iloc[0] if g.copied.any() else (g.text.iloc[0] if len(g) else ""))[:120]})
+                        "example": (g[g.copied].text.iloc[0] if g.copied.any() else (g.text.iloc[0] if len(g) else ""))[:120],
+                        "ci": [round(100 * float(lo[j]), 1), round(100 * float(hi[j]), 1)], "cv": None if cv is None else round(cv, 2),
+                        "evidence": evidence, "profile": profile})
     tot = int(any_m.sum())
     for mo in motives:
         mo["pct_motive"] = round(100 * mo["comments"] / tot, 1) if tot else 0.0
     motives.sort(key=lambda m: -m["comments"])
-    clade_block = {"motives": motives, "days": days, "with_motive": tot, "total": int(len(p))}
+    clade_block = {"motives": motives, "days": days, "with_motive": tot, "total": int(len(p)), "busy_days": int(len(busy))}
     data = {"pushes": pushes, "nodes": nodes, "links": links[: max_nodes * 4], "kosovo": kosovo, "bench": bench_stats(), "clades": clade_block,
             "stats": {"comments": int(len(p)), "accounts": int(p.user.nunique()), "videos": int(p.thread_id.nunique()),
                       "in_pushes": int(sum(pu["accounts"] for pu in pushes)),
@@ -230,7 +260,10 @@ h1{font-size:16px;margin:0;font-weight:700;letter-spacing:-.015em;white-space:no
 .tabs a.on{background:#0b0f19;color:#fff;border-color:#0b0f19}
 .kpis{display:flex;gap:26px;margin-left:auto}.kpi{text-align:right}.kpi b{display:block;font:700 19px/1.1 Inter;letter-spacing:-.02em}
 .kpi span{font-size:10.5px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em;white-space:nowrap}
-main{display:grid;grid-template-columns:minmax(0,1fr) 460px;height:calc(100vh - 72px)}
+main{display:grid;grid-template-columns:minmax(0,1fr) 440px;height:calc(100vh - 150px);min-height:520px;border-bottom:1px solid var(--line)}
+.card .q,.card .tg{display:none}.card.on .q,.card.on .tg{display:block}.card .more{font-size:11.5px;color:#6b7280;margin-top:4px}.card.on .more{display:none}
+.scrollcue{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:#0b0f19;color:#fff;font:600 12px Inter;padding:8px 14px;border-radius:999px;text-decoration:none;box-shadow:0 6px 18px #0b0f1930}
+.zoomhint{position:absolute;right:16px;top:12px;font-size:11.5px;color:#6b7280;background:#ffffffd9;border:1px solid var(--line);border-radius:7px;padding:4px 8px}
 section.s{max-width:1180px;margin:0 auto;padding:64px 28px 8px}section.s h2{font-size:28px;letter-spacing:-.025em;margin:0 0 6px}
 section.s .lead{color:var(--mut);font-size:15px;max-width:760px;margin:0 0 26px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
@@ -241,7 +274,7 @@ section.s .lead{color:var(--mut);font-size:15px;max-width:760px;margin:0 0 26px}
 .ok{background:#d1fae5;color:#065f46}.warn{background:#fef3c7;color:#92400e}
 .plain{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}
 .plain .tile b.k{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:6px}
-.sec li{margin:8px 0}footer{max-width:1180px;margin:0 auto;padding:40px 28px 60px;color:var(--mut);font-size:12.5px}
+.sec li{margin:8px 0}.chipx{background:#f3f4f6;border-radius:999px;padding:4px 10px;color:#374151}footer{max-width:1180px;margin:0 auto;padding:40px 28px 60px;color:var(--mut);font-size:12.5px}
 #stage{position:relative;overflow:hidden}svg#g{width:100%;height:100%;display:block}
 .hlabel{font:700 12px Inter;fill:#111827;paint-order:stroke;stroke:#f4f5f7;stroke-width:4px}.hsub{font:500 11px Inter;fill:#6b7280;paint-order:stroke;stroke:#f4f5f7;stroke-width:4px}
 aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;padding:18px 22px}
@@ -256,9 +289,9 @@ aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;pad
 .note{font-size:12px;color:var(--mut);background:#f9fafb;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:14px}
 </style></head><body>
 <header><div style="display:flex;align-items:center;gap:11px"><svg class="kodlogo" viewBox="0 0 40 44" width="34" height="37" aria-label="KOD logo" role="img"><path d="M20 2 L36 8 V21 C36 31 29 38.5 20 42 C11 38.5 4 31 4 21 V8 Z" fill="#0b0f19"/><path d="M20 5.5 L33 10.4 V21 C33 29.3 27.4 35.6 20 38.7 C12.6 35.6 7 29.3 7 21 V10.4 Z" fill="none" stroke="#ffffff" stroke-opacity=".16"/><line x1="13" y1="17" x2="27" y2="15" stroke="#cbd5e1" stroke-width="1.6"/><line x1="13" y1="17" x2="20" y2="29" stroke="#cbd5e1" stroke-width="1.6"/><line x1="27" y1="15" x2="20" y2="29" stroke="#ef4444" stroke-width="1.8"/><circle cx="13" cy="17" r="3.6" fill="#e5e7eb"/><circle cx="27" cy="15" r="3.6" fill="#e5e7eb"/><circle cx="20" cy="29" r="4.8" fill="#dc2626"/><circle cx="20" cy="29" r="7.6" fill="none" stroke="#dc2626" stroke-opacity=".45" stroke-width="1.4"/></svg><div><h1 style="font:800 20px/1 Inter;letter-spacing:.02em;margin:0">KOD</h1><div style="font:600 11px/1.3 Inter;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap">Kosova OSINT Defender</div></div></div><div class="sub" id="sub" style="margin-left:4px;border-left:1px solid #e5e7eb;padding-left:16px"></div>
-<nav class="tabs"><a class="on" href="kosovo.html">Kosovo · pushes</a><a href="graph.html">Model proof · benchmark</a></nav>
+
 <div class="kpis" id="kpis"></div></header>
-<main><div id="stage"><svg id="g"></svg>
+<main><div id="stage"><svg id="g"></svg><a class="scrollcue" href="#numbers">Scroll for motives, bot farms &amp; accuracy ↓</a><div class="zoomhint">Ctrl + scroll to zoom · drag to pan</div>
 <div class="legend"><b style="color:#0b0f19">Coordination score</b> — shade &amp; size<div class="ramp"></div>
 <div style="display:flex;justify-content:space-between;font:500 11px 'JetBrains Mono'"><span>0</span><span>50</span><span>100</span></div>
 <div style="margin-top:6px">Higher = posted word-for-word copies, in bursts with other accounts, from a brand-new channel. Lines join accounts that posted the identical text.</div></div></div>
@@ -278,7 +311,11 @@ aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;pad
 <p class="lead" id="mlead"></p>
 <div class="grid" style="grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)"><div class="tile"><b class="k" style="display:block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:10px">Share of comments that carry a motive</b><div id="mbars"></div>
 <div class="d" style="margin-top:10px">Dark part of each bar = posted word-for-word by other accounts too (coordinated). A comment can carry more than one motive.</div></div>
-<div class="tile"><b class="k" style="display:block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:10px">Motive comments per day</b><svg id="mtime" width="100%" height="300"></svg><div id="mleg" class="d"></div></div></div></section>
+<div class="tile"><b class="k" style="display:block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:10px">Motive comments per day</b><svg id="mtime" width="100%" height="300"></svg><div id="mleg" class="d"></div></div></div>
+<h3 style="font-size:19px;margin:34px 0 4px;letter-spacing:-.01em">Inside each motive: the real comments and who posts them</h3>
+<p class="lead" style="font-size:13.5px;margin-bottom:16px">Real public comments, most-copied first. Avatars are generated from each author's pseudonym: the same account always gets the same avatar, and no real photo or name is shown.
+<b>Range</b> = where the motive's share stays in 95% of 500 re-draws of the comments. <b>Day-to-day</b> = how much the share swings between busy days.</p>
+<div id="mcards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(520px,1fr));gap:14px"></div></section>
 <section class="s" id="farms"><h2>Bot farms</h2><p class="lead">Where the truth is known we confirm. Where it is not yet known we detect, and we say which is which.</p><div class="grid" id="farmTiles"></div></section>
 <section class="s"><h2>How sure are we? In plain words</h2><p class="lead">Tested on accounts the model had never seen, against labels checked by humans.</p><div class="plain" id="plain"></div></section>
 <section class="s sec"><h2>How secure is it?</h2><div class="plain" id="secure"></div></section>
@@ -290,7 +327,8 @@ document.getElementById("sub").textContent = `${S.comments.toLocaleString()} rea
 document.getElementById("kpis").innerHTML = [[S.in_pushes.toLocaleString(), "accounts pushing"], [S.copy.toLocaleString(), "copy-paste accounts"], [D.pushes.length, "pushes found"]]
   .map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("");
 const svg = d3.select("#g"), root = svg.append("g"), W = () => svg.node().clientWidth, H = () => svg.node().clientHeight;
-const zoom = d3.zoom().scaleExtent([0.3, 5]).on("zoom", (e) => root.attr("transform", e.transform)); svg.call(zoom);
+const zoom = d3.zoom().scaleExtent([0.3, 5]).filter((e) => e.type !== "wheel" || e.ctrlKey || e.metaKey)
+  .on("zoom", (e) => root.attr("transform", e.transform)); svg.call(zoom);
 const gH = root.append("g"), gL = root.append("g"), gN = root.append("g"), gT = root.append("g");
 const n = D.pushes.length, cx = (k) => W() / 2 + Math.cos(2 * Math.PI * k / n - 1.57) * W() * 0.33, cy = (k) => H() / 2 + Math.sin(2 * Math.PI * k / n - 1.57) * H() * 0.34;
 const nodes = D.nodes.map((d) => ({ ...d })), links = D.links.map((l) => ({ source: l.s, target: l.t }));
@@ -318,9 +356,10 @@ document.getElementById("side").innerHTML = `<div class="note"><b style="color:#
   <div class="facts"><span><b>${p.accounts}</b> accounts</span><span><b>${p.comments}</b> comments</span><span><b>${p.copy_accounts}</b> copy-paste</span><span><b>${p.burst_accounts}</b> in bursts</span><span><b>${pct(p.new_share)}</b> brand-new channels</span><span><b>${p.videos}</b> videos</span></div>
   ${p.examples.map(([t, c]) => `<div class="q">${t.replace(/</g, "&lt;")}<span>${c} account${c > 1 ? "s" : ""}</span></div>`).join("")}
   <div class="tg">Aimed at: ${p.targets.map(([t, c]) => `${t.replace(/</g, "&lt;")} (${c})`).join(" · ")}</div>
-  <div class="tg">Languages: ${Object.entries(p.langs).map(([l, c]) => `${l} ${c}`).join(" · ")}</div></div>`).join("");
-document.querySelectorAll(".card").forEach((el) => el.onclick = () => { const k = +el.dataset.k;
-  document.querySelectorAll(".card").forEach((c) => c.classList.toggle("on", c === el));
+  <div class="tg">Languages: ${Object.entries(p.langs).map(([l, c]) => `${l} ${c}`).join(" · ")}</div><div class="more">Click for examples and targeted videos</div></div>`).join("");
+document.querySelectorAll(".card").forEach((el) => el.onclick = () => { const k = +el.dataset.k, open = !el.classList.contains("on");
+  document.querySelectorAll(".card").forEach((c) => c.classList.toggle("on", open && c === el));
+  if (!open) { node.attr("opacity", 1); link.attr("stroke-opacity", 0.18); return; }
   node.attr("opacity", (d) => d.k === k ? 1 : 0.12); link.attr("stroke-opacity", (l) => l.source.k === k ? 0.5 : 0.03); });
 svg.on("click", () => { document.querySelectorAll(".card").forEach((c) => c.classList.remove("on")); node.attr("opacity", 1); link.attr("stroke-opacity", 0.18); });
 
@@ -365,6 +404,35 @@ document.getElementById("mbars").innerHTML = C.motives.map((m) => {
   el.append("g").attr("transform", `translate(0,${Ht - mB})`).call(d3.axisBottom(x).tickValues(ticks).tickFormat((d) => d.slice(5))).call((g) => g.select(".domain").attr("stroke", "#e5e7eb")).call((g) => g.selectAll("text").attr("fill", "#6b7280").attr("font-size", 10));
   document.getElementById("mleg").innerHTML = top.map((m) => `<span style="display:inline-flex;align-items:center;gap:5px;margin:6px 12px 0 0"><i style="width:10px;height:10px;border-radius:3px;background:${m.color};display:inline-block"></i>${m.name}</span>`).join("");
 })();
+
+function avatar(seed, size = 34) {           // identicon from the pseudonym: deterministic, not a real photo
+  let h = 2166136261; for (const ch of seed) { h ^= ch.charCodeAt(0); h = Math.imul(h, 16777619) >>> 0; }
+  const hue = h % 360, fg = `hsl(${hue} 55% 46%)`, bg = `hsl(${hue} 60% 94%)`; let cells = "";
+  for (let y = 0; y < 5; y++) for (let x = 0; x < 3; x++) { if ((h >> (y * 3 + x)) & 1) {
+    cells += `<rect x="${x}" y="${y}" width="1" height="1" fill="${fg}"/>` + (x < 2 ? `<rect x="${4 - x}" y="${y}" width="1" height="1" fill="${fg}"/>` : ""); } }
+  return `<svg viewBox="-1 -1 7 7" width="${size}" height="${size}" style="border-radius:50%;background:${bg};flex:none">${cells}</svg>`;
+}
+const ageTxt = (d) => d == null ? "age unknown" : d < 31 ? `${d} days old` : d < 365 ? `${Math.round(d / 30.4)} months old` : `${(d / 365).toFixed(1)} years old`;
+const vol = (cv) => cv == null ? ["not enough days", "#6b7280", "#f3f4f6"] : cv < 0.35 ? ["stable", "#065f46", "#d1fae5"] : cv < 0.7 ? ["moderate swing", "#92400e", "#fef3c7"] : ["volatile", "#991b1b", "#fee2e2"];
+document.getElementById("mcards").innerHTML = D.clades.motives.filter((m) => m.comments).map((m) => {
+  const [vl, vc, vb] = vol(m.cv), pr = m.profile;
+  return `<div class="tile" style="padding:18px 20px">
+   <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap"><span style="width:12px;height:12px;border-radius:3px;background:${m.color}"></span>
+    <b style="font-size:15.5px">${m.name}</b><span style="margin-left:auto;font:700 18px Inter">${m.pct_motive.toFixed(1)}%</span></div>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 12px;font-size:12px">
+    <span class="chipx">range <b>${m.ci[0]}–${m.ci[1]}%</b></span>
+    <span class="chipx" style="background:${vb};color:${vc}">day-to-day: <b>${vl}</b>${m.cv != null ? ` (${Math.round(100 * m.cv)}%)` : ""}</span>
+    <span class="chipx"><b>${m.comments}</b> comments · <b>${m.accounts}</b> accounts</span><span class="chipx"><b>${m.coordinated}</b> copy-pasted</span></div>
+   <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:12px">
+    ${[[Math.round(100 * pr.new180) + "%", "channels < 6 months"], [Math.round(100 * pr.new365) + "%", "channels < 1 year"],
+       [pr.median_age_y == null ? "–" : pr.median_age_y + " y", "median channel age"], [pr.zero_fol == null ? "–" : Math.round(100 * pr.zero_fol) + "%", "0 subscribers"]]
+      .map(([v, l]) => `<div style="background:#f9fafb;border:1px solid #eef0f3;border-radius:9px;padding:8px 10px"><div style="font:700 17px Inter">${v}</div><div style="font-size:11px;color:#6b7280">${l}</div></div>`).join("")}</div>
+   ${m.evidence.map((e) => `<div style="display:flex;gap:10px;padding:9px 0;border-top:1px solid #f3f4f6">${avatar(e.who)}
+     <div style="min-width:0;flex:1"><div style="font-size:11.5px;color:#6b7280;display:flex;gap:8px;flex-wrap:wrap"><b style="color:#111827;font-family:'JetBrains Mono'">${e.who}</b>
+       <span style="color:${e.age != null && e.age < 180 ? "#b91c1c" : "#6b7280"}">channel ${ageTxt(e.age)}</span><span>${e.fol == null ? "subscribers hidden" : e.fol.toLocaleString() + " subscribers"}</span><span>${e.day}</span></div>
+     <div style="font-size:13.5px;margin-top:3px;overflow-wrap:anywhere">${e.text.replace(/</g, "&lt;")}</div>
+     <div style="font-size:11.5px;color:#6b7280;margin-top:3px">${e.copies > 1 ? `<b style="color:#b91c1c">posted word-for-word by ${e.copies} accounts</b> · ` : ""}under “${e.video.replace(/</g, "&lt;")}”</div></div></div>`).join("")}
+  </div>`; }).join("");
 const B = D.bench, K = D.kosovo, P = (x, d = 1) => (100 * x).toFixed(d) + "%";
 document.getElementById("farmTiles").innerHTML = (B.farms != null ? `
  <div class="tile dark"><span class="tag ok">Confirmed · ground truth</span><div class="n">${B.farms}</div><div class="l">bot farms confirmed</div>
