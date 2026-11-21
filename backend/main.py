@@ -704,7 +704,7 @@ ACCOUNT_LABELS = {"followers_count": "Followers", "friends_count": "Accounts fol
                   "favourites_count": "Likes given", "statuses_count": "Posts published"}
 
 
-@app.post("/api/bot/account", dependencies=[Depends(require_key)])
+@app.post("/api/bot/account")  # public: pure computation on five numbers, reads no stored data
 async def bot_account(body: AccountCountsIn):
     """Account-profile network (backend/account_bot.py, trained on 11 public bot datasets): five public counts →
     BOT probability + each count's share of the decision (occlusion: count reset to the training mean)."""

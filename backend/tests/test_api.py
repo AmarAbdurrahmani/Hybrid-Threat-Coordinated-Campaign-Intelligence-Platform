@@ -374,4 +374,4 @@ def test_bot_account_profile_network(api):
     assert rb["bot_probability"] > rh["bot_probability"] and rb["verdict"] == "BOT" and rh["verdict"] == "NOT BOT"
     assert len(rb["indicators"]) == 5 and abs(sum(abs(i["percent"]) for i in rb["indicators"]) - 100) < 0.5
     assert client.post("/api/bot/account", json={**bot, "followers_count": -1}, headers=ANALYST).status_code == 422
-    assert client.post("/api/bot/account", json=bot).status_code == 401
+    assert client.post("/api/bot/account", json=bot).status_code == 200  # public: no stored data involved
