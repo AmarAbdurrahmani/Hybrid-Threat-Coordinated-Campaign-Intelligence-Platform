@@ -31,6 +31,7 @@ log = logging.getLogger("htccip.api")
 pipeline = Pipeline()
 geo = ingest.GeoIP()
 source_locks = {"youtube": asyncio.Lock(), "telegram": asyncio.Lock()}
+autoscan_lock = asyncio.Lock()  # one scan at a time; a second click waits and then hits the cache
 telegram_fetcher = None
 tickets: dict[str, float] = {}
 
@@ -108,6 +109,144 @@ async def source_loop(kind: str) -> None:
         await asyncio.sleep(period)
 
 
+# YouTube auto-scan: search.list -> commentThreads.list -> pipeline (detection runs per video thread).
+YT_FATAL = {"missingKey", "keyInvalid", "badRequest", "accessNotConfigured", "quotaExceeded", "dailyLimitExceeded",
+            "rateLimitExceeded", "unreachable"}
+
+
+def _yt_message(exc: "ingest.YouTubeError") -> str:
+    return YT_ERRORS.get(exc.reason, (0, f"YouTube API error ({exc.reason or exc.status or 'unknown'})"))[1]
+
+
+def _scan_summary(tid: str) -> dict:
+    analysis = pipeline.store.saved_analysis(tid) or {}
+    th = analysis.get("thread") or {}
+    flagged = sorted({it["c"]["user"] for it in analysis.get("items", []) if it.get("tier") != "organic"})
+    peak = th.get("peak") or {}
+    return {"level": th.get("level"), "level_name": th.get("levelName"), "flagged_comments": (th.get("high") or 0) + (th.get("medium") or 0),
+            "flagged_accounts": flagged, "clusters": len(analysis.get("clusters") or []), "largest_cluster": th.get("largestCluster") or 0,
+            "burst": peak.get("count") or 0, "burst_coordinated": peak.get("coordinated") or 0}
+
+
+async def run_youtube_autoscan(queries: list[str], key: str, *, order: str = "date", max_videos: int = 10, per_query: int = 10,
+                               comment_pages: int = 1, lookback_h: int | None = None, enrich: bool = True) -> dict:
+    """Discover recent videos for `queries`, pull their comments, ingest and analyse them.
+    Raises YouTubeError only when nothing could be scanned; later fatal errors return partial results."""
+    ttl = settings.youtube_autoscan_cache_s
+    lookback = settings.youtube_autoscan_lookback_h if lookback_h is None else lookback_h
+    stats: dict = {}
+    warnings: list[str] = []
+    async with autoscan_lock:
+        videos: dict[str, dict] = {}
+        for q in queries:
+            try:
+                found = await asyncio.to_thread(ingest.yt_search, q, api_key=key, order=order, max_results=per_query,
+                                                published_after_h=lookback or None, ttl=ttl, stats=stats)
+            except ingest.YouTubeError as exc:
+                if exc.reason in YT_FATAL and not videos:
+                    raise
+                warnings.append(f"search '{q}': {_yt_message(exc)}")
+                if exc.reason in YT_FATAL:
+                    break
+                continue
+            for v in found:
+                videos.setdefault(v["video_id"], dict(v))
+        # Rank by commentCount (1 unit) so the comment budget goes to videos that actually have comments.
+        skipped: list[dict] = []
+        try:
+            counts = await asyncio.to_thread(ingest.yt_video_stats, list(videos), key, ttl=ttl, stats=stats)
+        except ingest.YouTubeError as exc:
+            counts = None
+            warnings.append("comment counts unavailable (" + (exc.reason or "error") + ")")
+        if counts is not None:
+            for v in videos.values():
+                v["comment_count"] = counts.get(v["video_id"])
+                if v["video_id"] not in counts:
+                    v["status"], v["message"] = "videoNotFound", YT_ERRORS["videoNotFound"][1]
+                elif counts[v["video_id"]] is None:
+                    v["status"], v["message"] = "commentsDisabled", YT_ERRORS["commentsDisabled"][1]
+                elif counts[v["video_id"]] == 0:
+                    v["status"] = "no_comments"
+            candidates = sorted((v for v in videos.values() if not v.get("status")), key=lambda v: -v["comment_count"])
+            skipped = [v for v in videos.values() if v.get("status")]
+        else:
+            candidates = list(videos.values())
+        picked = candidates[:max_videos]
+
+        sem = asyncio.Semaphore(4)
+        fatal: list = []
+
+        async def fetch(v: dict) -> list[dict]:
+            async with sem:
+                if fatal:
+                    v["status"] = "skipped"
+                    return []
+                try:
+                    cs = await asyncio.to_thread(ingest.yt_fetch_comments, v["video_id"], None, comment_pages, key,
+                                                 page_size=50, replies=False, ttl=ttl, stats=stats)
+                except ingest.YouTubeError as exc:
+                    v["status"], v["message"] = exc.reason or f"HTTP {exc.status}", _yt_message(exc)
+                    if exc.reason in YT_FATAL:
+                        fatal.append(exc)
+                    return []
+                v["status"] = "ok" if cs else "no_comments"
+                return cs
+
+        per_video = await asyncio.gather(*(fetch(v) for v in picked))
+        if fatal and not any(per_video):
+            raise fatal[0]
+        if fatal:
+            warnings.append(_yt_message(fatal[0]) + " (partial scan)")
+        comments = [c for cs in per_video for c in cs]
+        enriched = False
+        if comments and enrich:
+            try:
+                await asyncio.to_thread(ingest.yt_enrich_accounts, comments, key, ttl=ttl, stats=stats)
+                enriched = True
+            except ingest.YouTubeError as exc:
+                warnings.append("channel ages unavailable (" + (exc.reason or "error") + ")")
+        ingest.strip_private(comments)
+        threads = [{"id": f"yt:{v['video_id']}", "platform": "youtube", "external_id": v["video_id"], "url": v["url"],
+                    "title": v["title"], "published": v["published"]}
+                   for v, cs in zip(picked, per_video) if cs]
+        batch = await pipeline.ingest(threads, comments) if threads else {"new": 0, "alerts": []}
+
+    out_videos, flagged_accounts = [], set()
+    for v, cs in [*zip(picked, per_video), *((v, []) for v in skipped)]:
+        row = {k: v.get(k) for k in ("video_id", "title", "channel", "published_at", "url", "query", "status", "message", "comment_count")}
+        row["comments"] = len(cs)
+        if cs:
+            row["thread_id"] = f"yt:{v['video_id']}"
+            row.update(await asyncio.to_thread(_scan_summary, row["thread_id"]))
+            flagged_accounts.update(row["flagged_accounts"])
+            row["flagged_accounts"] = len(row["flagged_accounts"])
+        out_videos.append({k: val for k, val in row.items() if val is not None})
+    ranked = sorted((v for v in out_videos if v.get("thread_id")),
+                    key=lambda v: (v.get("level") or 9, -v.get("flagged_comments", 0)))
+    return {"queries": queries, "order": order, "videos_found": len(videos), "videos_scanned": len(picked),
+            "videos_with_comments": len(threads), "comments": len(comments), "new": batch["new"],
+            "flagged_accounts": len(flagged_accounts), "clusters": sum(v.get("clusters", 0) for v in out_videos),
+            "alerts": len([a for a in batch.get("alerts", []) if a]), "channels_enriched": enriched,
+            "top_thread_id": ranked[0]["thread_id"] if ranked else None, "videos": out_videos, "warnings": warnings,
+            "quota": {"units": stats.get("units", 0), "calls": stats.get("calls", 0), "cached": stats.get("cached", 0)}}
+
+
+async def autoscan_loop() -> None:
+    period = settings.youtube_autoscan_every_min * 60
+    if period <= 0 or not settings.youtube_api_key:
+        return
+    while True:
+        try:
+            r = await run_youtube_autoscan(settings.youtube_autoscan_queries, settings.youtube_api_key)
+            log.info("YouTube auto-scan: %s videos, %s comments, %s flagged accounts, %s units",
+                     r["videos_scanned"], r["comments"], r["flagged_accounts"], r["quota"]["units"])
+        except ingest.YouTubeError as exc:
+            log.warning("YouTube auto-scan failed (%s)", exc.reason or exc.status)
+        except Exception:
+            log.exception("YouTube auto-scan crashed; will retry")
+        await asyncio.sleep(max(period, 300))
+
+
 async def recovery_loop() -> None:
     while True:
         try:
@@ -131,7 +270,7 @@ async def alert_loop() -> None:
 async def lifespan(_app: FastAPI):
     global telegram_fetcher
     tasks = [asyncio.create_task(task) for task in (source_loop("youtube"), source_loop("telegram"),
-                                                   recovery_loop(), alert_loop())]
+                                                   recovery_loop(), alert_loop(), autoscan_loop())]
     try:
         yield
     finally:
@@ -283,6 +422,17 @@ YT_ERRORS = {  # YouTube error reason -> (HTTP status, analyst-facing message)
     "forbidden": (403, "YouTube refused access to this video's comments"),
     "unreachable": (502, "Could not reach the YouTube API"),
 }
+
+
+class YouTubeAutoScanIn(BaseModel):
+    # Blank = server defaults (YOUTUBE_AUTOSCAN_QUERIES). Each query costs 100 quota units unless cached.
+    queries: list[Annotated[str, StringConstraints(strip_whitespace=True, min_length=2, max_length=120)]] = Field(default_factory=list, max_length=5)
+    api_key: Annotated[str, StringConstraints(strip_whitespace=True, pattern=r"^[A-Za-z0-9_-]{20,80}$")] | None = None
+    order: Literal["date", "relevance", "viewCount"] = "date"
+    max_videos: int = Field(10, ge=1, le=25)
+    comment_pages: int = Field(1, ge=1, le=4)
+    lookback_h: int | None = Field(None, ge=0, le=24 * 365)
+    enrich_channels: bool = True
 
 
 def youtube_http_error(exc: "ingest.YouTubeError") -> HTTPException:
@@ -480,6 +630,29 @@ async def osint_youtube(body: YouTubeIn):
     return {"thread_id": thread["id"], "video_id": video_id, "title": meta.get("title"), "channel": meta.get("channel"),
             "comments": len(comments), "new": batch["new"], "channels_enriched": enriched,
             "top_liked": [{"user": c["user"], "likes": c["likes"]} for c in liked]}
+
+
+@app.post("/api/osint/youtube/auto-scan", dependencies=[Depends(require_key)])
+async def osint_youtube_autoscan(body: YouTubeAutoScanIn):
+    """Discover relevant recent videos (search.list), fetch their comments (commentThreads.list),
+    and run coordinated-campaign detection on each video thread."""
+    key = body.api_key or settings.youtube_api_key or None
+    if not key:
+        raise youtube_http_error(ingest.YouTubeError("missing key", reason="missingKey"))
+    queries = list(dict.fromkeys(body.queries)) or settings.youtube_autoscan_queries
+    try:
+        return await run_youtube_autoscan(queries, key, order=body.order, max_videos=body.max_videos,
+                                          comment_pages=body.comment_pages, lookback_h=body.lookback_h,
+                                          enrich=body.enrich_channels)
+    except ingest.YouTubeError as exc:
+        log.warning("YouTube auto-scan failed (%s)", exc.reason or exc.status)
+        raise youtube_http_error(exc) from None
+
+
+@app.get("/api/osint/youtube/auto-scan/defaults", dependencies=[Depends(require_key)])
+async def osint_youtube_autoscan_defaults():
+    return {"queries": settings.youtube_autoscan_queries, "lookback_h": settings.youtube_autoscan_lookback_h,
+            "cache_s": settings.youtube_autoscan_cache_s, "server_key": bool(settings.youtube_api_key)}
 
 
 @app.post("/api/lab/evaluate", dependencies=[Depends(require_key)])

@@ -71,6 +71,8 @@ pollers and WebSocket tickets.
 | GET | `/api/infrastructure` | Regional egress and comment coverage from current thread analyses |
 | POST | `/api/simulate-attack` | Inject an exercise swarm |
 | POST | `/api/osint/youtube` | Fetch a public video's comments (URL or ID, optional per-request `api_key`) into the pipeline |
+| POST | `/api/osint/youtube/auto-scan` | Discover recent relevant videos (`search.list`), fetch their comments and run detection on each |
+| GET | `/api/osint/youtube/auto-scan/defaults` | Default auto-scan queries, lookback and cache window |
 | POST | `/api/lab/evaluate` | LLM second opinion (bot / human) for the evaluation lab; 503 unless `LLM_ENABLED` |
 | POST | `/api/ingest/comments` | Ingest external comments with scoped IDs and optional evidence URLs |
 | POST | `/api/ingest/portal` | Ingest your portal's comments with server-side IP for GeoIP lookup |
@@ -108,6 +110,23 @@ Authors are pseudonymised; `likeCount` is kept per comment. Errors come back as 
 key (400), quota exceeded (429), comments disabled (409), video not found (404). In the dashboard, the
 **Fetch YouTube** form uses this endpoint when the backend is connected; without a backend it fetches directly
 from the browser with the key typed into the form (kept in that tab's session storage only) and scores locally.
+
+**Auto-scan (no URL needed).** `POST /api/osint/youtube/auto-scan` takes
+`{"queries": ["Kosovo Serbia", ...], "order": "date"|"relevance", "max_videos": 10, "comment_pages": 1, "api_key": "..."}`
+(all optional). Blank `queries` uses `YOUTUBE_AUTOSCAN_QUERIES` (`;`-separated; default
+`Kosovo Serbia; Kosova Serbia; Kosovo Srbija; Kosovo NATO KFOR`). For each query it runs `search.list`
+(`type=video`, `maxResults=10`, last `YOUTUBE_AUTOSCAN_LOOKBACK_H` hours). It then ranks the videos by `commentCount` with one
+`videos.list` call, so zero-comment and comments-disabled videos are skipped without fetching. Next it pulls `commentThreads.list`
+(`part=snippet`, `maxResults=50`) for the top videos, adds channel ages, and ingests each video as a thread, which runs the full
+detection pipeline (near-duplicates, bursts, clusters, co-activity, alerts, WebSocket updates). The response
+lists every video with its level, flagged accounts and clusters, plus the totals and the quota spent.
+Responses are cached in memory for `YOUTUBE_AUTOSCAN_CACHE_S` (default 900 s). A repeat click spends 0 units.
+Comments-disabled and not-found results are cached too. Cost is about 100 units per query plus about 12, so the default
+four queries cost about 413 units. Quota or key errors stop the scan cleanly: you get a clear 4xx if nothing was scanned,
+or partial results with a warning. Set `YOUTUBE_AUTOSCAN_EVERY_MIN` to run the scan unattended (off by default).
+In the dashboard, **Auto-Scan YouTube** (under the Fetch YouTube bar) does all of this in one click,
+loads the highest-risk video and lists the others (click one to open it). With no backend it runs the same flow in the
+browser using the key from the form.
 
 ## How the engine scores (engine.py)
 

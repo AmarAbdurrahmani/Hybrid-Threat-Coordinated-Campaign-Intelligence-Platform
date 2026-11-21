@@ -226,3 +226,65 @@ def test_osint_youtube_fetches_into_pipeline_and_maps_errors(api, monkeypatch):
         monkeypatch.setattr(ingest, "yt_fetch_comments", boom)
         r = client.post("/api/osint/youtube", json={**url, "api_key": key}, headers=ANALYST)
         assert r.status_code == status and key not in r.text
+
+
+def test_youtube_autoscan_discovers_fetches_detects_and_caches(api, monkeypatch):
+    client, _ = api
+    assert client.post("/api/osint/youtube/auto-scan", json={}).status_code == 401
+    r = client.post("/api/osint/youtube/auto-scan", json={}, headers=ANALYST)
+    assert r.status_code == 400 and "API key" in r.json()["detail"]
+
+    ingest._YT_CACHE.clear()
+    now = time.time() * 1000
+    iso = lambda ms: time.strftime("%Y-%m-%dT%H:%M:%SZ", time.gmtime(ms / 1000))
+    vids = ["vidAAAAAAA1", "vidBBBBBBB2", "vidCCCCCCC3", "vidDDDDDDD4"]
+    calls = []
+
+    def fake_get(ep, params, api_key=None):
+        calls.append(ep)
+        if ep == "search":
+            assert params["type"] == "video" and params["maxResults"] == 10 and params["publishedAfter"].endswith(":00:00Z")
+            return {"items": [{"id": {"videoId": v}, "snippet": {"title": f"KFOR &amp; video {i}", "channelTitle": "News",
+                                                                   "publishedAt": iso(now - 3_600_000), "liveBroadcastContent": "none"}}
+                              for i, v in enumerate(vids)] + [{"id": {"videoId": "upcomingXXX"}, "snippet": {"liveBroadcastContent": "upcoming"}}]}
+        if ep == "videos":
+            assert params["part"] == "statistics"
+            return {"items": [{"id": v, "statistics": {"commentCount": "0" if v == vids[3] else "8"}} for v in vids]}
+        if ep == "commentThreads":
+            assert params["videoId"] != vids[3]  # zero comments: never fetched
+            assert params["part"] == "snippet" and params["maxResults"] == 50
+            if params["videoId"] == vids[2]:
+                raise ingest.YouTubeError("x", status=403, reason="commentsDisabled")
+            text = "NATO is selling us out, KFOR is leaving. We have to get them out now!"
+            return {"items": [{"snippet": {"topLevelComment": {"id": f"{params['videoId']}c{i}", "snippet": {
+                "authorChannelId": {"value": f"UCbot{i}"}, "authorDisplayName": f"bot{i}", "publishedAt": iso(now + i * 5000),
+                "textOriginal": text, "likeCount": 0}}}} for i in range(8)]}
+        if ep == "channels":
+            return {"items": [{"id": f"UCbot{i}", "snippet": {"publishedAt": "2026-11-01T00:00:00Z"},
+                               "statistics": {"subscriberCount": "0"}} for i in range(8)]}
+        raise AssertionError(ep)
+
+    monkeypatch.setattr(ingest, "_yt_get", fake_get)
+    key = "AIzaTestKeyForFixtureOnly_0123456789"
+    r = client.post("/api/osint/youtube/auto-scan", json={"queries": ["Kosovo KFOR"], "api_key": key}, headers=ANALYST)
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert key not in r.text
+    assert body["videos_found"] == 4 and body["videos_scanned"] == 3 and body["videos_with_comments"] == 2
+    assert body["comments"] == 16 and body["new"] == 16 and body["channels_enriched"]
+    assert body["flagged_accounts"] >= 1 and body["top_thread_id"] in {f"yt:{v}" for v in vids[:2]}
+    by_id = {v["video_id"]: v for v in body["videos"]}
+    assert by_id[vids[3]]["status"] == "no_comments" and by_id[vids[2]]["status"] == "commentsDisabled" and by_id[vids[0]]["title"] == "KFOR & video 0"
+    assert by_id[vids[0]]["level"] is not None and by_id[vids[0]]["flagged_comments"] >= 1
+    assert body["quota"]["units"] == 100 + 1 + 3 + 1 and body["quota"]["cached"] == 0
+    threads = {t["id"] for t in client.get("/api/threads", headers=ANALYST).json()}
+    assert {f"yt:{v}" for v in vids[:2]} <= threads
+
+    n = len(calls)  # repeat click: everything from cache, zero quota spent
+    r2 = client.post("/api/osint/youtube/auto-scan", json={"queries": ["Kosovo KFOR"], "api_key": key}, headers=ANALYST).json()
+    assert len(calls) == n and r2["quota"]["units"] == 0 and r2["new"] == 0 and r2["comments"] == 16
+
+    ingest._YT_CACHE.clear()
+    monkeypatch.setattr(ingest, "_yt_get", lambda *a, **k: (_ for _ in ()).throw(ingest.YouTubeError("x", status=403, reason="quotaExceeded")))
+    r = client.post("/api/osint/youtube/auto-scan", json={"api_key": key}, headers=ANALYST)
+    assert r.status_code == 429 and "quota" in r.json()["detail"] and key not in r.text

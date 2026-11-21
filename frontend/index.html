@@ -270,7 +270,14 @@ tailwind.config = { darkMode: 'class', theme: { extend: {
             <input id="ytKey" type="password" autocomplete="off" spellcheck="false" class="w-full sm:w-56 text-[12.5px] text-slate-100 bg-ink-950/70 border border-ink-600 rounded-[10px] px-3 py-2 focus:outline-none focus:border-cyan-500" placeholder="YouTube API key (optional)" aria-label="YouTube Data API v3 key">
             <button type="submit" id="ytFetch" class="chip chip-teal !h-10">Fetch YouTube</button>
           </form>
-          <div id="ytStatus" class="text-[11px] text-slate-500 px-1" role="status">Real comments via YouTube Data API v3 · authors are pseudonymised · the key stays in this browser tab and is never stored by the backend.</div>
+          <form id="ytAutoForm" class="ask flex flex-wrap items-center gap-2 pl-4 pr-1.5 py-1.5" autocomplete="off">
+            <svg viewBox="0 0 24 24" width="20" height="20" class="shrink-0 text-cyan-300" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="8.5"/><circle cx="12" cy="12" r="4.5" opacity=".6"/><path d="M12 12l6-6"/><circle cx="12" cy="12" r="1.2" fill="currentColor"/></svg>
+            <input id="ytQuery" class="flex-1 min-w-[180px] text-[13.5px] text-slate-100 placeholder:text-slate-500 py-2" placeholder="Auto-scan topics, “;”-separated (blank = Kosovo · Serbia · NATO/KFOR defaults)" aria-label="Auto-scan topics or keywords">
+            <select id="ytOrder" class="text-[12.5px] text-slate-100 bg-ink-950/70 border border-ink-600 rounded-[10px] px-2 py-2 focus:outline-none focus:border-cyan-500" aria-label="Discovery order"><option value="date">Newest first</option><option value="relevance">Most relevant</option></select>
+            <button type="submit" id="ytAuto" class="chip chip-teal !h-10" title="Discover recent relevant videos, pull their comments and run coordination detection">Auto-Scan YouTube</button>
+          </form>
+          <div id="ytStatus" class="text-[11px] text-slate-500 px-1" role="status">Real comments via YouTube Data API v3 · authors are pseudonymised · the key stays in this browser tab and is never stored by the backend. Auto-Scan finds recent Balkan / Kosovo / NATO videos by itself; a URL is only needed for a specific video.</div>
+          <div id="ytScan" class="hidden grid gap-1 px-1" aria-label="Auto-scan results"></div>
         </div>
 
         <!-- Thread metrics and comment timeline -->
@@ -3136,6 +3143,103 @@ if (typeof module !== "undefined") module.exports = Engine;
       go('#sec-overview');
     } catch (err) { ytStatus(err.message, 'err'); toast('YouTube: ' + err.message); }
     finally { btn.disabled = false; btn.textContent = 'Fetch YouTube'; }
+  });
+
+  // ---- AUTO-SCAN: search.list -> commentThreads.list -> detection, one click -------------------
+  // Backend connected -> POST /api/osint/youtube/auto-scan (server key or the tab's key, cached
+  // server-side so repeat clicks cost no quota). Offline -> same flow in this browser with the
+  // analyst's key, cached in sessionStorage for 15 minutes.
+  const YT_DEFAULT_Q = ['Kosovo Serbia', 'Kosova Serbia', 'Kosovo Srbija', 'Kosovo NATO KFOR'];
+  const YT_LVL = { 1: 'bg-rose-500/20 text-rose-200 border-rose-500/40', 2: 'bg-amber-500/20 text-amber-200 border-amber-500/40',
+    3: 'bg-yellow-500/10 text-yellow-200 border-yellow-500/30', 4: 'bg-slate-500/10 text-slate-300 border-slate-500/30' };
+  const ytScanVideos = new Map(); // browser mode: video_id -> { meta, comments }
+  const ytQueries = () => [...new Set($('#ytQuery').value.split(/[;|\n]/).map((q) => q.trim()).filter((q) => q.length > 1))].slice(0, 5);
+  function renderYtScan(videos, backend) {
+    const box = $('#ytScan');
+    const rows = videos.filter((v) => v.comments || v.status !== 'no_comments').slice(0, 12);
+    box.classList.toggle('hidden', !rows.length);
+    box.innerHTML = rows.map((v) => {
+      const lvl = v.level ? `<span class="shrink-0 text-[9.5px] font-mono px-1.5 rounded border ${YT_LVL[v.level] || YT_LVL[4]}">L${v.level}</span>`
+        : `<span class="shrink-0 text-[9.5px] font-mono px-1.5 rounded border border-ink-600 text-slate-500">${esc(v.status === 'ok' ? '··' : v.status || '··')}</span>`;
+      const stats = v.comments ? `${v.comments} comments${v.flagged_accounts != null ? ` · ${v.flagged_accounts} flagged` : ''}${v.clusters ? ` · ${v.clusters} clusters` : ''}` : esc(v.message || 'no comments');
+      const open = v.comments ? `data-yt-open="${esc(backend ? v.thread_id : v.video_id)}"` : '';
+      return `<div class="flex items-center gap-2 text-[11.5px] min-w-0">${lvl}<button type="button" ${open} class="truncate text-left ${v.comments ? 'text-slate-200 hover:text-cyan-300' : 'text-slate-500 cursor-default'}" title="${esc(v.title || '')}">${esc(v.title || v.video_id)}</button><span class="shrink-0 text-slate-500 hidden sm:inline">${esc(v.channel || '')}</span><span class="ml-auto shrink-0 font-mono text-[10.5px] text-slate-400">${stats}</span><a href="${esc(v.url)}" target="_blank" rel="noopener noreferrer" class="shrink-0 text-slate-500 hover:text-cyan-300" aria-label="Open on YouTube">↗</a></div>`;
+    }).join('');
+    box.dataset.mode = backend ? 'backend' : 'browser';
+  }
+  $('#ytScan').addEventListener('click', async (e) => {
+    const b = e.target.closest('[data-yt-open]'); if (!b) return;
+    const id = b.dataset.ytOpen;
+    try {
+      if ($('#ytScan').dataset.mode === 'backend') { delete $('#liveThreads').dataset.demo; await refreshThreadList(id); await loadLiveThread(id); }
+      else { const v = ytScanVideos.get(id); if (!v) return; state.external = { ...v.meta, vid: id }; state.sel = null; state.filter = 'all'; load(v.comments, v.meta.published, false); }
+      go('#sec-overview');
+    } catch (err) { toast('YouTube: ' + err.message); }
+  });
+  async function ytBrowserAutoScan(queries, order, key) {
+    const ck = 'htccip_ytscan:' + JSON.stringify([queries, order, Math.floor(Date.now() / 900000)]);
+    try { const hit = sessionStorage.getItem(ck); if (hit) return { ...JSON.parse(hit), cached: true }; } catch (e) {}
+    const after = new Date(Date.now() - 168 * 3600000); after.setUTCMinutes(0, 0, 0);
+    const found = new Map(); let units = 0;
+    for (const q of queries) {
+      const d = await ytGet('search', { part: 'snippet', type: 'video', q, order, maxResults: 10, publishedAfter: after.toISOString().replace(/\.\d+Z$/, 'Z') }, key); units += 100;
+      (d.items || []).forEach((it) => { const vid = it.id && it.id.videoId, sn = it.snippet || {};
+        if (vid && sn.liveBroadcastContent !== 'upcoming' && !found.has(vid)) found.set(vid, { video_id: vid, title: ytPlain(sn.title || ''), channel: ytPlain(sn.channelTitle || ''), published: sn.publishedAt, url: 'https://www.youtube.com/watch?v=' + vid }); });
+    }
+    if (!found.size) return { videos: [], comments: [], units, found: 0 };
+    const st = await ytGet('videos', { part: 'statistics', id: [...found.keys()].join(',') }, key); units += 1;
+    const cc = new Map((st.items || []).map((it) => [it.id, it.statistics && it.statistics.commentCount != null ? Number(it.statistics.commentCount) : null]));
+    found.forEach((v) => { const n = cc.get(v.video_id); v.comment_count = n; if (!cc.has(v.video_id)) { v.status = 'videoNotFound'; v.message = YT_MSG.videoNotFound; } else if (n == null) { v.status = 'commentsDisabled'; v.message = YT_MSG.commentsDisabled; } else if (!n) v.status = 'no_comments'; });
+    const picked = [...found.values()].filter((v) => !v.status).sort((a, b) => b.comment_count - a.comment_count).slice(0, 10);
+    const all = [];
+    for (const v of picked) {
+      try {
+        const d = await ytGet('commentThreads', { part: 'snippet', videoId: v.video_id, order: 'time', maxResults: 50, textFormat: 'plainText' }, key); units += 1;
+        v.items = (d.items || []).map((th) => { const c = th.snippet.topLevelComment, sn = c.snippet, raw = (sn.authorChannelId && sn.authorChannelId.value) || sn.authorDisplayName || 'unknown';
+          return { id: 'yt:' + c.id, user: ytPseud(raw), ts: sn.publishedAt, text: sn.textOriginal || ytPlain(sn.textDisplay || ''), likes: sn.likeCount ?? null,
+            url: `https://www.youtube.com/watch?v=${v.video_id}&lc=${c.id}`, platform: 'youtube', source: 'youtube', thread: v.title }; });
+        v.status = v.items.length ? 'ok' : 'no_comments'; all.push(...v.items);
+      } catch (err) { units += 1; v.status = 'error'; v.message = err.message; v.items = []; if (/quota|invalid|not enabled|rate limit/i.test(err.message)) { if (!all.length) throw err; break; } }
+    }
+    const out = { videos: [...picked, ...[...found.values()].filter((v) => !picked.includes(v))], comments: all, units, found: found.size };
+    try { sessionStorage.setItem(ck, JSON.stringify(out)); } catch (e) {}
+    return out;
+  }
+  $('#ytAutoForm').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const queries = ytQueries(), order = $('#ytOrder').value, key = $('#ytKey').value.trim(), btn = $('#ytAuto');
+    try { key ? sessionStorage.setItem('htccip_ytkey', key) : sessionStorage.removeItem('htccip_ytkey'); } catch (err) {}
+    const shown = queries.length ? queries : YT_DEFAULT_Q;
+    btn.disabled = true; btn.textContent = 'Scanning…';
+    ytStatus(`Auto-scan: searching YouTube for ${shown.map((q) => '“' + q + '”').join(', ')} → fetching comments → running detection…`);
+    try {
+      if (liveReady) {
+        const r = await apiFetch('/api/osint/youtube/auto-scan', { method: 'POST', body: JSON.stringify({ queries, order, ...(key ? { api_key: key } : {}) }) });
+        const j = await r.json().catch(() => ({}));
+        if (!r.ok) throw new Error(typeof j.detail === 'string' ? j.detail : r.status === 401 ? 'Enter the analyst API key in the LIVE bar' : 'HTTP ' + r.status);
+        renderYtScan(j.videos || [], true);
+        if (j.top_thread_id) { delete $('#liveThreads').dataset.demo; await refreshThreadList(j.top_thread_id); await loadLiveThread(j.top_thread_id); }
+        const q = j.quota || {};
+        ytStatus(`Auto-scan: ${j.videos_scanned} videos scanned (${j.videos_found} found for ${j.queries.length} queries) · ${j.comments} comments ingested (${j.new} new) · ${j.flagged_accounts} flagged accounts · ${j.clusters} clusters · ${j.alerts} alerts · quota ${q.units || 0} units${q.cached ? ` (${q.cached} responses from cache)` : ''}${j.warnings && j.warnings.length ? ' · ⚠ ' + j.warnings.join('; ') : ''}${j.top_thread_id ? ' · showing the highest-risk video' : ''}`, j.comments ? 'ok' : '');
+        toast(`Auto-scan: ${j.comments} comments from ${j.videos_with_comments} videos · ${j.flagged_accounts} flagged accounts`);
+      } else {
+        if (!key) throw new Error('The backend is not connected: enter a YouTube API key to auto-scan directly from this browser.');
+        const res = await ytBrowserAutoScan(shown, order, key);
+        ytScanVideos.clear();
+        res.videos.forEach((v) => { if (v.items && v.items.length) ytScanVideos.set(v.video_id, { meta: { title: v.title, channel: v.channel, published: v.published }, comments: v.items }); });
+        if (!res.comments.length) { renderYtScan(res.videos, false); throw new Error(`Found ${res.found} videos but none had public comments yet; try “Most relevant” or other topics.`); }
+        const top = res.videos.find((v) => v.items && v.items.length);
+        state.external = { title: `Auto-scan · ${ytScanVideos.size} videos`, channel: 'multiple channels', published: top.published, vid: top.video_id };
+        state.sel = null; state.filter = 'all'; state.q = ''; $('#search').value = '';
+        load(res.comments, new Date(Math.min(...res.videos.filter((v) => v.items && v.items.length).map((v) => Date.parse(v.published)))).toISOString(), false);
+        const users = new Set(state.res.items.filter((i) => i.tier !== 'organic').map((i) => i.c.user));
+        renderYtScan(res.videos, false);
+        ytStatus(`Auto-scan (in this browser): ${ytScanVideos.size} videos · ${res.comments.length} comments analysed together · ${users.size} flagged accounts · ${state.res.clusters.length} clusters · quota ${res.cached ? '0 units (cached)' : res.units + ' units'}. Click a video to analyse it alone. No backend: channel ages unavailable.`, 'ok');
+        toast(`Auto-scan: ${res.comments.length} comments from ${ytScanVideos.size} videos`);
+      }
+      go('#sec-overview');
+    } catch (err) { ytStatus('Auto-scan: ' + err.message, 'err'); toast('Auto-scan: ' + err.message); }
+    finally { btn.disabled = false; btn.textContent = 'Auto-Scan YouTube'; }
   });
 
   let tt; function toast(msg) { const t = $('#toast'); t.textContent = msg; t.classList.remove('hidden'); clearTimeout(tt); tt = setTimeout(() => t.classList.add('hidden'), 3200); }

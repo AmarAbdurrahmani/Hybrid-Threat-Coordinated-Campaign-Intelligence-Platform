@@ -45,6 +45,14 @@ class Settings:
     youtube_search_lang: str = os.getenv("YOUTUBE_SEARCH_LANG", "sq")
     youtube_poll_s: int = int(os.getenv("YOUTUBE_POLL_S", "90"))
     youtube_enrich_channels: bool = _bool("YOUTUBE_ENRICH_CHANNELS", True)
+    # Auto-scan (search.list -> commentThreads.list -> detection). Queries are ";"-separated.
+    youtube_autoscan_queries: list[str] = field(default_factory=lambda: [
+        q.strip() for q in os.getenv("YOUTUBE_AUTOSCAN_QUERIES", "").split(";") if q.strip()
+    ] or ["Kosovo Serbia", "Kosova Serbia", "Kosovo Srbija", "Kosovo NATO KFOR"])
+    youtube_autoscan_lookback_h: int = int(os.getenv("YOUTUBE_AUTOSCAN_LOOKBACK_H", "168"))
+    youtube_autoscan_cache_s: int = int(os.getenv("YOUTUBE_AUTOSCAN_CACHE_S", "900"))
+    # Unattended auto-scan period in minutes; 0 = off. Each run costs ~100 units per query.
+    youtube_autoscan_every_min: int = int(os.getenv("YOUTUBE_AUTOSCAN_EVERY_MIN", "0"))
 
     # --- Telegram (Telethon user client for PUBLIC channels; get api_id/hash at my.telegram.org) ---
     tg_api_id: int = int(os.getenv("TG_API_ID", "0") or 0)

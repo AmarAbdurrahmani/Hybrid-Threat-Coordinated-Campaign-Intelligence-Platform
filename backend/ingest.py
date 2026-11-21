@@ -121,6 +121,80 @@ def _yt_get(endpoint: str, params: dict, api_key: str | None = None) -> dict:
         raise YouTubeError(f"{endpoint} unreachable ({type(e.reason).__name__})", reason="unreachable") from None
 
 
+# Short-lived response cache so repeated auto-scans / refreshes don't burn quota.
+# Keyed by endpoint + params + a fingerprint of the key (never the key itself).
+_YT_CACHE: dict[str, tuple[float, dict]] = {}
+_YT_CACHE_MAX = 512
+_YT_STICKY = {"commentsDisabled", "videoNotFound", "forbidden"}
+YT_UNITS = {"search": 100}  # every other read endpoint we use costs 1 unit
+
+
+def _yt_call(endpoint: str, params: dict, api_key: str | None = None, ttl: float = 0, stats: dict | None = None) -> dict:  # noqa: C901
+    """`_yt_get` with an optional in-memory TTL cache and quota accounting in `stats`."""
+    key = api_key or settings.youtube_api_key or ""
+    ck = ""
+    if ttl > 0:
+        fp = hashlib.sha256(key.encode()).hexdigest()[:16]
+        ck = json.dumps([endpoint, sorted(params.items()), fp], default=str)
+        hit = _YT_CACHE.get(ck)
+        if hit and hit[0] > time.time():
+            if stats is not None:
+                stats["cached"] = stats.get("cached", 0) + 1
+            if isinstance(hit[1], YouTubeError):
+                raise YouTubeError(str(hit[1]), status=hit[1].status, reason=hit[1].reason)
+            return hit[1]
+    if stats is not None and key:  # failed requests are billed too
+        stats["calls"] = stats.get("calls", 0) + 1
+        stats["units"] = stats.get("units", 0) + YT_UNITS.get(endpoint, 1)
+    try:
+        data = _yt_get(endpoint, params, api_key)
+    except YouTubeError as exc:  # negative-cache per-video errors so repeat scans don't re-bill them
+        if ck and exc.reason in _YT_STICKY:
+            _YT_CACHE[ck] = (time.time() + ttl, exc)
+        raise
+    if ck:
+        if len(_YT_CACHE) >= _YT_CACHE_MAX:
+            now = time.time()
+            for k in [k for k, v in _YT_CACHE.items() if v[0] <= now] or list(_YT_CACHE)[: _YT_CACHE_MAX // 4]:
+                _YT_CACHE.pop(k, None)
+        _YT_CACHE[ck] = (time.time() + ttl, data)
+    return data
+
+
+def yt_search(query: str, *, api_key: str | None = None, order: str = "date", max_results: int = 10,
+              published_after_h: int | None = 168, lang: str | None = None, ttl: float = 900,
+              stats: dict | None = None) -> list[dict]:
+    """search.list (100 units) -> video posts with metadata. `publishedAfter` is floored to the
+    hour so the cache key stays stable between clicks."""
+    params = {"part": "snippet", "type": "video", "q": query, "order": order, "maxResults": max_results, "safeSearch": "none"}
+    if published_after_h:
+        after = (datetime.now(timezone.utc) - timedelta(hours=published_after_h)).replace(minute=0, second=0, microsecond=0)
+        params["publishedAfter"] = after.strftime("%Y-%m-%dT%H:%M:%SZ")
+    if lang:
+        params["relevanceLanguage"] = lang
+    d = _yt_call("search", params, api_key, ttl, stats)
+    out = []
+    for it in d.get("items", []):
+        vid, sn = (it.get("id") or {}).get("videoId"), it.get("snippet") or {}
+        if not vid or sn.get("liveBroadcastContent") == "upcoming":  # upcoming premieres have no comments
+            continue
+        out.append({"video_id": vid, "title": html.unescape(sn.get("title") or ""), "channel": html.unescape(sn.get("channelTitle") or ""),
+                    "published_at": sn.get("publishedAt"), "published": iso_to_ms(sn.get("publishedAt")),
+                    "url": f"https://www.youtube.com/watch?v={vid}", "query": query})
+    return out
+
+
+def yt_video_stats(video_ids: list[str], api_key: str | None = None, *, ttl: float = 0, stats: dict | None = None) -> dict[str, int | None]:
+    """videos.list statistics (1 unit per 50 IDs): commentCount, or None when comments are disabled."""
+    out: dict[str, int | None] = {}
+    for i in range(0, len(video_ids), 50):
+        d = _yt_call("videos", {"part": "statistics", "id": ",".join(video_ids[i:i + 50])}, api_key, ttl, stats)
+        for it in d.get("items", []):
+            cc = (it.get("statistics") or {}).get("commentCount")
+            out[it["id"]] = int(cc) if cc is not None else None
+    return out
+
+
 def yt_search_videos(query: str, published_after_h: int = 24, lang: str = "sq", max_results: int = 10) -> list[str]:
     after = (datetime.now(timezone.utc) - timedelta(hours=published_after_h)).strftime("%Y-%m-%dT%H:%M:%SZ")
     d = _yt_get("search", {"part": "id", "type": "video", "q": query, "order": "date", "publishedAfter": after,
@@ -138,14 +212,16 @@ def yt_video_meta(video_ids: list[str], api_key: str | None = None) -> dict[str,
     return out
 
 
-def yt_fetch_comments(video_id: str, since_ms: float | None = None, max_pages: int = 10, api_key: str | None = None) -> list[dict]:
+def yt_fetch_comments(video_id: str, since_ms: float | None = None, max_pages: int = 10, api_key: str | None = None, *,
+                      page_size: int = 100, replies: bool = True, ttl: float = 0, stats: dict | None = None) -> list[dict]:
     """Newest-first; stops paging once comments are older than `since_ms`."""
     out, token = [], None
     for _ in range(max_pages):
-        params = {"part": "snippet,replies", "videoId": video_id, "order": "time", "maxResults": 100, "textFormat": "plainText"}
+        params = {"part": "snippet,replies" if replies else "snippet", "videoId": video_id, "order": "time",
+                  "maxResults": page_size, "textFormat": "plainText"}
         if token:
             params["pageToken"] = token
-        d = _yt_get("commentThreads", params, api_key)
+        d = _yt_call("commentThreads", params, api_key, ttl, stats)
         stop = False
         for th in d.get("items", []):
             top = th["snippet"]["topLevelComment"]
@@ -170,12 +246,12 @@ def yt_fetch_comments(video_id: str, since_ms: float | None = None, max_pages: i
     return out
 
 
-def yt_enrich_accounts(comments: list[dict], api_key: str | None = None) -> None:
+def yt_enrich_accounts(comments: list[dict], api_key: str | None = None, *, ttl: float = 0, stats: dict | None = None) -> None:
     """Public channel metadata: creation date + subscriber count (if not hidden)."""
     ids = sorted({c["_raw_channel"] for c in comments if c.get("_raw_channel", "").startswith("UC")})
     meta = {}
     for i in range(0, len(ids), 50):
-        d = _yt_get("channels", {"part": "snippet,statistics", "id": ",".join(ids[i:i + 50])}, api_key)
+        d = _yt_call("channels", {"part": "snippet,statistics", "id": ",".join(ids[i:i + 50])}, api_key, ttl, stats)
         for it in d.get("items", []):
             st = it.get("statistics", {})
             meta[it["id"]] = {"created": it["snippet"].get("publishedAt"),
