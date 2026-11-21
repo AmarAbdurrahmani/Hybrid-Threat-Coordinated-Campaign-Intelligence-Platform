@@ -14,6 +14,14 @@ Rule for the whole talk: **simulated data is always called an exercise**, and ev
    backend is down, because it runs in the browser and says so.
 4. Click **Reset demo** so the stage starts on the built-in exercise thread. Its header chip reads **EXERCISE · SIMULATED**.
 
+## Layout notes (light redesign)
+
+- The stage is a real **OpenStreetMap** map. The **3D globe** is still one click away (map toolbar → *3D globe*). If anything looks broken on the day, `…/dark.html` is the pre-redesign dark dashboard.
+- **Platforms & threat landscape** (globe icon in the left rail):
+  - Seven platform cards with logos. Each shows whether HTCCIP can monitor that platform live (YouTube now; Telegram once configured) or why not (Meta, TikTok and X need research or paid API access; WhatsApp is end-to-end encrypted), plus the typical weapon used there.
+  - Six **PUBLIC RECORD** country cards: Ukraine/EU (Doppelganger), Moldova, Romania, Taiwan (Spamouflage), Serbia & Kosovo, and the North Caucasus. Each card gives the weapon, the motive and per-claim **estimative probabilities**.
+- After a browser Auto-Scan, **Live monitor** re-polls the scanned videos every 5 min (about 10 quota units per poll).
+
 ## The walk-through
 
 | # | Do | Point at | Say |
@@ -30,6 +38,10 @@ Rule for the whole talk: **simulated data is always called an exercise**, and ev
 
 **Real data is usually quieter, and that is the point.** A typical scan shows Level 3–4 with a few flagged accounts. Say so:
 the engine does not invent campaigns.
+
+**Landscape talking point (30 s):**
+- Open the Romania card and say: "We separate the claims. A coordinated TikTok push: *very likely*. Directed by the Russian state: *roughly even*, because the public evidence is incomplete and one strand was paid for domestically."
+- Then the Kosovo card: "The SNS-linked network is *very likely*. That it targeted Kosovo is *unlikely*. That's why our Kosovo scenario is labelled an exercise."
 
 ## If something fails on stage
 

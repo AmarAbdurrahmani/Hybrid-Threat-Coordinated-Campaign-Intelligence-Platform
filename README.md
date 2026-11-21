@@ -50,6 +50,8 @@ pollers and WebSocket tickets.
 
 Full pitch walkthrough, on-stage fallbacks and the simulated-vs-real table: [docs/DEMO.md](docs/DEMO.md).
 
+The dashboard uses a light theme with a Leaflet/OpenStreetMap map; the 3D globe is an optional view. `frontend/dark.html` keeps the pre-redesign dark dashboard as a fallback. The **Platforms & threat landscape** section is a public-record summary (sources on every card), not detector output.
+
 1. Open the dashboard → LIVE bar is green. Pick a real YouTube thread (or say "monitoring").
 2. Click **Simulate attack**. Twelve sock-puppet accounts hit **two** threads 25 min apart;
    the co-activity graph links them across threads, the thread hits LEVEL 1.
