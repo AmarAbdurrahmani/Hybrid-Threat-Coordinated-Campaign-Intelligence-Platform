@@ -48,6 +48,8 @@ pollers and WebSocket tickets.
 
 ## Stage demo script (3 minutes)
 
+Full pitch walkthrough, on-stage fallbacks and the simulated-vs-real table: [docs/DEMO.md](docs/DEMO.md).
+
 1. Open the dashboard → LIVE bar is green. Pick a real YouTube thread (or say "monitoring").
 2. Click **Simulate attack**. Twelve sock-puppet accounts hit **two** threads 25 min apart;
    the co-activity graph links them across threads, the thread hits LEVEL 1.
@@ -201,6 +203,21 @@ Telegram never expose commenters' IPs. Say this to the jury before they ask.
   Proxy `/api` and `/ws` to `:8000` (Vite: `server.proxy`), or add your origin to `CORS_ORIGINS`.
 - The panels read the same fields the built-in engine produces, so a backend result renders
   without changes (`fromContract()` in `index.html` only rebuilds Maps and Dates).
+
+## Next steps
+
+Each item builds on an output that is already on the dashboard.
+
+1. **Analyst / mentor validation**
+   - *Today:* **Account network** clusters (e.g. `K1 · 13 accounts`), the lab verdicts (`BOT 86%` with its signal chips) and the **SitRep**.
+   - *Next:* domain experts label a sample of real flagged and unflagged accounts. The lab's exercise pass rate (31/31) then becomes measured precision and recall on real threads.
+2. **False-positive threshold calibration**
+   - *Today:* the alert level in the **Coordination overview** and the SitRep.
+   - *Next:* calibrate `engine.py` levels on labelled real threads. Currently a single cluster of 3 or more accounts lifts a thread to Level 2, even when only about 6% of its comments are flagged. Make that rule depend on cluster evidence strength and on the flagged share.
+3. **More data sources**
+   - *Today:* YouTube (Fetch / Auto-Scan) and the Telegram connector, plus cross-thread co-activity edges and **Threat replay**.
+   - *Next:* add portal comment sections and research-API access to X and Facebook, so that cross-platform swarms appear in the same network and replay.
+4. **Operational hardening:** a persistent database on Render, per-analyst keys, an audit log of SitRep exports, and the retention period agreed with the legal office (see below).
 
 ## Legal & safety notes for a defence setting
 
