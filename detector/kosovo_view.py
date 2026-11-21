@@ -288,9 +288,9 @@ TEMPLATE = r"""<!doctype html>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <style>
-:root{--bg:#eaf1fb;--cream:#fbf5e3;--cream2:#f6ecd0;--sky:#e3ecf9;--card:#fff;--line:#e5e7eb;--ink:#161616;--mut:#6b7280;--kblue:#04408b;--kgold:#d2ab67;--knavy:#032f66}
+:root{--bg:#f4f6fa;--cream:#ffffff;--cream2:#e3e8f1;--sky:#f3f6fb;--card:#fff;--line:#e5e7eb;--ink:#161616;--mut:#6b7280;--kblue:#04408b;--kgold:#d2ab67;--knavy:#032f66}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-header{position:sticky;top:0;z-index:5;height:72px;border-top:3px solid var(--kgold);background:linear-gradient(90deg,#ffffff 0%,#ffffff 35%,var(--cream) 100%) !important;display:flex;align-items:center;gap:22px;padding:0 26px;background:var(--card);border-bottom:1px solid var(--line)}
+header{position:sticky;top:0;z-index:5;height:72px;border-top:3px solid var(--kgold);background:#ffffff !important;border-bottom:1px solid #e3e8f1;display:flex;align-items:center;gap:22px;padding:0 26px;background:var(--card);border-bottom:1px solid var(--line)}
 h1{font-size:16px;margin:0;font-weight:700;letter-spacing:-.015em;white-space:nowrap}.sub{color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
 .tabs{display:flex;gap:6px;margin-left:18px}.tabs a{white-space:nowrap;font:600 12.5px Inter;padding:8px 12px;border-radius:8px;color:#374151;text-decoration:none;border:1px solid var(--line)}
 .tabs a.on{background:#0b0f19;color:#fff;border-color:#0b0f19}
@@ -305,32 +305,32 @@ section.s .lead{color:var(--mut);font-size:15px;max-width:760px;margin:0 0 26px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
 .tile{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px}
 .tile .n{font:800 44px/1 Inter;letter-spacing:-.04em;font-variant-numeric:tabular-nums}.tile .l{font-weight:650;margin-top:8px}
-.tile .d{color:var(--mut);font-size:13px;margin-top:6px}.tile.dark{background:var(--knavy);color:#fff;border-color:var(--knavy)}.tile.dark .d{color:#9ca3af}
+.tile .d{color:var(--mut);font-size:13px;margin-top:6px}.tile.dark{background:#04408b;color:#fff;border-color:#04408b}.tile.dark .d{color:#9ca3af}
 .tag{display:inline-block;font:700 10.5px Inter;letter-spacing:.07em;text-transform:uppercase;padding:4px 8px;border-radius:6px;margin-bottom:10px}
 .ok{background:#d1fae5;color:#065f46}.warn{background:#fef3c7;color:#92400e}
 .plain{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}
 .plain .tile b.k{display:block;font-size:13px;text-transform:uppercase;letter-spacing:.06em;color:var(--mut);margin-bottom:6px}
-.sec li{margin:8px 0}section.band{background:var(--cream);box-shadow:0 0 0 100vmax var(--cream);clip-path:inset(0 -100vmax);padding-bottom:40px}section.band .tile{border-color:#eadfbe}.tile{border-color:#dbe5f3}.chipx{background:#f3f4f6;border-radius:999px;padding:4px 10px;color:#374151}footer{max-width:1180px;margin:0 auto;padding:40px 28px 60px;color:var(--mut);font-size:12.5px}
-#stage{position:relative;overflow:hidden;background:radial-gradient(ellipse at 30% 20%,#f3f7fd 0%,var(--sky) 70%)}svg#g{width:100%;height:100%;display:block}
+.sec li{margin:8px 0}section.band{padding-bottom:8px}.tile{border-color:#e3e8f1}section.s h2{color:#04408b}section.s h2::after{content:'';display:block;width:46px;height:3px;background:#d2ab67;border-radius:2px;margin-top:10px}section.blue{background:#04408b;box-shadow:0 0 0 100vmax #04408b;clip-path:inset(0 -100vmax);padding-bottom:56px;margin-top:40px}section.blue h2{color:#fff}section.blue .lead{color:#c9d7ee}section.blue .tile{border-color:transparent;box-shadow:0 8px 24px #00163a33}section.blue .tile.dark{background:#d2ab67;color:#161616}section.blue .tile.dark .d{color:#3b2f12}.chipx{background:#f3f4f6;border-radius:999px;padding:4px 10px;color:#374151}footer{max-width:1180px;margin:0 auto;padding:40px 28px 60px;color:var(--mut);font-size:12.5px}
+#stage{position:relative;overflow:hidden;background:#f3f6fb}svg#g{width:100%;height:100%;display:block}
 .hlabel{font:700 12px Inter;fill:#111827;paint-order:stroke;stroke:#edf2f7;stroke-width:4px}.hsub{font:500 11px Inter;fill:#6b7280;paint-order:stroke;stroke:#edf2f7;stroke-width:4px}
-aside{background:var(--cream);border-left:1px solid var(--cream2);overflow:auto;padding:18px 22px}
-.card{background:#fff;border:1px solid #eadfbe;border-radius:12px;padding:12px 14px;margin:0 0 10px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
+aside{background:#ffffff;border-left:1px solid #e3e8f1;overflow:auto;padding:18px 22px}
+.card{background:#fff;border:1px solid #e3e8f1;border-radius:12px;padding:12px 14px;margin:0 0 10px;cursor:pointer;transition:border-color .15s,box-shadow .15s}
 .card:hover,.card.on{border-color:#111827;box-shadow:0 4px 14px #0b0f1914}
-.rank{font:800 20px Inter;color:#d1d5db;margin-right:10px;vertical-align:-2px}.nm{font-weight:700;font-size:14px}
+.rank{font:800 20px Inter;color:#d2ab67;margin-right:10px;vertical-align:-2px}.nm{font-weight:700;font-size:14px}
 .facts{display:flex;flex-wrap:wrap;gap:6px 14px;margin:8px 0 6px;font-size:12px;color:#374151}.facts b{font-variant-numeric:tabular-nums}
 .q{font-size:12.5px;background:#f9fafb;border-left:3px solid #dc2626;padding:5px 9px;margin:5px 0;border-radius:0 6px 6px 0}
 .q span{color:var(--mut);font-size:11px;margin-left:6px}.tg{font-size:11.5px;color:var(--mut);margin-top:4px}
 .legend{position:absolute;right:14px;bottom:12px;display:flex;align-items:center;gap:7px;background:#ffffffaa;border-radius:999px;padding:4px 10px;font:500 10.5px Inter;color:#6b7280;opacity:.8}
 .ramp{width:90px;height:6px;border-radius:4px;margin:0;background:linear-gradient(90deg,#e5e7eb,#fca5a5 35%,#dc2626 62%,#7f1d1d 84%,#120202)}
-.note{font-size:12px;color:var(--mut);background:#fffdf6;border:1px solid #eadfbe;border-radius:10px;padding:10px 12px;margin-bottom:14px}
+.note{font-size:12px;color:var(--mut);background:#f4f7fc;border:1px solid #dbe4f3;border-radius:10px;padding:10px 12px;margin-bottom:14px}
 </style></head><body>
-<header><div style="display:flex;align-items:center;gap:11px"><svg class="kodlogo" viewBox="0 0 40 44" width="48" height="53" aria-label="Angry Birds logo" role="img"><path d="M20 2 L36 8 V21 C36 31 29 38.5 20 42 C11 38.5 4 31 4 21 V8 Z" fill="#04408b"/><path d="M20 5.5 L33 10.4 V21 C33 29.3 27.4 35.6 20 38.7 C12.6 35.6 7 29.3 7 21 V10.4 Z" fill="none" stroke="#ffffff" stroke-opacity=".16"/><line x1="13" y1="17" x2="27" y2="15" stroke="#cbd5e1" stroke-width="1.6"/><line x1="13" y1="17" x2="20" y2="29" stroke="#cbd5e1" stroke-width="1.6"/><line x1="27" y1="15" x2="20" y2="29" stroke="#ef4444" stroke-width="1.8"/><circle cx="13" cy="17" r="3.6" fill="#e5e7eb"/><circle cx="27" cy="15" r="3.6" fill="#e5e7eb"/><circle cx="20" cy="29" r="4.8" fill="#dc2626"/><circle cx="20" cy="29" r="7.6" fill="none" stroke="#dc2626" stroke-opacity=".45" stroke-width="1.4"/></svg><div><h1 style="font:800 26px/1 Inter;letter-spacing:-.02em;margin:0;color:#04408b;white-space:nowrap">Angry Birds</h1></div></div><div style="margin-left:4px;display:flex;align-items:center;gap:14px"><span style="font:700 26px Inter;color:#d2ab67">@</span><img src="mod-logo.png" alt="Republika e Kosovës · Ministria e Mbrojtjes" style="height:44px;width:auto;display:block"></div>
+<header><div style="display:flex;align-items:center;gap:11px"><svg class="kodlogo" viewBox="0 0 40 44" width="48" height="53" aria-label="Angry Birds logo" role="img"><path d="M20 2 L36 8 V21 C36 31 29 38.5 20 42 C11 38.5 4 31 4 21 V8 Z" fill="#04408b"/><path d="M20 5.5 L33 10.4 V21 C33 29.3 27.4 35.6 20 38.7 C12.6 35.6 7 29.3 7 21 V10.4 Z" fill="none" stroke="#ffffff" stroke-opacity=".16"/><line x1="13" y1="17" x2="27" y2="15" stroke="#cbd5e1" stroke-width="1.6"/><line x1="13" y1="17" x2="20" y2="29" stroke="#cbd5e1" stroke-width="1.6"/><line x1="27" y1="15" x2="20" y2="29" stroke="#ef4444" stroke-width="1.8"/><circle cx="13" cy="17" r="3.6" fill="#e5e7eb"/><circle cx="27" cy="15" r="3.6" fill="#e5e7eb"/><circle cx="20" cy="29" r="4.8" fill="#dc2626"/><circle cx="20" cy="29" r="7.6" fill="none" stroke="#dc2626" stroke-opacity=".45" stroke-width="1.4"/></svg><div><h1 style="font:800 26px/1 Inter;letter-spacing:-.02em;margin:0;color:#04408b;white-space:nowrap">Angry Birds</h1></div></div><div style="margin-left:4px;display:flex;align-items:center;gap:14px"><span style="width:1px;height:36px;background:#dbe2ee"></span><img src="mod-logo.png" alt="Republika e Kosovës · Ministria e Mbrojtjes" style="height:44px;width:auto;display:block"></div>
 
 </header>
 <main><div id="stage"><svg id="g"></svg><a class="scrollcue" href="#numbers">Scroll for motives, bot farms &amp; accuracy ↓</a><div class="zoomhint">Ctrl + scroll to zoom · drag to pan</div>
 <div class="legend" title="Coordination likelihood per account: copies, bursts, fresh channel, no audience, repetition across videos and narratives. Lines join accounts that posted the identical text."><span>coordination</span><div class="ramp"></div><span>0–100</span></div></div>
 <aside id="side"></aside></main>
-<section class="s" id="numbers"><h2>By the numbers</h2>
+<section class="s blue" id="numbers"><h2>By the numbers</h2>
 <p class="lead">A trained model, not a rule list. It learns every weight from labelled accounts and is tested on accounts it has never seen.</p>
 <div class="grid" id="numTiles"></div>
 <div class="grid" style="grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);margin-top:14px">
