@@ -20,3 +20,6 @@ models/
 .idea/
 # context handoff output (session-derived; stays local)
 .claude/handoff/
+
+# bot detector: downloaded datasets and trained artefacts
+detector/data/

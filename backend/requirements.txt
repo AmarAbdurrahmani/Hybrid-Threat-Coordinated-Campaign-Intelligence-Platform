@@ -21,3 +21,7 @@ anthropic>=1.0  # messages.parse (structured outputs) for the evaluation lab
 # --- dev ---
 pytest>=8
 httpx>=0.28                   # FastAPI integration tests
+
+# bot detector (detector/)
+pandas>=2.2
+lightgbm>=4.3

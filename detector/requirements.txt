@@ -1,0 +1,8 @@
+# Training the bot detector (inference needs only numpy, scipy, pandas, scikit-learn, lightgbm)
+numpy>=1.26
+scipy>=1.11
+pandas>=2.2
+scikit-learn>=1.4
+lightgbm>=4.3
+torch>=2.2   # GNN training only
+pytest>=8

@@ -10,3 +10,6 @@ scikit-learn>=1.4
 telethon>=1.36
 maxminddb>=2.6
 anthropic>=1.0  # messages.parse (structured outputs) for the evaluation lab
+pandas>=2.2       # bot detector (detector/)
+scipy>=1.11
+lightgbm>=4.3

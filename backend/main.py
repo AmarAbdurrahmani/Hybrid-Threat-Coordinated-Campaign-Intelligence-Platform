@@ -510,7 +510,7 @@ async def health():
             "embedder": pipeline.embedder.kind, "alerts": "dry-run" if settings.alert_dry_run else "live",
             "auth_required": bool(settings.api_key or not settings.allow_unauthenticated),
             "analyst_key_configured": bool(settings.api_key),
-            "youtube": bool(settings.youtube_api_key), "features": ["youtube_osint", "youtube_autoscan"], "telegram": bool(settings.tg_api_id and settings.tg_api_hash),
+            "youtube": bool(settings.youtube_api_key), "features": ["youtube_osint", "youtube_autoscan", "bot_account", "bot_score"], "telegram": bool(settings.tg_api_id and settings.tg_api_hash),
             "llm": settings.llm_enabled and bool(settings.anthropic_api_key),
             "llm_model": settings.llm_model if evaluator.available() else None}
 
@@ -669,6 +669,109 @@ async def osint_youtube(body: YouTubeIn):
     return {"thread_id": thread["id"], "video_id": video_id, "title": meta.get("title"), "channel": meta.get("channel"),
             "comments": len(comments), "new": batch["new"], "channels_enriched": enriched,
             "top_liked": [{"user": c["user"], "likes": c["likes"]} for c in liked]}
+
+
+# ---- Bot detector (detector/ package at the repo root): one question, is this account a bot? ----------------
+_BOT_MODEL: dict | None = None
+
+
+def _bot_model():
+    """Lazy-load the trained detector (LightGBM + numpy GNN + isotonic calibration). 503 if absent."""
+    global _BOT_MODEL
+    if _BOT_MODEL is None:
+        import sys
+        root = os.path.abspath(os.path.join(os.path.dirname(__file__), ".."))
+        if root not in sys.path:
+            sys.path.insert(0, root)
+        try:
+            from detector import model as bot_model
+            _BOT_MODEL = {"mod": bot_model, "m": bot_model.load()}
+        except Exception as exc:  # missing artefacts or lightgbm/pandas not installed
+            raise HTTPException(503, f"Bot detector unavailable: {type(exc).__name__}: {exc}") from None
+    return _BOT_MODEL
+
+
+class AccountCountsIn(BaseModel):
+    followers_count: int = Field(ge=0)
+    friends_count: int = Field(ge=0)
+    listed_count: int = Field(ge=0)
+    favourites_count: int = Field(ge=0)
+    statuses_count: int = Field(ge=0)
+    high_recall: bool = False  # source-balanced F2 checkpoint (catches more bots, more false alarms)
+
+
+ACCOUNT_LABELS = {"followers_count": "Followers", "friends_count": "Accounts followed", "listed_count": "Lists it appears on",
+                  "favourites_count": "Likes given", "statuses_count": "Posts published"}
+
+
+@app.post("/api/bot/account", dependencies=[Depends(require_key)])
+async def bot_account(body: AccountCountsIn):
+    """Account-profile network (backend/account_bot.py, trained on 11 public bot datasets): five public counts →
+    BOT probability + each count's share of the decision (occlusion: count reset to the training mean)."""
+    import numpy as np
+    import account_bot
+    counts = [getattr(body, f) for f in account_bot.FIELDS]
+    path = account_bot.MODEL.with_name("account_bot_expanded.npz")
+    path = account_bot.MODEL if body.high_recall or not path.exists() else path
+    with np.load(path, allow_pickle=False) as m:
+        params = [m[k] for k in ("w", "b", "v", "c")]
+        x = (np.log1p(np.asarray(counts, float)) - m["mean"]) / m["scale"]
+        logit = lambda z: float((np.tanh(z @ params[0] + params[1]) @ params[2] + params[3]))
+        p = float(account_bot.forward(x, *params)[1]); thr = float(m["threshold"])
+        base = logit(x)
+        deltas = []
+        for i in range(len(x)):
+            z = x.copy(); z[i] = 0.0  # 0 = training mean in normalised space
+            deltas.append(base - logit(z))
+    total = sum(abs(d) for d in deltas) or 1.0
+    indicators = sorted(({"indicator": ACCOUNT_LABELS[f], "percent": round(100 * d / total, 1), "direction": "+" if d >= 0 else "−"}
+                         for f, d in zip(account_bot.FIELDS, deltas)), key=lambda r: -abs(r["percent"]))
+    return {"model": {"name": "account-profile network", "checkpoint": path.name, "threshold_pct": round(100 * thr, 1),
+                      "trained_on": "gilani-2017, cresci-rtbust-2019, midterm-2018, cresci-stock-2018, pronbots-2019, celebrity-2019, botwiki-2019, vendor-purchased-2019 (+ verified/political/botometer-feedback held out)"},
+            "bot_probability": round(100 * p, 1), "verdict": "BOT" if p >= thr else "NOT BOT", "indicators": indicators}
+
+
+class BotScoreIn(BaseModel):
+    # Either score the accounts behind stored threads, or post accounts + posts directly (schema: detector/SPEC.md).
+    thread_ids: list[str] = Field(default_factory=list, max_length=50)
+    accounts: list[dict] = Field(default_factory=list, max_length=5000)
+    posts: list[dict] = Field(default_factory=list, max_length=50000)
+
+
+@app.post("/api/bot/score", dependencies=[Depends(require_key)])
+async def bot_score(body: BotScoreIn):
+    """BOT probability (calibrated %) + percentage contribution of every indicator, per account. Nothing else."""
+    bm = _bot_model()
+
+    def run():
+        import pandas as pd
+        from detector import datasets
+        if body.posts:
+            posts = pd.DataFrame(body.posts)
+            accounts = pd.DataFrame(body.accounts) if body.accounts else pd.DataFrame({"account_id": posts["account_id"].astype(str).unique()})
+        else:
+            accounts, posts = datasets.load_backend_db(settings.db_path)
+            if body.thread_ids:
+                posts = posts[posts["thread_id"].isin(body.thread_ids)]
+                accounts = accounts[accounts["account_id"].isin(set(posts["account_id"]))]
+        if posts.empty:
+            raise HTTPException(404, "No posts to score")
+        for col, default in (("created_ts", float("nan")), ("followers", float("nan")), ("following", float("nan")),
+                             ("posts_total", float("nan")), ("label", float("nan")), ("family", ""), ("source", "api")):
+            if col not in accounts:
+                accounts[col] = default
+        for col in ("thread_id", "parent_id", "urls"):
+            if col not in posts:
+                posts[col] = ""
+        recs, *_ = bm["mod"].score(accounts, posts, bm["m"])
+        return sorted(recs, key=lambda r: -r["bot_probability"])
+
+    recs = await asyncio.to_thread(run)
+    meta = bm["m"]["meta"]
+    return {"model": {"trained_on": meta.get("trained_on"), "trained_at": meta.get("trained_at"),
+                      "benchmark_f1": meta.get("metrics_random_split", {}).get("f1"), "benchmark_f1_ci": meta.get("f1_ci"),
+                      "unseen_bot_type_f1": meta.get("lofo_f1"), "threshold_pct": round(100 * meta["threshold"], 1)},
+            "accounts": recs}
 
 
 @app.post("/api/osint/youtube/auto-scan", dependencies=[Depends(require_key)])

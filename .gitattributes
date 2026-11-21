@@ -1,0 +1,2 @@
+detector/model/* -text
+backend/*.npz binary

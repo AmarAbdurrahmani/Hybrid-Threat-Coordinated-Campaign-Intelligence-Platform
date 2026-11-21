@@ -342,3 +342,36 @@ def test_youtube_key_restriction_reason_is_parsed_and_explained(api, monkeypatch
     client, _ = api
     r = client.post("/api/osint/youtube/auto-scan", json={"queries": ["Kosovo"], "api_key": "A" * 39}, headers=ANALYST)
     assert r.status_code == 403 and "HTTP referrers" in r.json()["detail"]
+
+
+def test_bot_score_returns_only_bot_probability_and_indicator_percentages(api):
+    pytest.importorskip("lightgbm"); pytest.importorskip("pandas")
+    from pathlib import Path
+    if not (Path(__file__).resolve().parents[2] / "detector" / "model" / "model.json").exists():
+        pytest.skip("detector model not trained")
+    client, _ = api
+    posts = [{"post_id": f"p{i}", "account_id": "copy_a" if i % 2 else "copy_b", "ts": 1.7e9 + i * 20,
+              "text": "NATO out of Kosovo now, share this everywhere!!", "thread_id": "t1"} for i in range(12)]
+    posts += [{"post_id": "h1", "account_id": "human", "ts": 1.7e9 + 9000, "text": "Went to Prizren with my family, great weather", "thread_id": "t1"}]
+    r = client.post("/api/bot/score", json={"posts": posts}, headers=ANALYST)
+    assert r.status_code == 200, r.text
+    body = r.json()
+    assert {"model", "accounts"} <= set(body) and len(body["accounts"]) == 3
+    for acc in body["accounts"]:
+        assert set(acc) == {"account_id", "bot_probability", "verdict", "threshold", "indicators"}
+        assert 0 <= acc["bot_probability"] <= 100 and acc["verdict"] in ("BOT", "NOT BOT")
+        assert abs(sum(abs(i["percent"]) for i in acc["indicators"]) - 100) < 0.5
+        assert not any("narrative" in i["indicator"].lower() or "intent" in i["indicator"].lower() for i in acc["indicators"])
+    assert client.post("/api/bot/score", json={"posts": posts}).status_code == 401
+
+
+def test_bot_account_profile_network(api):
+    client, _ = api
+    bot = {"followers_count": 3, "friends_count": 900, "listed_count": 0, "favourites_count": 10, "statuses_count": 5000}
+    human = {"followers_count": 500, "friends_count": 300, "listed_count": 12, "favourites_count": 2000, "statuses_count": 800}
+    rb = client.post("/api/bot/account", json=bot, headers=ANALYST).json()
+    rh = client.post("/api/bot/account", json=human, headers=ANALYST).json()
+    assert rb["bot_probability"] > rh["bot_probability"] and rb["verdict"] == "BOT" and rh["verdict"] == "NOT BOT"
+    assert len(rb["indicators"]) == 5 and abs(sum(abs(i["percent"]) for i in rb["indicators"]) - 100) < 0.5
+    assert client.post("/api/bot/account", json={**bot, "followers_count": -1}, headers=ANALYST).status_code == 422
+    assert client.post("/api/bot/account", json=bot).status_code == 401
