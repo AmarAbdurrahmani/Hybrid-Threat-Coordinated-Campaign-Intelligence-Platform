@@ -55,7 +55,7 @@
     .replace(/(&#39;[^&]*&#39;)/g, '<span class="st">$1</span>');
 
   const accounts = G.nodes.filter(n => n.labels[0] === "Account");
-  const sub = (nodeIds, relFilter, cap = 420) => {
+  const sub = (nodeIds, relFilter, cap = 160) => {
     const ids = new Set([...nodeIds].slice(0, cap));
     const rels = G.rels.filter(r => ids.has(r.start) && ids.has(r.end) && relFilter(r));
     return { nodes: [...ids].map(i => nodeById.get(i)), rels };
@@ -238,5 +238,5 @@
   }
   $("qlist").innerHTML = QUERIES.map((q, i) => `<button class="qbtn" data-i="${i}">${esc(q.name)}<small>${esc(q.cypher)}</small></button>`).join("");
   $("qlist").querySelectorAll(".qbtn").forEach(b => b.onclick = () => run(+b.dataset.i));
-  run(1);
+  run(0);
 })();
