@@ -91,6 +91,43 @@ def showcase(best, risk, cluster_of, group_name, user_themes, threads, per_user_
     return out
 
 
+def clades(groups, risk, cluster_of, user_texts, norm_orig, user_ts, per_user_threads, threads, pair_rels, best) -> list[dict]:
+    """Every coordination group (3+ linked accounts), with its main theme and what the members have in common."""
+    links = defaultdict(Counter)
+    for s_, d_, rel, _ in pair_rels:
+        links[cluster_of.get(s_, 0)][rel] += 1
+    day = lambda ms: datetime.fromtimestamp(ms / 1000, timezone.utc).strftime("%d %b %Y")
+    out = []
+    for g in groups:
+        mem = g["members"]; n = len(mem)
+        top = [(t, c) for t, c in g["themes"].most_common() if c / n >= 0.15]
+        key = top[0][0] if top else "none"
+        phrases = Counter()
+        for u in mem:
+            phrases.update(set(user_texts.get(u, [])))
+        phrase, pn = phrases.most_common(1)[0] if phrases else ("", 0)
+        shared = pn >= 2
+        if shared:
+            text = norm_orig[phrase]
+        else:
+            bu = max(mem, key=lambda u: risk.get(u, 0))
+            text = re.sub(r"\s+", " ", (best.get(bu, {}).get("c", {}) or {}).get("text") or "").strip()
+        vids = Counter()
+        for u in mem:
+            vids.update(per_user_threads[u].keys())
+        tv = threads.get(vids.most_common(1)[0][0], {}) if vids else {}
+        ts = [t for u in mem for t in user_ts.get(u, [])]
+        rs = [risk.get(u, 0) for u in mem]
+        out.append({"gi": g["gi"], "key": key, "theme": THEMES[key]["label"] if key != "none" else "Other copied lines", "icon": ICON.get(key, "💬"),
+                    "accounts": n, "avg_risk": round(sum(rs) / n), "max_risk": round(max(rs)), "flagged": sum(1 for r in rs if r >= 35),
+                    "shared": shared, "repeated_by": pn if shared else 0, "text": text[:120] + ("…" if len(text) > 120 else ""),
+                    "themes": [{"label": THEMES[t]["short"], "value": round(100 * c / n)} for t, c in g["themes"].most_common(4)],
+                    "copy": links[g["gi"]].get("COPY", 0), "co_thread": links[g["gi"]].get("CO_THREAD", 0), "sync": links[g["gi"]].get("SYNC", 0),
+                    "videos": len(vids), "video": tv.get("title") or "", "video_id": tv.get("external_id") or "",
+                    "from": day(min(ts)) if ts else "", "to": day(max(ts)) if ts else ""})
+    return out
+
+
 def confidence_table(path: Path) -> dict:
     """What a stated BOT % actually meant on held-out labelled accounts."""
     import pandas as pd
@@ -176,9 +213,16 @@ def main() -> None:
     per_user_threads, per_user_n, per_thread_n = defaultdict(Counter), Counter(), Counter()
     user_themes, theme_comments, theme_users = defaultdict(Counter), Counter(), defaultdict(set)
     acct_meta = {}
+    user_texts, user_ts, norm_orig = defaultdict(list), defaultdict(list), {}
     for c in comments:
         per_user_threads[c["user"]][c["thread_id"]] += 1; per_user_n[c["user"]] += 1; per_thread_n[c["thread_id"]] += 1
-        for th in tag_theme(c["text"]):   # text is read here and never written out
+        if c["text"]:
+            orig = re.sub(r"\s+", " ", c["text"]).strip(); norm = orig.casefold()
+            if len(norm) >= 6:
+                user_texts[c["user"]].append(norm); norm_orig.setdefault(norm, orig)
+        if c["ts"]:
+            user_ts[c["user"]].append(c["ts"])
+        for th in tag_theme(c["text"]):
             user_themes[c["user"]][th] += 1; theme_comments[th] += 1; theme_users[th].add(c["user"])
         if c["account"] and c["user"] not in acct_meta:
             acct_meta[c["user"]] = json.loads(c["account"])
@@ -369,6 +413,7 @@ def main() -> None:
             "weak": sum(1 for s in risk.values() if 15 <= s < 35), "none": sum(1 for s in risk.values() if s < 15),
             "accounts": len(risk),
         },
+        "clades": clades(groups, risk, cluster_of, user_texts, norm_orig, user_ts, per_user_threads, threads, pair_rels, best),
         "showcase": showcase(best, risk, cluster_of, group_name, user_themes, threads, per_user_n),
         "stats": stage_stats(col, threads, tmeta, per_thread_n, per_user_n, best, risk, relc, levels, weights, meta),
     }

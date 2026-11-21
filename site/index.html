@@ -13,7 +13,7 @@
 <nav class="top">
   <a class="brand" href="#top">HTCCIP</a>
   <div class="links">
-    <a href="#found">Found</a><a href="#top10">Top 10</a><a href="#trust">Can we trust it?</a><a href="#full">Full analysis</a>
+    <a href="#found">Found</a><a href="#families">Families</a><a href="#top10">Top 10</a><a href="#trust">Can we trust it?</a><a href="#full">Full analysis</a>
   </div>
 </nav>
 
@@ -27,6 +27,15 @@
   <h2>What we found</h2>
   <p class="sub">Sorted by how sure we are. Coordination evidence is not proof: a human confirms before anyone acts.</p>
   <div class="found" id="foundrow"></div>
+</section>
+
+<section id="families" class="wrap">
+  <h2 id="famtitle">Bot families</h2>
+  <div class="legend10"><span>⚪ one bubble = one family of linked accounts</span><span>number = accounts in it</span><span>bigger = more accounts</span><span>darker = more bot-like</span><span>circle = what they talk about</span><span>👆 tap a bubble</span></div>
+  <div class="ten">
+    <div class="bubbles"><svg id="clades" role="img" aria-label="All bot families grouped by topic"></svg></div>
+    <article class="pick" id="cpick" aria-live="polite"></article>
+  </div>
 </section>
 
 <section id="top10" class="wrap">

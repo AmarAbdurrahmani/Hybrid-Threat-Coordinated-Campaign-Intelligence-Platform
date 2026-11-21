@@ -1,5 +1,5 @@
 {
- "built": "2026-11-21 20:45 UTC",
+ "built": "2026-11-21 20:50 UTC",
  "kpis": [
   {
    "value": 10275,
@@ -347,6 +347,5111 @@
   "none": 3853,
   "accounts": 7188
  },
+ "clades": [
+  {
+   "gi": 1,
+   "key": "contests_independence",
+   "theme": "Contests Kosovo's independence",
+   "icon": "🗺️",
+   "accounts": 542,
+   "avg_risk": 29,
+   "max_risk": 57,
+   "flagged": 166,
+   "shared": true,
+   "repeated_by": 51,
+   "text": "KOSOVO IS SERBIA",
+   "themes": [
+    {
+     "label": "Kosovo is Serbia",
+     "value": 34
+    },
+    {
+     "label": "War",
+     "value": 8
+    },
+    {
+     "label": "Russia",
+     "value": 8
+    },
+    {
+     "label": "Albania",
+     "value": 8
+    }
+   ],
+   "copy": 3717,
+   "co_thread": 654,
+   "sync": 8,
+   "videos": 42,
+   "video": "INTERVJU: Vasko Eftov – Putin neće slati vojsku zbog Kosova, ma koliko ga Srbi voleli! (21.11.2026)",
+   "video_id": "daG9f5qTdSI",
+   "from": "23 Sep 2026",
+   "to": "21 Nov 2026"
+  },
+  {
+   "gi": 2,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 67,
+   "avg_risk": 36,
+   "max_risk": 52,
+   "flagged": 31,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Bravo za pitanje 👏👏👏",
+   "themes": [
+    {
+     "label": "Leaders",
+     "value": 10
+    },
+    {
+     "label": "War",
+     "value": 7
+    },
+    {
+     "label": "NATO",
+     "value": 4
+    },
+    {
+     "label": "EU/US",
+     "value": 3
+    }
+   ],
+   "copy": 7,
+   "co_thread": 108,
+   "sync": 1,
+   "videos": 13,
+   "video": "Neko je na hodniku iznervirao Aleksandra Vučića pitanjem. video: instagram Aleksa Banduka",
+   "video_id": "Vbmhqm8_Qac",
+   "from": "24 Sep 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 3,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 53,
+   "avg_risk": 25,
+   "max_risk": 57,
+   "flagged": 9,
+   "shared": true,
+   "repeated_by": 16,
+   "text": "I LIVE IN KOSOVO",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 4
+    },
+    {
+     "label": "Kosova independent",
+     "value": 2
+    },
+    {
+     "label": "Kosovo is Serbia",
+     "value": 2
+    },
+    {
+     "label": "EU/US",
+     "value": 2
+    }
+   ],
+   "copy": 380,
+   "co_thread": 8,
+   "sync": 1,
+   "videos": 5,
+   "video": "Is Kosovo a country or not?",
+   "video_id": "xfhM49CN7Oc",
+   "from": "18 Oct 2026",
+   "to": "21 Nov 2026"
+  },
+  {
+   "gi": 4,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 19,
+   "avg_risk": 37,
+   "max_risk": 52,
+   "flagged": 11,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Laki je malo nervozan",
+   "themes": [
+    {
+     "label": "Leaders",
+     "value": 5
+    },
+    {
+     "label": "Albania",
+     "value": 5
+    },
+    {
+     "label": "EU/US",
+     "value": 5
+    }
+   ],
+   "copy": 3,
+   "co_thread": 29,
+   "sync": 0,
+   "videos": 3,
+   "video": "Neko je na hodniku iznervirao Aleksandra Vučića pitanjem. video: instagram Aleksa Banduka",
+   "video_id": "Vbmhqm8_Qac",
+   "from": "22 Oct 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 5,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 16,
+   "avg_risk": 34,
+   "max_risk": 48,
+   "flagged": 5,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Fantastic speech with clear facts",
+   "themes": [
+    {
+     "label": "War",
+     "value": 25
+    },
+    {
+     "label": "Russia",
+     "value": 19
+    },
+    {
+     "label": "Albania",
+     "value": 12
+    },
+    {
+     "label": "EU/US",
+     "value": 6
+    }
+   ],
+   "copy": 0,
+   "co_thread": 20,
+   "sync": 0,
+   "videos": 6,
+   "video": "FULL SPEECH: Serbian President Vučić Accuses West of Double Standards Over Kosovo at UN | AC1G",
+   "video_id": "BNwurRKBgs4",
+   "from": "23 Sep 2026",
+   "to": "14 Nov 2026"
+  },
+  {
+   "gi": 6,
+   "key": "eu_us",
+   "theme": "EU / United States",
+   "icon": "🇪🇺",
+   "accounts": 14,
+   "avg_risk": 34,
+   "max_risk": 43,
+   "flagged": 6,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Lies",
+   "themes": [
+    {
+     "label": "EU/US",
+     "value": 36
+    },
+    {
+     "label": "War",
+     "value": 29
+    },
+    {
+     "label": "Albania",
+     "value": 21
+    },
+    {
+     "label": "Religion",
+     "value": 14
+    }
+   ],
+   "copy": 0,
+   "co_thread": 16,
+   "sync": 0,
+   "videos": 3,
+   "video": "FULL SPEECH: Serbian President Vučić Accuses West of Double Standards Over Kosovo at UN | AC1G",
+   "video_id": "BNwurRKBgs4",
+   "from": "24 Sep 2026",
+   "to": "19 Oct 2026"
+  },
+  {
+   "gi": 7,
+   "key": "politicians",
+   "theme": "Kurti / Vučić / leaders",
+   "icon": "👤",
+   "accounts": 13,
+   "avg_risk": 34,
+   "max_risk": 42,
+   "flagged": 7,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "You really mean to tell me that 1.6 Mio people will be part of another country against their will? I doubt it. Serbia is…",
+   "themes": [
+    {
+     "label": "Leaders",
+     "value": 23
+    },
+    {
+     "label": "EU/US",
+     "value": 23
+    },
+    {
+     "label": "Albania",
+     "value": 15
+    },
+    {
+     "label": "Russia",
+     "value": 15
+    }
+   ],
+   "copy": 0,
+   "co_thread": 13,
+   "sync": 0,
+   "videos": 5,
+   "video": "FULL SPEECH: Serbian President Vučić Accuses West of Double Standards Over Kosovo at UN | AC1G",
+   "video_id": "BNwurRKBgs4",
+   "from": "23 Sep 2026",
+   "to": "07 Nov 2026"
+  },
+  {
+   "gi": 8,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 12,
+   "avg_risk": 34,
+   "max_risk": 43,
+   "flagged": 6,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Dream on 😂",
+   "themes": [
+    {
+     "label": "War",
+     "value": 50
+    },
+    {
+     "label": "NATO",
+     "value": 33
+    },
+    {
+     "label": "Leaders",
+     "value": 25
+    },
+    {
+     "label": "Albania",
+     "value": 25
+    }
+   ],
+   "copy": 0,
+   "co_thread": 19,
+   "sync": 0,
+   "videos": 3,
+   "video": "FULL SPEECH: Serbian President Vučić Accuses West of Double Standards Over Kosovo at UN | AC1G",
+   "video_id": "BNwurRKBgs4",
+   "from": "24 Sep 2026",
+   "to": "17 Nov 2026"
+  },
+  {
+   "gi": 9,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 12,
+   "avg_risk": 37,
+   "max_risk": 58,
+   "flagged": 6,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Fantastic speech with clear facts! Bravo 👏",
+   "themes": [
+    {
+     "label": "War",
+     "value": 33
+    },
+    {
+     "label": "EU/US",
+     "value": 33
+    },
+    {
+     "label": "Leaders",
+     "value": 25
+    },
+    {
+     "label": "Russia",
+     "value": 25
+    }
+   ],
+   "copy": 0,
+   "co_thread": 15,
+   "sync": 0,
+   "videos": 7,
+   "video": "FULL SPEECH: Serbian President Vučić Accuses West of Double Standards Over Kosovo at UN | AC1G",
+   "video_id": "BNwurRKBgs4",
+   "from": "24 Sep 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 10,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 10,
+   "avg_risk": 40,
+   "max_risk": 50,
+   "flagged": 7,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "2:16 atleast the joke went down swinging",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 23,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 11,
+   "key": "eu_us",
+   "theme": "EU / United States",
+   "icon": "🇪🇺",
+   "accounts": 10,
+   "avg_risk": 34,
+   "max_risk": 47,
+   "flagged": 6,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Zlatanovic srbin info",
+   "themes": [
+    {
+     "label": "EU/US",
+     "value": 30
+    },
+    {
+     "label": "Leaders",
+     "value": 10
+    },
+    {
+     "label": "Religion",
+     "value": 10
+    },
+    {
+     "label": "Albania",
+     "value": 10
+    }
+   ],
+   "copy": 0,
+   "co_thread": 12,
+   "sync": 0,
+   "videos": 4,
+   "video": "Neko je na hodniku iznervirao Aleksandra Vučića pitanjem. video: instagram Aleksa Banduka",
+   "video_id": "Vbmhqm8_Qac",
+   "from": "13 Oct 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 12,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 10,
+   "avg_risk": 38,
+   "max_risk": 48,
+   "flagged": 7,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "bravooo",
+   "themes": [
+    {
+     "label": "War",
+     "value": 20
+    },
+    {
+     "label": "Kosovo is Serbia",
+     "value": 10
+    },
+    {
+     "label": "EU/US",
+     "value": 10
+    }
+   ],
+   "copy": 0,
+   "co_thread": 13,
+   "sync": 0,
+   "videos": 2,
+   "video": "Srbi sa Kosova podneli krivičnu prijavu",
+   "video_id": "g9T3cT7Tocs",
+   "from": "11 Nov 2026",
+   "to": "16 Nov 2026"
+  },
+  {
+   "gi": 13,
+   "key": "supports_independence",
+   "theme": "Supports Kosovo's independence",
+   "icon": "🏛️",
+   "accounts": 9,
+   "avg_risk": 39,
+   "max_risk": 55,
+   "flagged": 6,
+   "shared": true,
+   "repeated_by": 2,
+   "text": "Kosovo is it’s own country",
+   "themes": [
+    {
+     "label": "Kosova independent",
+     "value": 22
+    },
+    {
+     "label": "Kosovo is Serbia",
+     "value": 11
+    },
+    {
+     "label": "Albania",
+     "value": 11
+    }
+   ],
+   "copy": 1,
+   "co_thread": 12,
+   "sync": 0,
+   "videos": 2,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "20 Nov 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 14,
+   "key": "contests_independence",
+   "theme": "Contests Kosovo's independence",
+   "icon": "🗺️",
+   "accounts": 8,
+   "avg_risk": 29,
+   "max_risk": 49,
+   "flagged": 3,
+   "shared": true,
+   "repeated_by": 2,
+   "text": "it is a part of serbia",
+   "themes": [
+    {
+     "label": "Kosovo is Serbia",
+     "value": 25
+    },
+    {
+     "label": "NATO",
+     "value": 12
+    }
+   ],
+   "copy": 4,
+   "co_thread": 4,
+   "sync": 0,
+   "videos": 5,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "01 Oct 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 15,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 8,
+   "avg_risk": 20,
+   "max_risk": 35,
+   "flagged": 1,
+   "shared": true,
+   "repeated_by": 4,
+   "text": "Kosovo is Albania",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 75
+    },
+    {
+     "label": "Kosova independent",
+     "value": 12
+    }
+   ],
+   "copy": 15,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 5,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "09 Oct 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 16,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 8,
+   "avg_risk": 33,
+   "max_risk": 36,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "A zashto sfet gi progllasill serbiti genocidashi zashto",
+   "themes": [
+    {
+     "label": "War",
+     "value": 25
+    },
+    {
+     "label": "Religion",
+     "value": 25
+    },
+    {
+     "label": "EU/US",
+     "value": 12
+    }
+   ],
+   "copy": 0,
+   "co_thread": 9,
+   "sync": 0,
+   "videos": 2,
+   "video": "Kako danas žive Srbi na Kosovu i Metohiji? - JUTRO",
+   "video_id": "Uqn-B3y8wR8",
+   "from": "29 Oct 2026",
+   "to": "01 Nov 2026"
+  },
+  {
+   "gi": 17,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 8,
+   "avg_risk": 16,
+   "max_risk": 19,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Dobar gost.👍",
+   "themes": [
+    {
+     "label": "War",
+     "value": 25
+    },
+    {
+     "label": "Russia",
+     "value": 12
+    }
+   ],
+   "copy": 0,
+   "co_thread": 10,
+   "sync": 0,
+   "videos": 2,
+   "video": "INTERVJU: Vasko Eftov – Putin neće slati vojsku zbog Kosova, ma koliko ga Srbi voleli! (21.11.2026)",
+   "video_id": "daG9f5qTdSI",
+   "from": "24 Sep 2026",
+   "to": "21 Nov 2026"
+  },
+  {
+   "gi": 18,
+   "key": "contests_independence",
+   "theme": "Contests Kosovo's independence",
+   "icon": "🗺️",
+   "accounts": 7,
+   "avg_risk": 30,
+   "max_risk": 50,
+   "flagged": 2,
+   "shared": true,
+   "repeated_by": 5,
+   "text": "Kosovo is not a country",
+   "themes": [
+    {
+     "label": "Kosovo is Serbia",
+     "value": 71
+    },
+    {
+     "label": "War",
+     "value": 14
+    },
+    {
+     "label": "Religion",
+     "value": 14
+    },
+    {
+     "label": "Russia",
+     "value": 14
+    }
+   ],
+   "copy": 10,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 4,
+   "video": "Is Kosovo a country or not?",
+   "video_id": "xfhM49CN7Oc",
+   "from": "28 Oct 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 19,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 7,
+   "avg_risk": 35,
+   "max_risk": 48,
+   "flagged": 4,
+   "shared": true,
+   "repeated_by": 2,
+   "text": "A part of Albania",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 43
+    },
+    {
+     "label": "Kosovo is Serbia",
+     "value": 29
+    }
+   ],
+   "copy": 3,
+   "co_thread": 4,
+   "sync": 0,
+   "videos": 3,
+   "video": "What If Kosovo Suddenly Disappeared? 🤔",
+   "video_id": "g9F3sgZ0M3Y",
+   "from": "11 Oct 2026",
+   "to": "17 Nov 2026"
+  },
+  {
+   "gi": 20,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 7,
+   "avg_risk": 19,
+   "max_risk": 27,
+   "flagged": 0,
+   "shared": true,
+   "repeated_by": 2,
+   "text": "Zivela Srbija",
+   "themes": [
+    {
+     "label": "Kosovo is Serbia",
+     "value": 14
+    },
+    {
+     "label": "Leaders",
+     "value": 14
+    }
+   ],
+   "copy": 7,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 8,
+   "video": "Istorijsko obraćanje Vučića u UN: Upozorenje Globalnom jugu i poruka o Kosovu i Metohiji...",
+   "video_id": "VTWmOlWptoI",
+   "from": "24 Sep 2026",
+   "to": "17 Nov 2026"
+  },
+  {
+   "gi": 21,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 7,
+   "avg_risk": 24,
+   "max_risk": 30,
+   "flagged": 0,
+   "shared": true,
+   "repeated_by": 2,
+   "text": "Serbia is kosovo",
+   "themes": [
+    {
+     "label": "NATO",
+     "value": 14
+    },
+    {
+     "label": "EU/US",
+     "value": 14
+    },
+    {
+     "label": "Kosovo is Serbia",
+     "value": 14
+    },
+    {
+     "label": "Albania",
+     "value": 14
+    }
+   ],
+   "copy": 3,
+   "co_thread": 4,
+   "sync": 0,
+   "videos": 3,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "04 Oct 2026",
+   "to": "21 Nov 2026"
+  },
+  {
+   "gi": 22,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 7,
+   "avg_risk": 21,
+   "max_risk": 26,
+   "flagged": 0,
+   "shared": true,
+   "repeated_by": 2,
+   "text": "Team albania",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 100
+    }
+   ],
+   "copy": 21,
+   "co_thread": 0,
+   "sync": 0,
+   "videos": 1,
+   "video": "Team Albania VS Team Serbia #albania #serbia #history #geography #map #maps #europe #usa #america",
+   "video_id": "JJltcG2lBtg",
+   "from": "14 Nov 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 23,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 7,
+   "avg_risk": 36,
+   "max_risk": 39,
+   "flagged": 4,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Ldk se fundmi edhe me shkoll politike",
+   "themes": [
+    {
+     "label": "NATO",
+     "value": 14
+    }
+   ],
+   "copy": 0,
+   "co_thread": 15,
+   "sync": 0,
+   "videos": 2,
+   "video": "Why Kosovo is NOT Serbia Today?",
+   "video_id": "pfSYWfdQLm0",
+   "from": "16 Oct 2026",
+   "to": "07 Nov 2026"
+  },
+  {
+   "gi": 24,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 7,
+   "avg_risk": 35,
+   "max_risk": 42,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Albanians fought hand in hand with the Serbs against the Turks, and then they got fucked over by the Serbs for years—fro…",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 43
+    },
+    {
+     "label": "Religion",
+     "value": 29
+    },
+    {
+     "label": "War",
+     "value": 29
+    },
+    {
+     "label": "Russia",
+     "value": 29
+    }
+   ],
+   "copy": 0,
+   "co_thread": 6,
+   "sync": 0,
+   "videos": 1,
+   "video": "Kosovo’s Albanian History",
+   "video_id": "mZX0EAXuZyQ",
+   "from": "11 Nov 2026",
+   "to": "12 Nov 2026"
+  },
+  {
+   "gi": 25,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 7,
+   "avg_risk": 36,
+   "max_risk": 43,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Same",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 10,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 26,
+   "key": "eu_us",
+   "theme": "EU / United States",
+   "icon": "🇪🇺",
+   "accounts": 7,
+   "avg_risk": 35,
+   "max_risk": 44,
+   "flagged": 4,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Bravoo",
+   "themes": [
+    {
+     "label": "EU/US",
+     "value": 43
+    },
+    {
+     "label": "War",
+     "value": 14
+    }
+   ],
+   "copy": 0,
+   "co_thread": 9,
+   "sync": 0,
+   "videos": 1,
+   "video": "Srbi sa Kosova podneli krivičnu prijavu",
+   "video_id": "g9T3cT7Tocs",
+   "from": "16 Nov 2026",
+   "to": "16 Nov 2026"
+  },
+  {
+   "gi": 27,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 7,
+   "avg_risk": 35,
+   "max_risk": 46,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Been waiting for this since the pod.",
+   "themes": [
+    {
+     "label": "NATO",
+     "value": 14
+    },
+    {
+     "label": "War",
+     "value": 14
+    }
+   ],
+   "copy": 0,
+   "co_thread": 11,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 28,
+   "key": "contests_independence",
+   "theme": "Contests Kosovo's independence",
+   "icon": "🗺️",
+   "accounts": 6,
+   "avg_risk": 36,
+   "max_risk": 47,
+   "flagged": 4,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Kosovë is it's own country, and soon enough a part of Albania once more.",
+   "themes": [
+    {
+     "label": "Kosovo is Serbia",
+     "value": 33
+    },
+    {
+     "label": "EU/US",
+     "value": 17
+    },
+    {
+     "label": "Albania",
+     "value": 17
+    },
+    {
+     "label": "Kosova independent",
+     "value": 17
+    }
+   ],
+   "copy": 1,
+   "co_thread": 10,
+   "sync": 0,
+   "videos": 2,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "26 Oct 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 29,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 6,
+   "avg_risk": 34,
+   "max_risk": 36,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Vide kuce Stojan al se zalijepio za nogu AV",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 17
+    }
+   ],
+   "copy": 0,
+   "co_thread": 5,
+   "sync": 0,
+   "videos": 2,
+   "video": "Neko je na hodniku iznervirao Aleksandra Vučića pitanjem. video: instagram Aleksa Banduka",
+   "video_id": "Vbmhqm8_Qac",
+   "from": "12 Oct 2026",
+   "to": "18 Nov 2026"
+  },
+  {
+   "gi": 30,
+   "key": "politicians",
+   "theme": "Kurti / Vučić / leaders",
+   "icon": "👤",
+   "accounts": 6,
+   "avg_risk": 39,
+   "max_risk": 49,
+   "flagged": 4,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Srbin info, Dejan Petar Zlatanović",
+   "themes": [
+    {
+     "label": "Leaders",
+     "value": 17
+    },
+    {
+     "label": "EU/US",
+     "value": 17
+    }
+   ],
+   "copy": 0,
+   "co_thread": 8,
+   "sync": 0,
+   "videos": 1,
+   "video": "Neko je na hodniku iznervirao Aleksandra Vučića pitanjem. video: instagram Aleksa Banduka",
+   "video_id": "Vbmhqm8_Qac",
+   "from": "18 Nov 2026",
+   "to": "18 Nov 2026"
+  },
+  {
+   "gi": 31,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 6,
+   "avg_risk": 38,
+   "max_risk": 46,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Hahahaha Zlatanovic Deki!",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 13,
+   "sync": 0,
+   "videos": 2,
+   "video": "Neko je na hodniku iznervirao Aleksandra Vučića pitanjem. video: instagram Aleksa Banduka",
+   "video_id": "Vbmhqm8_Qac",
+   "from": "09 Nov 2026",
+   "to": "18 Nov 2026"
+  },
+  {
+   "gi": 32,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 6,
+   "avg_risk": 32,
+   "max_risk": 39,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Instant no as a Serbian",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 5,
+   "sync": 0,
+   "videos": 1,
+   "video": "Question for Serbians 🇷🇸 (1914)",
+   "video_id": "4FD9j4YGkPA",
+   "from": "16 Oct 2026",
+   "to": "17 Oct 2026"
+  },
+  {
+   "gi": 33,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 6,
+   "avg_risk": 36,
+   "max_risk": 48,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Bravo Deki!❤",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 5,
+   "sync": 0,
+   "videos": 1,
+   "video": "Neko je na hodniku iznervirao Aleksandra Vučića pitanjem. video: instagram Aleksa Banduka",
+   "video_id": "Vbmhqm8_Qac",
+   "from": "18 Nov 2026",
+   "to": "18 Nov 2026"
+  },
+  {
+   "gi": 34,
+   "key": "contests_independence",
+   "theme": "Contests Kosovo's independence",
+   "icon": "🗺️",
+   "accounts": 6,
+   "avg_risk": 36,
+   "max_risk": 45,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "bro isn't kosovo part of serbia",
+   "themes": [
+    {
+     "label": "Kosovo is Serbia",
+     "value": 33
+    },
+    {
+     "label": "NATO",
+     "value": 33
+    },
+    {
+     "label": "War",
+     "value": 17
+    }
+   ],
+   "copy": 0,
+   "co_thread": 7,
+   "sync": 0,
+   "videos": 1,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 35,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 6,
+   "avg_risk": 34,
+   "max_risk": 36,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Dejane kralju....istetoviraću te na podlaktici❤❤❤BRAVOOOOO",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 7,
+   "sync": 0,
+   "videos": 3,
+   "video": "Neko je na hodniku iznervirao Aleksandra Vučića pitanjem. video: instagram Aleksa Banduka",
+   "video_id": "Vbmhqm8_Qac",
+   "from": "22 Oct 2026",
+   "to": "18 Nov 2026"
+  },
+  {
+   "gi": 36,
+   "key": "religion",
+   "theme": "Religion",
+   "icon": "⛪",
+   "accounts": 6,
+   "avg_risk": 31,
+   "max_risk": 46,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "@austr@australiaprisonisland9156 Find me a Muslim who is of Serb ethnicity, I personally don’t know of any. I do know th…",
+   "themes": [
+    {
+     "label": "Religion",
+     "value": 67
+    },
+    {
+     "label": "War",
+     "value": 33
+    },
+    {
+     "label": "Albania",
+     "value": 17
+    },
+    {
+     "label": "Kosovo is Serbia",
+     "value": 17
+    }
+   ],
+   "copy": 0,
+   "co_thread": 5,
+   "sync": 0,
+   "videos": 1,
+   "video": "Serbia's Borders Are Wrong",
+   "video_id": "1blKNuQ8m0M",
+   "from": "10 Oct 2026",
+   "to": "10 Oct 2026"
+  },
+  {
+   "gi": 37,
+   "key": "contests_independence",
+   "theme": "Contests Kosovo's independence",
+   "icon": "🗺️",
+   "accounts": 6,
+   "avg_risk": 32,
+   "max_risk": 38,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Kosovo i Metohija su Srbija !",
+   "themes": [
+    {
+     "label": "Kosovo is Serbia",
+     "value": 17
+    },
+    {
+     "label": "EU/US",
+     "value": 17
+    },
+    {
+     "label": "NATO",
+     "value": 17
+    },
+    {
+     "label": "Albania",
+     "value": 17
+    }
+   ],
+   "copy": 0,
+   "co_thread": 8,
+   "sync": 0,
+   "videos": 2,
+   "video": "FULL SPEECH: Serbia President Aleksandar Vučić at UNGA 2026 | Kosovo, Ukraine & Global Order | AC1E",
+   "video_id": "TA2Gw6C9VEY",
+   "from": "24 Sep 2026",
+   "to": "29 Sep 2026"
+  },
+  {
+   "gi": 38,
+   "key": "religion",
+   "theme": "Religion",
+   "icon": "⛪",
+   "accounts": 6,
+   "avg_risk": 33,
+   "max_risk": 37,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "oh yes .. do you have his birth certificate. .. in these days the facts are simple DNA .",
+   "themes": [
+    {
+     "label": "Religion",
+     "value": 33
+    },
+    {
+     "label": "Albania",
+     "value": 33
+    },
+    {
+     "label": "War",
+     "value": 17
+    },
+    {
+     "label": "EU/US",
+     "value": 17
+    }
+   ],
+   "copy": 0,
+   "co_thread": 7,
+   "sync": 0,
+   "videos": 1,
+   "video": "Kosovo’s Albanian History",
+   "video_id": "mZX0EAXuZyQ",
+   "from": "11 Nov 2026",
+   "to": "12 Nov 2026"
+  },
+  {
+   "gi": 39,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 6,
+   "avg_risk": 35,
+   "max_risk": 48,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Well hey, at least they went down swinging...",
+   "themes": [
+    {
+     "label": "War",
+     "value": 17
+    }
+   ],
+   "copy": 0,
+   "co_thread": 15,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 40,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 5,
+   "avg_risk": 20,
+   "max_risk": 35,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Nikad",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 20
+    },
+    {
+     "label": "EU/US",
+     "value": 20
+    },
+    {
+     "label": "War",
+     "value": 20
+    }
+   ],
+   "copy": 1,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 7,
+   "video": "Is Kosovo Actually an Independent Country? 🇽🇰🇷🇸 Kosovo Explained",
+   "video_id": "Xsuu2Owt1Fs",
+   "from": "24 Sep 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 41,
+   "key": "contests_independence",
+   "theme": "Contests Kosovo's independence",
+   "icon": "🗺️",
+   "accounts": 5,
+   "avg_risk": 29,
+   "max_risk": 49,
+   "flagged": 2,
+   "shared": true,
+   "repeated_by": 2,
+   "text": "Albaniaaaaaaa",
+   "themes": [
+    {
+     "label": "Kosovo is Serbia",
+     "value": 60
+    },
+    {
+     "label": "Albania",
+     "value": 40
+    }
+   ],
+   "copy": 4,
+   "co_thread": 1,
+   "sync": 0,
+   "videos": 3,
+   "video": "Team Albania VS Team Serbia #albania #serbia #history #geography #map #maps #europe #usa #america",
+   "video_id": "JJltcG2lBtg",
+   "from": "23 Oct 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 42,
+   "key": "contests_independence",
+   "theme": "Contests Kosovo's independence",
+   "icon": "🗺️",
+   "accounts": 5,
+   "avg_risk": 38,
+   "max_risk": 55,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Kosovo i Metohija je Srbija",
+   "themes": [
+    {
+     "label": "Kosovo is Serbia",
+     "value": 40
+    },
+    {
+     "label": "EU/US",
+     "value": 40
+    },
+    {
+     "label": "Albania",
+     "value": 20
+    },
+    {
+     "label": "NATO",
+     "value": 20
+    }
+   ],
+   "copy": 1,
+   "co_thread": 5,
+   "sync": 0,
+   "videos": 2,
+   "video": "FULL SPEECH: Serbian President Vučić Accuses West of Double Standards Over Kosovo at UN | AC1G",
+   "video_id": "BNwurRKBgs4",
+   "from": "24 Sep 2026",
+   "to": "21 Oct 2026"
+  },
+  {
+   "gi": 43,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 5,
+   "avg_risk": 33,
+   "max_risk": 47,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "WE THOUGHT YOU WAS A TOAD!",
+   "themes": [],
+   "copy": 3,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 44,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 5,
+   "avg_risk": 33,
+   "max_risk": 37,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Not sure why James Blunt, nice guy though he is, gets ANY credit for stopping WWIII: that was 100% down to General Jacks…",
+   "themes": [
+    {
+     "label": "War",
+     "value": 20
+    }
+   ],
+   "copy": 0,
+   "co_thread": 7,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 45,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 5,
+   "avg_risk": 38,
+   "max_risk": 48,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "😂😂😂😂😂😂😂😂",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 10,
+   "sync": 0,
+   "videos": 1,
+   "video": "Neko je na hodniku iznervirao Aleksandra Vučića pitanjem. video: instagram Aleksa Banduka",
+   "video_id": "Vbmhqm8_Qac",
+   "from": "18 Nov 2026",
+   "to": "18 Nov 2026"
+  },
+  {
+   "gi": 46,
+   "key": "russia",
+   "theme": "Russia",
+   "icon": "🇷🇺",
+   "accounts": 5,
+   "avg_risk": 37,
+   "max_risk": 49,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Country",
+   "themes": [
+    {
+     "label": "Russia",
+     "value": 40
+    },
+    {
+     "label": "Kosovo is Serbia",
+     "value": 20
+    },
+    {
+     "label": "Religion",
+     "value": 20
+    },
+    {
+     "label": "Albania",
+     "value": 20
+    }
+   ],
+   "copy": 0,
+   "co_thread": 4,
+   "sync": 0,
+   "videos": 1,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "20 Nov 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 47,
+   "key": "religion",
+   "theme": "Religion",
+   "icon": "⛪",
+   "accounts": 5,
+   "avg_risk": 33,
+   "max_risk": 41,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Ratko Mladic Heroj 💪",
+   "themes": [
+    {
+     "label": "Religion",
+     "value": 20
+    }
+   ],
+   "copy": 0,
+   "co_thread": 4,
+   "sync": 0,
+   "videos": 1,
+   "video": "Vuletić: Srpsko društvo je dubinski bolesno!",
+   "video_id": "HuUP4qQGGY0",
+   "from": "20 Oct 2026",
+   "to": "20 Oct 2026"
+  },
+  {
+   "gi": 48,
+   "key": "religion",
+   "theme": "Religion",
+   "icon": "⛪",
+   "accounts": 5,
+   "avg_risk": 36,
+   "max_risk": 46,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Well, at least we know why Brandon lost the race.",
+   "themes": [
+    {
+     "label": "Religion",
+     "value": 20
+    }
+   ],
+   "copy": 0,
+   "co_thread": 5,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 49,
+   "key": "nato",
+   "theme": "NATO / KFOR",
+   "icon": "🛡️",
+   "accounts": 5,
+   "avg_risk": 34,
+   "max_risk": 38,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Ziv bio Vucicu tako je. KOSOVO JE SRBIJA. ZATO JE TVOJA POBEDA 1000 POSTO. ZIVELA SRBIJA. ❤❤❤",
+   "themes": [
+    {
+     "label": "NATO",
+     "value": 20
+    },
+    {
+     "label": "War",
+     "value": 20
+    },
+    {
+     "label": "Kosovo is Serbia",
+     "value": 20
+    },
+    {
+     "label": "Leaders",
+     "value": 20
+    }
+   ],
+   "copy": 0,
+   "co_thread": 5,
+   "sync": 0,
+   "videos": 2,
+   "video": "Istorijsko obraćanje Vučića u UN: Upozorenje Globalnom jugu i poruka o Kosovu i Metohiji...",
+   "video_id": "VTWmOlWptoI",
+   "from": "24 Sep 2026",
+   "to": "18 Oct 2026"
+  },
+  {
+   "gi": 50,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 5,
+   "avg_risk": 33,
+   "max_risk": 39,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Iti multumim! ❤️",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 40
+    },
+    {
+     "label": "EU/US",
+     "value": 40
+    },
+    {
+     "label": "Russia",
+     "value": 20
+    }
+   ],
+   "copy": 0,
+   "co_thread": 4,
+   "sync": 0,
+   "videos": 1,
+   "video": "Am RISCAT TOTUL venind aici! Acesta este CEL MAI DISPUTAT oraş din EUROPA!",
+   "video_id": "fhdDDOA7o-0",
+   "from": "16 Nov 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 51,
+   "key": "religion",
+   "theme": "Religion",
+   "icon": "⛪",
+   "accounts": 5,
+   "avg_risk": 31,
+   "max_risk": 34,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Omg a video posted today that ain’t gta 6 related you have no idea how much I appreciate you trout lol 😂",
+   "themes": [
+    {
+     "label": "Religion",
+     "value": 20
+    },
+    {
+     "label": "War",
+     "value": 20
+    }
+   ],
+   "copy": 0,
+   "co_thread": 5,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 52,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 4,
+   "avg_risk": 28,
+   "max_risk": 36,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Radikalcino, skloni se u istoriju... ti si out za sva vremena!!!!",
+   "themes": [],
+   "copy": 1,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 2,
+   "video": "Šarović otkrio: Evo zašto je Vučić gori od Nataše Kandić! Srbi sa Kosova podržali studente",
+   "video_id": "0Qt_MOSTvPM",
+   "from": "12 Oct 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 53,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 4,
+   "avg_risk": 28,
+   "max_risk": 43,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Akili me i miri 🎉🎉🎉🎉",
+   "themes": [],
+   "copy": 1,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "PRIME 7 - Big Brother VIP Kosova 5 - 20.11.2026",
+   "video_id": "4nrfXoSlE4M",
+   "from": "21 Nov 2026",
+   "to": "21 Nov 2026"
+  },
+  {
+   "gi": 54,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 4,
+   "avg_risk": 34,
+   "max_risk": 41,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "🥺😭😭🥺😭😭🇭🇷🇭🇷🇭🇷🇭🇷🇭🇷🇭🇷🇭🇷🇭🇷🇭🇷🇭🇷 da si",
+   "themes": [
+    {
+     "label": "War",
+     "value": 25
+    }
+   ],
+   "copy": 0,
+   "co_thread": 4,
+   "sync": 0,
+   "videos": 2,
+   "video": "What if Serbia Re-established Yugoslavia Today?  #history #yugoslavia",
+   "video_id": "8tKOTn_9Vr0",
+   "from": "20 Oct 2026",
+   "to": "24 Oct 2026"
+  },
+  {
+   "gi": 55,
+   "key": "contests_independence",
+   "theme": "Contests Kosovo's independence",
+   "icon": "🗺️",
+   "accounts": 4,
+   "avg_risk": 40,
+   "max_risk": 53,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Kosovo is serbia! Serbia forever",
+   "themes": [
+    {
+     "label": "Kosovo is Serbia",
+     "value": 25
+    },
+    {
+     "label": "Russia",
+     "value": 25
+    }
+   ],
+   "copy": 0,
+   "co_thread": 5,
+   "sync": 0,
+   "videos": 2,
+   "video": "Why Kosovo is NOT Serbia Today?",
+   "video_id": "pfSYWfdQLm0",
+   "from": "16 Oct 2026",
+   "to": "16 Nov 2026"
+  },
+  {
+   "gi": 56,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 4,
+   "avg_risk": 32,
+   "max_risk": 37,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Konačno konačno",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Srbi sa Kosova podneli krivičnu prijavu",
+   "video_id": "g9T3cT7Tocs",
+   "from": "16 Nov 2026",
+   "to": "18 Nov 2026"
+  },
+  {
+   "gi": 57,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 4,
+   "avg_risk": 30,
+   "max_risk": 34,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Nur Serbenvvon Serbijen und bosnijen wahr gekenft gegen turken ,das wahr nicht multiietnisvhe Trupen das ist Liege",
+   "themes": [
+    {
+     "label": "War",
+     "value": 50
+    },
+    {
+     "label": "Religion",
+     "value": 50
+    },
+    {
+     "label": "Albania",
+     "value": 50
+    },
+    {
+     "label": "NATO",
+     "value": 50
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 5,
+   "video": "Kosovo’s Albanian History",
+   "video_id": "mZX0EAXuZyQ",
+   "from": "25 Sep 2026",
+   "to": "15 Nov 2026"
+  },
+  {
+   "gi": 58,
+   "key": "eu_us",
+   "theme": "EU / United States",
+   "icon": "🇪🇺",
+   "accounts": 4,
+   "avg_risk": 34,
+   "max_risk": 36,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Respekte Marin 🇦🇱🇦🇱🇦🇱🇦🇱🇦🇱🇦🇱🇦🇱🇦🇱🇦🇱",
+   "themes": [
+    {
+     "label": "EU/US",
+     "value": 50
+    },
+    {
+     "label": "Religion",
+     "value": 25
+    },
+    {
+     "label": "Albania",
+     "value": 25
+    }
+   ],
+   "copy": 0,
+   "co_thread": 4,
+   "sync": 0,
+   "videos": 2,
+   "video": "Çfarë fsheh Serbia për shqiptarët? – Gjurmë Shqiptare",
+   "video_id": "2ohjwQD7Zs8",
+   "from": "26 Sep 2026",
+   "to": "29 Oct 2026"
+  },
+  {
+   "gi": 59,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 4,
+   "avg_risk": 32,
+   "max_risk": 38,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "I'm using the 1983 event as inspiration for my fiction setting \"Armageddon 84.\" Great to see the events getting some att…",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 4,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 60,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 4,
+   "avg_risk": 38,
+   "max_risk": 44,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Konačno ❤❤❤",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 5,
+   "sync": 0,
+   "videos": 1,
+   "video": "Srbi sa Kosova podneli krivičnu prijavu",
+   "video_id": "g9T3cT7Tocs",
+   "from": "16 Nov 2026",
+   "to": "16 Nov 2026"
+  },
+  {
+   "gi": 61,
+   "key": "nato",
+   "theme": "NATO / KFOR",
+   "icon": "🛡️",
+   "accounts": 4,
+   "avg_risk": 38,
+   "max_risk": 45,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "@Majorsunny-y11 Ach, das Völkerrecht wird jetzt plötzlich ausgepackt? 😂 Wo war denn das Völkerrecht, als die serbische D…",
+   "themes": [
+    {
+     "label": "NATO",
+     "value": 75
+    },
+    {
+     "label": "War",
+     "value": 75
+    },
+    {
+     "label": "EU/US",
+     "value": 50
+    },
+    {
+     "label": "Albania",
+     "value": 50
+    }
+   ],
+   "copy": 0,
+   "co_thread": 4,
+   "sync": 0,
+   "videos": 5,
+   "video": "Kosovo: Warum stehen deutsche Soldaten seit 27 Jahren dort?",
+   "video_id": "o-r00EFmoEM",
+   "from": "01 Oct 2026",
+   "to": "18 Nov 2026"
+  },
+  {
+   "gi": 62,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 4,
+   "avg_risk": 18,
+   "max_risk": 24,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Mua me pelqen Arlinda,gjerat personale jane personale por nese shikohet si loje mendoj qe vetem ajo po luan,ka argumente…",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "PRIME 7 - Big Brother VIP Kosova 5 - 20.11.2026",
+   "video_id": "4nrfXoSlE4M",
+   "from": "21 Nov 2026",
+   "to": "21 Nov 2026"
+  },
+  {
+   "gi": 63,
+   "key": "contests_independence",
+   "theme": "Contests Kosovo's independence",
+   "icon": "🗺️",
+   "accounts": 4,
+   "avg_risk": 30,
+   "max_risk": 36,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "wtf what an idiot, Kosovo was always Serbian and stop making lies. You can check battle of Kosovo 1389, Serbian great vi…",
+   "themes": [
+    {
+     "label": "Kosovo is Serbia",
+     "value": 50
+    },
+    {
+     "label": "Albania",
+     "value": 50
+    },
+    {
+     "label": "EU/US",
+     "value": 50
+    },
+    {
+     "label": "War",
+     "value": 50
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 2,
+   "video": "Why Kosovo is NOT Serbia Today?",
+   "video_id": "pfSYWfdQLm0",
+   "from": "16 Oct 2026",
+   "to": "17 Nov 2026"
+  },
+  {
+   "gi": 64,
+   "key": "religion",
+   "theme": "Religion",
+   "icon": "⛪",
+   "accounts": 4,
+   "avg_risk": 31,
+   "max_risk": 33,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "​@Benjamin-j8uti pročitaj rezoluciju 1244!!!",
+   "themes": [
+    {
+     "label": "Religion",
+     "value": 25
+    },
+    {
+     "label": "Leaders",
+     "value": 25
+    },
+    {
+     "label": "War",
+     "value": 25
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 6,
+   "video": "ČANAK: KOSOVO NIJE OTETO IZGUBLJENO JE RATOM 😯🤔",
+   "video_id": "u-TxT3NX_Ow",
+   "from": "27 Sep 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 65,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 4,
+   "avg_risk": 34,
+   "max_risk": 41,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Svaka ti cas",
+   "themes": [
+    {
+     "label": "War",
+     "value": 25
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 2,
+   "video": "Vučić iskreno o svojim razmišljanjima #izbori2026 #studentipobedjuju #vucic #beograd",
+   "video_id": "eZbJLDgxuk0",
+   "from": "20 Oct 2026",
+   "to": "17 Nov 2026"
+  },
+  {
+   "gi": 66,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 4,
+   "avg_risk": 31,
+   "max_risk": 39,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "A kad je Kosovo bilo dio srbije?!!",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 3,
+   "video": "📌 Nenad Čanak: „Priznat ćemo Kosovo, ali u drugim granicama“",
+   "video_id": "eqdxs66bJWY",
+   "from": "04 Oct 2026",
+   "to": "21 Nov 2026"
+  },
+  {
+   "gi": 67,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 4,
+   "avg_risk": 33,
+   "max_risk": 37,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "That joke was about a good as his political race... (Wish I lived there to vote for him)",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 4,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 68,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 4,
+   "avg_risk": 29,
+   "max_risk": 38,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "thats the wrong flag its the albanian flag",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 25
+    }
+   ],
+   "copy": 0,
+   "co_thread": 4,
+   "sync": 0,
+   "videos": 1,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 69,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 4,
+   "avg_risk": 39,
+   "max_risk": 48,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "At least Brandon’s joke went down swinging",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 70,
+   "key": "contests_independence",
+   "theme": "Contests Kosovo's independence",
+   "icon": "🗺️",
+   "accounts": 4,
+   "avg_risk": 37,
+   "max_risk": 39,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Čuti tele jedno",
+   "themes": [
+    {
+     "label": "Kosovo is Serbia",
+     "value": 25
+    },
+    {
+     "label": "Albania",
+     "value": 25
+    },
+    {
+     "label": "EU/US",
+     "value": 25
+    }
+   ],
+   "copy": 0,
+   "co_thread": 4,
+   "sync": 0,
+   "videos": 3,
+   "video": "Why Kosovo is NOT Serbia Today?",
+   "video_id": "pfSYWfdQLm0",
+   "from": "16 Oct 2026",
+   "to": "28 Oct 2026"
+  },
+  {
+   "gi": 71,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 4,
+   "avg_risk": 30,
+   "max_risk": 31,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "I thojn soijunat po mir qe i thojn se tash e dim kush jan esht plani albinit o ju nuk e dini se kush esht ky edhe ne shq…",
+   "themes": [
+    {
+     "label": "War",
+     "value": 75
+    },
+    {
+     "label": "Russia",
+     "value": 50
+    },
+    {
+     "label": "EU/US",
+     "value": 50
+    },
+    {
+     "label": "Albania",
+     "value": 25
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 4,
+   "video": "FULL SPEECH: Serbia President Aleksandar Vučić at UNGA 2026 | Kosovo, Ukraine & Global Order | AC1E",
+   "video_id": "TA2Gw6C9VEY",
+   "from": "24 Sep 2026",
+   "to": "07 Nov 2026"
+  },
+  {
+   "gi": 72,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 4,
+   "avg_risk": 30,
+   "max_risk": 35,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Gjithashtu ✌🏻❤️",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "BG-IM FROM ALBANIA (official video)",
+   "video_id": "4e-JAvp0lYg",
+   "from": "30 Oct 2026",
+   "to": "02 Nov 2026"
+  },
+  {
+   "gi": 73,
+   "key": "russia",
+   "theme": "Russia",
+   "icon": "🇷🇺",
+   "accounts": 4,
+   "avg_risk": 34,
+   "max_risk": 38,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "I like James Blunt. His music is fuckin insufferable, but I feel like he kinda knows it and doesn’t take himself serious…",
+   "themes": [
+    {
+     "label": "Russia",
+     "value": 25
+    },
+    {
+     "label": "EU/US",
+     "value": 25
+    },
+    {
+     "label": "War",
+     "value": 25
+    }
+   ],
+   "copy": 0,
+   "co_thread": 6,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 74,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 4,
+   "avg_risk": 36,
+   "max_risk": 43,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Znaš da je to Dejan Petar Zlatanović sa kanala SrbinInfo!",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 6,
+   "sync": 0,
+   "videos": 2,
+   "video": "Neko je na hodniku iznervirao Aleksandra Vučića pitanjem. video: instagram Aleksa Banduka",
+   "video_id": "Vbmhqm8_Qac",
+   "from": "16 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 75,
+   "key": "russia",
+   "theme": "Russia",
+   "icon": "🇷🇺",
+   "accounts": 4,
+   "avg_risk": 10,
+   "max_risk": 13,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Ovaj lik verovatno pije kafu sa Putinom. Ovakve gluposti ne treba komentarisati",
+   "themes": [
+    {
+     "label": "Russia",
+     "value": 25
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "INTERVJU: Vasko Eftov – Putin neće slati vojsku zbog Kosova, ma koliko ga Srbi voleli! (21.11.2026)",
+   "video_id": "daG9f5qTdSI",
+   "from": "21 Nov 2026",
+   "to": "21 Nov 2026"
+  },
+  {
+   "gi": 76,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 4,
+   "avg_risk": 28,
+   "max_risk": 37,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Serbs Croats Macedonians Montenegrins and Slovenes get a DNA test…… Surprise! There is your explanation of why there are…",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 50
+    },
+    {
+     "label": "Kosovo is Serbia",
+     "value": 25
+    },
+    {
+     "label": "Religion",
+     "value": 25
+    },
+    {
+     "label": "War",
+     "value": 25
+    }
+   ],
+   "copy": 0,
+   "co_thread": 4,
+   "sync": 0,
+   "videos": 1,
+   "video": "Serbia's Borders Are Wrong",
+   "video_id": "1blKNuQ8m0M",
+   "from": "10 Oct 2026",
+   "to": "22 Oct 2026"
+  },
+  {
+   "gi": 77,
+   "key": "politicians",
+   "theme": "Kurti / Vučić / leaders",
+   "icon": "👤",
+   "accounts": 4,
+   "avg_risk": 32,
+   "max_risk": 45,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "👑👑I🇦🇱🇦🇱🇦🇱🇦🇱🇦🇱🙏",
+   "themes": [
+    {
+     "label": "Leaders",
+     "value": 25
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 4,
+   "video": "Vuqiq është kot fare #albinkurti #subscribe #like",
+   "video_id": "e1NoVXUKJik",
+   "from": "26 Oct 2026",
+   "to": "16 Nov 2026"
+  },
+  {
+   "gi": 78,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 4,
+   "avg_risk": 34,
+   "max_risk": 37,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Deki brzaš, Perhan nema brata, ima polubrata Andreja koga mama više voli.",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 6,
+   "sync": 0,
+   "videos": 1,
+   "video": "Neko je na hodniku iznervirao Aleksandra Vučića pitanjem. video: instagram Aleksa Banduka",
+   "video_id": "Vbmhqm8_Qac",
+   "from": "18 Nov 2026",
+   "to": "18 Nov 2026"
+  },
+  {
+   "gi": 79,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 4,
+   "avg_risk": 33,
+   "max_risk": 36,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "بارك الله فيك، محتوى رائع ننتظر الباقي بفارغ الصبر فلا تطل علينا",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 4,
+   "sync": 0,
+   "videos": 1,
+   "video": "معركة كوسوفو الثانية ⚔️ شاهد الصدام الأخير لمراد الثاني قبل فتح القسطنطينية | #5",
+   "video_id": "Xw9GxpZRjv0",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 80,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 32,
+   "max_risk": 41,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "No",
+   "themes": [],
+   "copy": 1,
+   "co_thread": 1,
+   "sync": 0,
+   "videos": 2,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "16 Oct 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 81,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 17,
+   "max_risk": 21,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "It's a country",
+   "themes": [],
+   "copy": 1,
+   "co_thread": 1,
+   "sync": 0,
+   "videos": 3,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "03 Nov 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 82,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 29,
+   "max_risk": 40,
+   "flagged": 1,
+   "shared": true,
+   "repeated_by": 3,
+   "text": "I live in kosova",
+   "themes": [],
+   "copy": 3,
+   "co_thread": 0,
+   "sync": 0,
+   "videos": 2,
+   "video": "Is Kosovo a country or not?",
+   "video_id": "xfhM49CN7Oc",
+   "from": "05 Nov 2026",
+   "to": "17 Nov 2026"
+  },
+  {
+   "gi": 83,
+   "key": "supports_independence",
+   "theme": "Supports Kosovo's independence",
+   "icon": "🏛️",
+   "accounts": 3,
+   "avg_risk": 23,
+   "max_risk": 34,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "It's own country",
+   "themes": [
+    {
+     "label": "Kosova independent",
+     "value": 33
+    }
+   ],
+   "copy": 1,
+   "co_thread": 1,
+   "sync": 0,
+   "videos": 2,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "28 Oct 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 84,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 15,
+   "max_risk": 18,
+   "flagged": 0,
+   "shared": true,
+   "repeated_by": 2,
+   "text": "Kosovo republic",
+   "themes": [],
+   "copy": 1,
+   "co_thread": 1,
+   "sync": 0,
+   "videos": 2,
+   "video": "What If Kosovo Suddenly Disappeared? 🤔",
+   "video_id": "g9F3sgZ0M3Y",
+   "from": "22 Oct 2026",
+   "to": "30 Oct 2026"
+  },
+  {
+   "gi": 85,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 22,
+   "max_risk": 25,
+   "flagged": 0,
+   "shared": true,
+   "repeated_by": 3,
+   "text": "Kosovo is a contry",
+   "themes": [],
+   "copy": 3,
+   "co_thread": 0,
+   "sync": 0,
+   "videos": 2,
+   "video": "Is Kosovo a country or not?",
+   "video_id": "xfhM49CN7Oc",
+   "from": "29 Oct 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 86,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 34,
+   "max_risk": 41,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Albania and kosovo😊❤",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 67
+    }
+   ],
+   "copy": 1,
+   "co_thread": 1,
+   "sync": 0,
+   "videos": 1,
+   "video": "Team Albania VS Team Serbia #albania #serbia #history #geography #map #maps #europe #usa #america",
+   "video_id": "JJltcG2lBtg",
+   "from": "15 Nov 2026",
+   "to": "21 Nov 2026"
+  },
+  {
+   "gi": 87,
+   "key": "politicians",
+   "theme": "Kurti / Vučić / leaders",
+   "icon": "👤",
+   "accounts": 3,
+   "avg_risk": 30,
+   "max_risk": 43,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Šešeljev govor, odnosno govor bivšeg Šešeljevog potrčka . Šešelj je osuđeni ratnio zločinac. Aleksandar Vučić je skupa s…",
+   "themes": [
+    {
+     "label": "Leaders",
+     "value": 100
+    },
+    {
+     "label": "EU/US",
+     "value": 67
+    },
+    {
+     "label": "War",
+     "value": 33
+    },
+    {
+     "label": "Religion",
+     "value": 33
+    }
+   ],
+   "copy": 1,
+   "co_thread": 1,
+   "sync": 0,
+   "videos": 2,
+   "video": "FULL SPEECH: Serbian President Vučić Accuses West of Double Standards Over Kosovo at UN | AC1G",
+   "video_id": "BNwurRKBgs4",
+   "from": "24 Sep 2026",
+   "to": "26 Sep 2026"
+  },
+  {
+   "gi": 88,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 16,
+   "max_risk": 22,
+   "flagged": 0,
+   "shared": true,
+   "repeated_by": 2,
+   "text": "I live there",
+   "themes": [],
+   "copy": 3,
+   "co_thread": 0,
+   "sync": 0,
+   "videos": 2,
+   "video": "Is Kosovo a country or not?",
+   "video_id": "xfhM49CN7Oc",
+   "from": "29 Oct 2026",
+   "to": "18 Nov 2026"
+  },
+  {
+   "gi": 89,
+   "key": "contests_independence",
+   "theme": "Contests Kosovo's independence",
+   "icon": "🗺️",
+   "accounts": 3,
+   "avg_risk": 38,
+   "max_risk": 44,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Serbia is fake State",
+   "themes": [
+    {
+     "label": "Kosovo is Serbia",
+     "value": 33
+    },
+    {
+     "label": "EU/US",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 2,
+   "video": "Why Kosovo is NOT Serbia Today?",
+   "video_id": "pfSYWfdQLm0",
+   "from": "16 Oct 2026",
+   "to": "16 Oct 2026"
+  },
+  {
+   "gi": 90,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 29,
+   "max_risk": 32,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Ti Erik je gjujt prej kornerit kete her jom me arlinden ti me duket ishe kot aty a Anjezea Pa Pik lidhje veq hajt pausha…",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "PRIME 7 - Big Brother VIP Kosova 5 - 20.11.2026",
+   "video_id": "4nrfXoSlE4M",
+   "from": "21 Nov 2026",
+   "to": "21 Nov 2026"
+  },
+  {
+   "gi": 91,
+   "key": "politicians",
+   "theme": "Kurti / Vučić / leaders",
+   "icon": "👤",
+   "accounts": 3,
+   "avg_risk": 34,
+   "max_risk": 34,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Branka od kukanja nema ništa nego da se izađe na glasanje 25 10 2026 glasajte za studente.",
+   "themes": [
+    {
+     "label": "Leaders",
+     "value": 33
+    },
+    {
+     "label": "Religion",
+     "value": 33
+    },
+    {
+     "label": "Albania",
+     "value": 33
+    },
+    {
+     "label": "EU/US",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Srbi sa Kosova stigli u Beograd i podržali Studentsku listu: Vučić izdajnik; samo ga studenti ruše!",
+   "video_id": "wrIKVqndUP0",
+   "from": "13 Oct 2026",
+   "to": "13 Oct 2026"
+  },
+  {
+   "gi": 92,
+   "key": "religion",
+   "theme": "Religion",
+   "icon": "⛪",
+   "accounts": 3,
+   "avg_risk": 14,
+   "max_risk": 20,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "To i jeste najzalosnije 😢",
+   "themes": [
+    {
+     "label": "Religion",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 2,
+   "video": "Vuletić: Srpsko društvo je dubinski bolesno!",
+   "video_id": "HuUP4qQGGY0",
+   "from": "20 Oct 2026",
+   "to": "23 Oct 2026"
+  },
+  {
+   "gi": 93,
+   "key": "religion",
+   "theme": "Religion",
+   "icon": "⛪",
+   "accounts": 3,
+   "avg_risk": 14,
+   "max_risk": 14,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "L'histoire avec le Kosovo c'est précisément comme si les Italiens aujourd'hui revendiquaient toues les terres qui étaien…",
+   "themes": [
+    {
+     "label": "Religion",
+     "value": 33
+    },
+    {
+     "label": "Albania",
+     "value": 33
+    },
+    {
+     "label": "EU/US",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 2,
+   "video": "Kosovo’s Albanian History",
+   "video_id": "mZX0EAXuZyQ",
+   "from": "10 Oct 2026",
+   "to": "15 Nov 2026"
+  },
+  {
+   "gi": 94,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 34,
+   "max_risk": 34,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Le ta shofin shqiptaret e Kosoves se cka jan miqte edhe se cka ashte (kanun) KOORDINIMI?!! Edhe se a kish mundur me ndod…",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Team Kosovo or Team Serbia? Let's find out who wins!",
+   "video_id": "egBpCjwPVxk",
+   "from": "21 Nov 2026",
+   "to": "21 Nov 2026"
+  },
+  {
+   "gi": 95,
+   "key": "contests_independence",
+   "theme": "Contests Kosovo's independence",
+   "icon": "🗺️",
+   "accounts": 3,
+   "avg_risk": 37,
+   "max_risk": 39,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "servs did not exist in bosnia 400 years ago",
+   "themes": [
+    {
+     "label": "Kosovo is Serbia",
+     "value": 33
+    },
+    {
+     "label": "Russia",
+     "value": 33
+    },
+    {
+     "label": "War",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Serbia's Borders Are Wrong",
+   "video_id": "1blKNuQ8m0M",
+   "from": "10 Oct 2026",
+   "to": "10 Oct 2026"
+  },
+  {
+   "gi": 96,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 15,
+   "max_risk": 16,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Lupeta, za Srbske bolesti je u pravu a ostalo baljezga.",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "INTERVJU: Vasko Eftov – Putin neće slati vojsku zbog Kosova, ma koliko ga Srbi voleli! (21.11.2026)",
+   "video_id": "daG9f5qTdSI",
+   "from": "21 Nov 2026",
+   "to": "21 Nov 2026"
+  },
+  {
+   "gi": 97,
+   "key": "eu_us",
+   "theme": "EU / United States",
+   "icon": "🇪🇺",
+   "accounts": 3,
+   "avg_risk": 21,
+   "max_risk": 23,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "I neka ga je iznervirao, pa on nas godinama nervira pa trpimo. I još uvek nas nervira.",
+   "themes": [
+    {
+     "label": "EU/US",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 3,
+   "video": "Srbi sa Kosova podneli krivičnu prijavu",
+   "video_id": "g9T3cT7Tocs",
+   "from": "16 Nov 2026",
+   "to": "18 Nov 2026"
+  },
+  {
+   "gi": 98,
+   "key": "nato",
+   "theme": "NATO / KFOR",
+   "icon": "🛡️",
+   "accounts": 3,
+   "avg_risk": 32,
+   "max_risk": 36,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Goli otok u hrvacku .",
+   "themes": [
+    {
+     "label": "NATO",
+     "value": 33
+    },
+    {
+     "label": "EU/US",
+     "value": 33
+    },
+    {
+     "label": "Albania",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 4,
+   "video": "Team Kosovo or Team Serbia? Let's find out who wins!",
+   "video_id": "egBpCjwPVxk",
+   "from": "22 Oct 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 99,
+   "key": "eu_us",
+   "theme": "EU / United States",
+   "icon": "🇪🇺",
+   "accounts": 3,
+   "avg_risk": 35,
+   "max_risk": 36,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "🤣🤣🤣🤣je ma i pergadituri ne trojet tona poe imagjinoj me pas ftesen Ramush Hajradini ne ket studio asnje pytje skish dité…",
+   "themes": [
+    {
+     "label": "EU/US",
+     "value": 33
+    },
+    {
+     "label": "Leaders",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 2,
+   "video": "Vuqiq është kot fare #albinkurti #subscribe #like",
+   "video_id": "e1NoVXUKJik",
+   "from": "07 Nov 2026",
+   "to": "15 Nov 2026"
+  },
+  {
+   "gi": 100,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 34,
+   "max_risk": 37,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Shqiptar i vertet dhe Patriot i madh.",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 67
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 3,
+   "video": "Vuqiq është kot fare #albinkurti #subscribe #like",
+   "video_id": "e1NoVXUKJik",
+   "from": "07 Nov 2026",
+   "to": "17 Nov 2026"
+  },
+  {
+   "gi": 101,
+   "key": "politicians",
+   "theme": "Kurti / Vučić / leaders",
+   "icon": "👤",
+   "accounts": 3,
+   "avg_risk": 31,
+   "max_risk": 38,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Alexander Vucic was minister of Slobodan Miloshevic (Balkan Butcher) who caused four wars in the former Yugoslavia. He p…",
+   "themes": [
+    {
+     "label": "Leaders",
+     "value": 67
+    },
+    {
+     "label": "War",
+     "value": 67
+    },
+    {
+     "label": "Russia",
+     "value": 33
+    },
+    {
+     "label": "Kosova independent",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "FULL SPEECH: Serbian President Vučić Accuses West of Double Standards Over Kosovo at UN | AC1G",
+   "video_id": "BNwurRKBgs4",
+   "from": "24 Sep 2026",
+   "to": "24 Sep 2026"
+  },
+  {
+   "gi": 102,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 37,
+   "max_risk": 39,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Beogradski pashallak dogje",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "What if Serbia Re-established Yugoslavia Today?  #history #yugoslavia",
+   "video_id": "8tKOTn_9Vr0",
+   "from": "26 Oct 2026",
+   "to": "26 Oct 2026"
+  },
+  {
+   "gi": 103,
+   "key": "eu_us",
+   "theme": "EU / United States",
+   "icon": "🇪🇺",
+   "accounts": 3,
+   "avg_risk": 35,
+   "max_risk": 38,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Belosvetski LAZOV! Kosovo je priznato od najmanje 110 drzava u svjetu od sveukupno 193 drzava. Ti mozes da zahvalis samo…",
+   "themes": [
+    {
+     "label": "EU/US",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Istorijsko obraćanje Vučića u UN: Upozorenje Globalnom jugu i poruka o Kosovu i Metohiji...",
+   "video_id": "VTWmOlWptoI",
+   "from": "24 Sep 2026",
+   "to": "24 Sep 2026"
+  },
+  {
+   "gi": 104,
+   "key": "religion",
+   "theme": "Religion",
+   "icon": "⛪",
+   "accounts": 3,
+   "avg_risk": 38,
+   "max_risk": 43,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "😢",
+   "themes": [
+    {
+     "label": "Religion",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Çfarë fsheh Serbia për shqiptarët? – Gjurmë Shqiptare",
+   "video_id": "2ohjwQD7Zs8",
+   "from": "26 Sep 2026",
+   "to": "26 Sep 2026"
+  },
+  {
+   "gi": 105,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 33,
+   "max_risk": 38,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "The serbs in replublika srpska don't \"remain where they are\". The only reason they're a majority in republica srpska is …",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Serbia's Borders Are Wrong",
+   "video_id": "1blKNuQ8m0M",
+   "from": "10 Oct 2026",
+   "to": "10 Oct 2026"
+  },
+  {
+   "gi": 106,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 19,
+   "max_risk": 30,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "I live in 🇽🇰 and Serbia is not a part of 🇽🇰",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 2,
+   "video": "Is Kosovo a country or not?",
+   "video_id": "xfhM49CN7Oc",
+   "from": "15 Nov 2026",
+   "to": "15 Nov 2026"
+  },
+  {
+   "gi": 107,
+   "key": "politicians",
+   "theme": "Kurti / Vučić / leaders",
+   "icon": "👤",
+   "accounts": 3,
+   "avg_risk": 35,
+   "max_risk": 36,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "❤",
+   "themes": [
+    {
+     "label": "Leaders",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 2,
+   "video": "Vuqiq është kot fare #albinkurti #subscribe #like",
+   "video_id": "e1NoVXUKJik",
+   "from": "10 Oct 2026",
+   "to": "08 Nov 2026"
+  },
+  {
+   "gi": 108,
+   "key": "eu_us",
+   "theme": "EU / United States",
+   "icon": "🇪🇺",
+   "accounts": 3,
+   "avg_risk": 35,
+   "max_risk": 37,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Guess why a third of Bosnia’s population is Serb…",
+   "themes": [
+    {
+     "label": "EU/US",
+     "value": 33
+    },
+    {
+     "label": "Kosovo is Serbia",
+     "value": 33
+    },
+    {
+     "label": "Religion",
+     "value": 33
+    },
+    {
+     "label": "Albania",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Serbia's Borders Are Wrong",
+   "video_id": "1blKNuQ8m0M",
+   "from": "10 Oct 2026",
+   "to": "10 Oct 2026"
+  },
+  {
+   "gi": 109,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 35,
+   "max_risk": 36,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Смеће које је направила вјештачка интелигенција ...",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Serbia's Borders Are Wrong",
+   "video_id": "1blKNuQ8m0M",
+   "from": "10 Oct 2026",
+   "to": "10 Oct 2026"
+  },
+  {
+   "gi": 110,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 26,
+   "max_risk": 36,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Ooooo",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Team Albania VS Team Serbia #albania #serbia #history #geography #map #maps #europe #usa #america",
+   "video_id": "JJltcG2lBtg",
+   "from": "18 Nov 2026",
+   "to": "18 Nov 2026"
+  },
+  {
+   "gi": 111,
+   "key": "religion",
+   "theme": "Religion",
+   "icon": "⛪",
+   "accounts": 3,
+   "avg_risk": 31,
+   "max_risk": 44,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Ti nemas pojma.",
+   "themes": [
+    {
+     "label": "Religion",
+     "value": 33
+    },
+    {
+     "label": "Albania",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Why Kosovo is NOT Serbia Today?",
+   "video_id": "pfSYWfdQLm0",
+   "from": "16 Oct 2026",
+   "to": "16 Oct 2026"
+  },
+  {
+   "gi": 112,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 26,
+   "max_risk": 29,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Bravo Terminatoru iz Srbije😂",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Vučić pred UN: „Gazili su Srbiju, ali je nisu pobedili – odbranićemo svoj teritorijalni integritet“",
+   "video_id": "0b4qv5J9JrU",
+   "from": "24 Sep 2026",
+   "to": "24 Sep 2026"
+  },
+  {
+   "gi": 113,
+   "key": "politicians",
+   "theme": "Kurti / Vučić / leaders",
+   "icon": "👤",
+   "accounts": 3,
+   "avg_risk": 31,
+   "max_risk": 34,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "А што те чувају припадници кобри и даље? Јесу они момци дали отказе, пензинисани су? Чиме их плаћаш, од посланичке плате…",
+   "themes": [
+    {
+     "label": "Leaders",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 2,
+   "video": "Neko je na hodniku iznervirao Aleksandra Vučića pitanjem. video: instagram Aleksa Banduka",
+   "video_id": "Vbmhqm8_Qac",
+   "from": "12 Oct 2026",
+   "to": "18 Nov 2026"
+  },
+  {
+   "gi": 114,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 38,
+   "max_risk": 40,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "🇷🇸😡😡😡😡😡🇽🇰",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 115,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 34,
+   "max_risk": 36,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Star wars was the media name for the project, not Reagans",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 116,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 28,
+   "max_risk": 29,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "💎🇦🇱🦅🇽🇰🙏",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 33
+    },
+    {
+     "label": "EU/US",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 4,
+   "video": "Albin Kurti e 'shkaterron' plotesisht Vuçiçin ne OKB, ia permend krimet, luften dhe e nervozon/arkiv",
+   "video_id": "cnSeG-ELudI",
+   "from": "10 Oct 2026",
+   "to": "09 Nov 2026"
+  },
+  {
+   "gi": 117,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 36,
+   "max_risk": 38,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "If there was a Greater Serbia, Greater Croatia, Greater Albania, Greater Bulgaria Then Bosnia, Macedonia, Montenegro, Ko…",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Serbia's Borders Are Wrong",
+   "video_id": "1blKNuQ8m0M",
+   "from": "10 Oct 2026",
+   "to": "10 Oct 2026"
+  },
+  {
+   "gi": 118,
+   "key": "religion",
+   "theme": "Religion",
+   "icon": "⛪",
+   "accounts": 3,
+   "avg_risk": 34,
+   "max_risk": 36,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "the argument about krajina is not the same, we're ignoring that not all orthodox people there were actually serbs for mo…",
+   "themes": [
+    {
+     "label": "Religion",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Serbia's Borders Are Wrong",
+   "video_id": "1blKNuQ8m0M",
+   "from": "10 Oct 2026",
+   "to": "17 Oct 2026"
+  },
+  {
+   "gi": 119,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 32,
+   "max_risk": 34,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "😂",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Team Kosovo or Team Serbia? Let's find out who wins!",
+   "video_id": "egBpCjwPVxk",
+   "from": "20 Nov 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 120,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 34,
+   "max_risk": 39,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Been waiting a hot minute (since he teased it on unsub) for royalty salmon here to hit upload on this one and then it tu…",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "20 Nov 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 121,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 3,
+   "avg_risk": 30,
+   "max_risk": 32,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Kurr nuk karrohet se qka perjetuan dhe si u vran femijet nga ushtria dhe policia serbe neve na mbetet ti argumenuojm te …",
+   "themes": [
+    {
+     "label": "War",
+     "value": 67
+    },
+    {
+     "label": "Religion",
+     "value": 33
+    },
+    {
+     "label": "Albania",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Çfarë fsheh Serbia për shqiptarët? – Gjurmë Shqiptare",
+   "video_id": "2ohjwQD7Zs8",
+   "from": "27 Sep 2026",
+   "to": "27 Sep 2026"
+  },
+  {
+   "gi": 122,
+   "key": "russia",
+   "theme": "Russia",
+   "icon": "🇷🇺",
+   "accounts": 3,
+   "avg_risk": 28,
+   "max_risk": 37,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Serbias part",
+   "themes": [
+    {
+     "label": "Russia",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "20 Nov 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 123,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 3,
+   "avg_risk": 28,
+   "max_risk": 32,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "NO",
+   "themes": [
+    {
+     "label": "War",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 124,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 31,
+   "max_risk": 32,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "destroying that ENTIRE US ARMATA & subsequently irradiating that area and the ENTIRE OCEAN with a NUKAPEDO (nuclear torp…",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 125,
+   "key": "religion",
+   "theme": "Religion",
+   "icon": "⛪",
+   "accounts": 3,
+   "avg_risk": 45,
+   "max_risk": 48,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Yes",
+   "themes": [
+    {
+     "label": "Religion",
+     "value": 33
+    },
+    {
+     "label": "NATO",
+     "value": 33
+    },
+    {
+     "label": "War",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "20 Nov 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 126,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 31,
+   "max_risk": 32,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "😢🇦🇱",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 33
+    },
+    {
+     "label": "War",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Çfarë fsheh Serbia për shqiptarët? – Gjurmë Shqiptare",
+   "video_id": "2ohjwQD7Zs8",
+   "from": "27 Sep 2026",
+   "to": "27 Sep 2026"
+  },
+  {
+   "gi": 127,
+   "key": "religion",
+   "theme": "Religion",
+   "icon": "⛪",
+   "accounts": 3,
+   "avg_risk": 36,
+   "max_risk": 41,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "7:30 We are claiming kosovo and metohija for several different reasons 1)this land belongs to deep cultural and historic…",
+   "themes": [
+    {
+     "label": "Religion",
+     "value": 33
+    },
+    {
+     "label": "Russia",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Serbia's Borders Are Wrong",
+   "video_id": "1blKNuQ8m0M",
+   "from": "10 Oct 2026",
+   "to": "10 Oct 2026"
+  },
+  {
+   "gi": 128,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 28,
+   "max_risk": 36,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Ich kenne sogar die person privat die alle aufnahmen hatt",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 67
+    },
+    {
+     "label": "Leaders",
+     "value": 33
+    },
+    {
+     "label": "EU/US",
+     "value": 33
+    },
+    {
+     "label": "War",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 5,
+   "video": "Kosovo’s Albanian History",
+   "video_id": "mZX0EAXuZyQ",
+   "from": "03 Oct 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 129,
+   "key": "eu_us",
+   "theme": "EU / United States",
+   "icon": "🇪🇺",
+   "accounts": 3,
+   "avg_risk": 18,
+   "max_risk": 23,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "serbia again. they started ww1 leading to ww2.(the kill of austro hungarian leader was funded by goverment members too.)…",
+   "themes": [
+    {
+     "label": "EU/US",
+     "value": 67
+    },
+    {
+     "label": "War",
+     "value": 33
+    },
+    {
+     "label": "Albania",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 130,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 30,
+   "max_risk": 34,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Oooo mret je 👑👑👑👑👑👑",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 67
+    },
+    {
+     "label": "EU/US",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Vuqiq është kot fare #albinkurti #subscribe #like",
+   "video_id": "e1NoVXUKJik",
+   "from": "07 Nov 2026",
+   "to": "07 Nov 2026"
+  },
+  {
+   "gi": 131,
+   "key": "religion",
+   "theme": "Religion",
+   "icon": "⛪",
+   "accounts": 3,
+   "avg_risk": 34,
+   "max_risk": 36,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Me fal nuk kam zemer te ndjek kete emision Marin",
+   "themes": [
+    {
+     "label": "Religion",
+     "value": 67
+    },
+    {
+     "label": "Albania",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Çfarë fsheh Serbia për shqiptarët? – Gjurmë Shqiptare",
+   "video_id": "2ohjwQD7Zs8",
+   "from": "26 Sep 2026",
+   "to": "26 Sep 2026"
+  },
+  {
+   "gi": 132,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 3,
+   "avg_risk": 30,
+   "max_risk": 32,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "a moj serbi mos pafsh dit kurr ju denoft zoti",
+   "themes": [
+    {
+     "label": "War",
+     "value": 67
+    },
+    {
+     "label": "Albania",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Çfarë fsheh Serbia për shqiptarët? – Gjurmë Shqiptare",
+   "video_id": "2ohjwQD7Zs8",
+   "from": "26 Sep 2026",
+   "to": "26 Sep 2026"
+  },
+  {
+   "gi": 133,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 16,
+   "max_risk": 16,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Ovaj makedonac dobijo napade zapadne bolesti diagnoza olupirana nacija Pitanje za eftova ko je rasturiji makedoniju Srbi…",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "INTERVJU: Vasko Eftov – Putin neće slati vojsku zbog Kosova, ma koliko ga Srbi voleli! (21.11.2026)",
+   "video_id": "daG9f5qTdSI",
+   "from": "21 Nov 2026",
+   "to": "21 Nov 2026"
+  },
+  {
+   "gi": 134,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 30,
+   "max_risk": 31,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Koje je ovo djubre .Snajper safari.On nije dobar ni svom srpskom normalnom narodu",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 2,
+   "video": "FULL SPEECH: Serbia President Aleksandar Vučić at UNGA 2026 | Kosovo, Ukraine & Global Order | AC1E",
+   "video_id": "TA2Gw6C9VEY",
+   "from": "24 Sep 2026",
+   "to": "03 Oct 2026"
+  },
+  {
+   "gi": 135,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 3,
+   "avg_risk": 32,
+   "max_risk": 35,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Ska sanca lotet krikodillite. Ku qendron shteti mbi mbrotjen civile. Codi ushtarak kforit. Si ushtri ashte deshtume me k…",
+   "themes": [
+    {
+     "label": "War",
+     "value": 33
+    },
+    {
+     "label": "Religion",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Vrasja e Arlindës nga kunati, Albin Kurti trondit vendin detajet! Plas hapur skandalin e madh",
+   "video_id": "kUifraOXoew",
+   "from": "26 Oct 2026",
+   "to": "29 Oct 2026"
+  },
+  {
+   "gi": 136,
+   "key": "politicians",
+   "theme": "Kurti / Vučić / leaders",
+   "icon": "👤",
+   "accounts": 3,
+   "avg_risk": 30,
+   "max_risk": 43,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Arno veći srbin od mnogih Srba ❤❤❤",
+   "themes": [
+    {
+     "label": "Leaders",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 5,
+   "video": "Srbi znaju da je KiM više od teritorije, ono je zavet, identitet i deo kulture srpskog naroda 🇷🇸",
+   "video_id": "5MVdiRIp9L8",
+   "from": "04 Oct 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 137,
+   "key": "eu_us",
+   "theme": "EU / United States",
+   "icon": "🇪🇺",
+   "accounts": 3,
+   "avg_risk": 36,
+   "max_risk": 39,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Sve si predao i prodao i zato sad ne seri",
+   "themes": [
+    {
+     "label": "EU/US",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 4,
+   "video": "Istorijsko obraćanje Vučića u UN: Upozorenje Globalnom jugu i poruka o Kosovu i Metohiji...",
+   "video_id": "VTWmOlWptoI",
+   "from": "24 Sep 2026",
+   "to": "16 Nov 2026"
+  },
+  {
+   "gi": 138,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 36,
+   "max_risk": 37,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "The Netherlands because of Flanders and north France where people speak Dutch 🇳🇱",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 33
+    },
+    {
+     "label": "Religion",
+     "value": 33
+    },
+    {
+     "label": "War",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 5,
+   "video": "Serbia's Borders Are Wrong",
+   "video_id": "1blKNuQ8m0M",
+   "from": "24 Sep 2026",
+   "to": "14 Nov 2026"
+  },
+  {
+   "gi": 139,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 31,
+   "max_risk": 34,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Not exited no history",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 2,
+   "video": "Question for Serbians 🇷🇸 (1914)",
+   "video_id": "4FD9j4YGkPA",
+   "from": "16 Oct 2026",
+   "to": "20 Oct 2026"
+  },
+  {
+   "gi": 140,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 9,
+   "max_risk": 13,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "😂 Skam pare asnje prime sivjet dhe asnje reels asnje video te bbvKosova 😂 Jane thjesht disa çiliminj qe bejne si te zgju…",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "PRIME 7 - Big Brother VIP Kosova 5 - 20.11.2026",
+   "video_id": "4nrfXoSlE4M",
+   "from": "21 Nov 2026",
+   "to": "21 Nov 2026"
+  },
+  {
+   "gi": 141,
+   "key": "politicians",
+   "theme": "Kurti / Vučić / leaders",
+   "icon": "👤",
+   "accounts": 3,
+   "avg_risk": 24,
+   "max_risk": 29,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Човек који је у Падинска скели највише тукао пензионера добио доживотну робију, његови помагачи по 20 година затвора. Ко…",
+   "themes": [
+    {
+     "label": "Leaders",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Vučić smatra da Kurti podržava Studentsku listu u Srbiji #srbija #izbori2026 #vucic #sns #studenti",
+   "video_id": "_QhimBNMQP0",
+   "from": "14 Nov 2026",
+   "to": "14 Nov 2026"
+  },
+  {
+   "gi": 142,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 42,
+   "max_risk": 47,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Been waiting for this since unsub sneak peak",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 143,
+   "key": "nato",
+   "theme": "NATO / KFOR",
+   "icon": "🛡️",
+   "accounts": 3,
+   "avg_risk": 19,
+   "max_risk": 27,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Austrougarine Čanak, što ne reče da se Kosovo i Metohija Rezolucijom 1244. UN vodi još uvek kao deo Srbije. To će se u N…",
+   "themes": [
+    {
+     "label": "NATO",
+     "value": 33
+    },
+    {
+     "label": "Kosovo is Serbia",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 4,
+   "video": "Kako danas žive Srbi na Kosovu i Metohiji? - JUTRO",
+   "video_id": "Uqn-B3y8wR8",
+   "from": "10 Oct 2026",
+   "to": "01 Nov 2026"
+  },
+  {
+   "gi": 144,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 35,
+   "max_risk": 42,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "And is an contry Kosovo",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "20 Nov 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 145,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 23,
+   "max_risk": 31,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "People, Who are the father and mother of Albania's greatest hero? In 10 years, you will be saying that 1,300,000 Albania…",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 100
+    },
+    {
+     "label": "Kosovo is Serbia",
+     "value": 33
+    },
+    {
+     "label": "War",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Kosovo’s Albanian History",
+   "video_id": "mZX0EAXuZyQ",
+   "from": "12 Nov 2026",
+   "to": "12 Nov 2026"
+  },
+  {
+   "gi": 146,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 3,
+   "avg_risk": 36,
+   "max_risk": 43,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "😢😢😢😢😢😢😢😢",
+   "themes": [
+    {
+     "label": "War",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Çfarë fsheh Serbia për shqiptarët? – Gjurmë Shqiptare",
+   "video_id": "2ohjwQD7Zs8",
+   "from": "27 Sep 2026",
+   "to": "27 Sep 2026"
+  },
+  {
+   "gi": 147,
+   "key": "eu_us",
+   "theme": "EU / United States",
+   "icon": "🇪🇺",
+   "accounts": 3,
+   "avg_risk": 38,
+   "max_risk": 48,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "😂",
+   "themes": [
+    {
+     "label": "EU/US",
+     "value": 67
+    },
+    {
+     "label": "Religion",
+     "value": 33
+    },
+    {
+     "label": "Albania",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Why Kosovo is NOT Serbia Today?",
+   "video_id": "pfSYWfdQLm0",
+   "from": "16 Oct 2026",
+   "to": "16 Oct 2026"
+  },
+  {
+   "gi": 148,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 29,
+   "max_risk": 34,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "As hardcore as this message was, the enemy must be identified as Chatham House, Lloyd's, London. Enough dancing around!!…",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 33
+    },
+    {
+     "label": "War",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "FULL SPEECH: Serbia President Aleksandar Vučić at UNGA 2026 | Kosovo, Ukraine & Global Order | AC1E",
+   "video_id": "TA2Gw6C9VEY",
+   "from": "24 Sep 2026",
+   "to": "24 Sep 2026"
+  },
+  {
+   "gi": 149,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 3,
+   "avg_risk": 30,
+   "max_risk": 33,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Here is another genocidal maniac",
+   "themes": [
+    {
+     "label": "War",
+     "value": 67
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "FULL SPEECH: Serbian President Vučić Accuses West of Double Standards Over Kosovo at UN | AC1G",
+   "video_id": "BNwurRKBgs4",
+   "from": "24 Sep 2026",
+   "to": "24 Sep 2026"
+  },
+  {
+   "gi": 150,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 21,
+   "max_risk": 24,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Thank you Brandon!",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 151,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 25,
+   "max_risk": 30,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "SERBES ARE INVEDORS IN BOLLCON FROM RUSIA😮😮😮😮",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 67
+    },
+    {
+     "label": "Religion",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 3,
+   "video": "Kosovo’s Albanian History",
+   "video_id": "mZX0EAXuZyQ",
+   "from": "20 Oct 2026",
+   "to": "11 Nov 2026"
+  },
+  {
+   "gi": 152,
+   "key": "contests_independence",
+   "theme": "Contests Kosovo's independence",
+   "icon": "🗺️",
+   "accounts": 3,
+   "avg_risk": 43,
+   "max_risk": 49,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Serbia",
+   "themes": [
+    {
+     "label": "Kosovo is Serbia",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "20 Nov 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 153,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 26,
+   "max_risk": 28,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Which year is this?",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "20 Nov 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 154,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 27,
+   "max_risk": 31,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Akili🎉🎉🎉🎉🎉🎉🎉🎉🎉",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "PRIME 7 - Big Brother VIP Kosova 5 - 20.11.2026",
+   "video_id": "4nrfXoSlE4M",
+   "from": "21 Nov 2026",
+   "to": "21 Nov 2026"
+  },
+  {
+   "gi": 155,
+   "key": "albania",
+   "theme": "Albania / Albanian nation",
+   "icon": "🇦🇱",
+   "accounts": 3,
+   "avg_risk": 38,
+   "max_risk": 40,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Whole Montenegro, Kosovo and Republika Srpska",
+   "themes": [
+    {
+     "label": "Albania",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Serbia's Borders Are Wrong",
+   "video_id": "1blKNuQ8m0M",
+   "from": "10 Oct 2026",
+   "to": "10 Oct 2026"
+  },
+  {
+   "gi": 156,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 31,
+   "max_risk": 34,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Ask Brandon why he waited so long to address the loss? I thought he tuned tail and ran out of state. Leaving you hos man…",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 157,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 34,
+   "max_risk": 37,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Да ! То је Србија сада ! Изгубили смо Југ, изашли највише од настанка Српских територија на Запад ! Forewer lives Republ…",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Serbia's Borders Are Wrong",
+   "video_id": "1blKNuQ8m0M",
+   "from": "10 Oct 2026",
+   "to": "10 Oct 2026"
+  },
+  {
+   "gi": 158,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 39,
+   "max_risk": 43,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Bravo❤❤❤❤",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Srbi sa Kosova podneli krivičnu prijavu",
+   "video_id": "g9T3cT7Tocs",
+   "from": "17 Nov 2026",
+   "to": "17 Nov 2026"
+  },
+  {
+   "gi": 159,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 3,
+   "avg_risk": 34,
+   "max_risk": 39,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "YES, RIGHT. EAST SERBIA WAS WEST BULGARIA 🇧🇬. NISH,PIROT,BOSILEGRAD.....BELONG TO BULGARIA 🇧🇬",
+   "themes": [
+    {
+     "label": "War",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Serbia's Borders Are Wrong",
+   "video_id": "1blKNuQ8m0M",
+   "from": "10 Oct 2026",
+   "to": "10 Oct 2026"
+  },
+  {
+   "gi": 160,
+   "key": "contests_independence",
+   "theme": "Contests Kosovo's independence",
+   "icon": "🗺️",
+   "accounts": 3,
+   "avg_risk": 41,
+   "max_risk": 44,
+   "flagged": 3,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "A part of Serbia bc its true",
+   "themes": [
+    {
+     "label": "Kosovo is Serbia",
+     "value": 67
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "What If Kosovo Suddenly Disappeared? 🤔",
+   "video_id": "g9F3sgZ0M3Y",
+   "from": "21 Oct 2026",
+   "to": "21 Oct 2026"
+  },
+  {
+   "gi": 161,
+   "key": "eu_us",
+   "theme": "EU / United States",
+   "icon": "🇪🇺",
+   "accounts": 3,
+   "avg_risk": 33,
+   "max_risk": 37,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "@SadijaK-e1v Math is clearly not your strong suit, just like lying. Vučić was 20 years old when the war in Bosnia starte…",
+   "themes": [
+    {
+     "label": "EU/US",
+     "value": 67
+    },
+    {
+     "label": "War",
+     "value": 67
+    },
+    {
+     "label": "Russia",
+     "value": 33
+    },
+    {
+     "label": "Leaders",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "FULL SPEECH: Serbian President Vučić Accuses West of Double Standards Over Kosovo at UN | AC1G",
+   "video_id": "BNwurRKBgs4",
+   "from": "24 Sep 2026",
+   "to": "24 Sep 2026"
+  },
+  {
+   "gi": 162,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 3,
+   "avg_risk": 25,
+   "max_risk": 29,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "It’s Serbian",
+   "themes": [
+    {
+     "label": "War",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 163,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 33,
+   "max_risk": 34,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "ALEXANDER VUÇIÇ IS DIKTATOR.SERBIEN IST DIKTATOR CANTRY",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "FULL SPEECH: Serbia President Aleksandar Vučić at UNGA 2026 | Kosovo, Ukraine & Global Order | AC1E",
+   "video_id": "TA2Gw6C9VEY",
+   "from": "24 Sep 2026",
+   "to": "24 Sep 2026"
+  },
+  {
+   "gi": 164,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 25,
+   "max_risk": 29,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Serbia fsheh k*rin tim 😂 mjafte se na lodhet,meremi me punet tona",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Çfarë fsheh Serbia për shqiptarët? – Gjurmë Shqiptare",
+   "video_id": "2ohjwQD7Zs8",
+   "from": "26 Sep 2026",
+   "to": "26 Sep 2026"
+  },
+  {
+   "gi": 165,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 16,
+   "max_risk": 28,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Kosovo is independet",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "from": "20 Nov 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 166,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 35,
+   "max_risk": 39,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Literally just finished watching the unsub video about this video coming out... no cliff hanger for me boys.",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 167,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 40,
+   "max_risk": 51,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Do not encourage Serbia Please",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Serbia's Borders Are Wrong",
+   "video_id": "1blKNuQ8m0M",
+   "from": "10 Oct 2026",
+   "to": "10 Oct 2026"
+  },
+  {
+   "gi": 168,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 32,
+   "max_risk": 36,
+   "flagged": 1,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Aha 😂",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "FULL SPEECH: Serbian President Vučić Accuses West of Double Standards Over Kosovo at UN | AC1G",
+   "video_id": "BNwurRKBgs4",
+   "from": "24 Sep 2026",
+   "to": "24 Sep 2026"
+  },
+  {
+   "gi": 169,
+   "key": "eu_us",
+   "theme": "EU / United States",
+   "icon": "🇪🇺",
+   "accounts": 3,
+   "avg_risk": 33,
+   "max_risk": 34,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Izdajnike i nato retardirane 🦮- čkice o prvu banderu! 💩'⚔️🔥!",
+   "themes": [
+    {
+     "label": "EU/US",
+     "value": 33
+    },
+    {
+     "label": "NATO",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 2,
+   "video": "Srbi sa Kosova podneli krivičnu prijavu",
+   "video_id": "g9T3cT7Tocs",
+   "from": "14 Nov 2026",
+   "to": "16 Nov 2026"
+  },
+  {
+   "gi": 170,
+   "key": "war",
+   "theme": "War and violence",
+   "icon": "⚔️",
+   "accounts": 3,
+   "avg_risk": 38,
+   "max_risk": 44,
+   "flagged": 2,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Pure hypocrisy, freedom loving land Serbia??? They attacked in the 90’s Slovenia, Croatia and especially Bosnia, a presi…",
+   "themes": [
+    {
+     "label": "War",
+     "value": 100
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 2,
+   "video": "FULL SPEECH: Serbian President Vučić Accuses West of Double Standards Over Kosovo at UN | AC1G",
+   "video_id": "BNwurRKBgs4",
+   "from": "24 Sep 2026",
+   "to": "26 Oct 2026"
+  },
+  {
+   "gi": 171,
+   "key": "russia",
+   "theme": "Russia",
+   "icon": "🇷🇺",
+   "accounts": 3,
+   "avg_risk": 20,
+   "max_risk": 26,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Your so beautiful, it's true Trout",
+   "themes": [
+    {
+     "label": "Russia",
+     "value": 33
+    },
+    {
+     "label": "NATO",
+     "value": 33
+    },
+    {
+     "label": "War",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "20 Nov 2026",
+   "to": "20 Nov 2026"
+  },
+  {
+   "gi": 172,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 25,
+   "max_risk": 30,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Nisu mogli da se vide inače oni to govore već godinama​@vladanvladan9853",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 1,
+   "video": "Srbi sa Kosova podneli krivičnu prijavu",
+   "video_id": "g9T3cT7Tocs",
+   "from": "17 Nov 2026",
+   "to": "17 Nov 2026"
+  },
+  {
+   "gi": 173,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 19,
+   "max_risk": 20,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Okay you got the title right on this one",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "Three Times WW3 Was Stopped",
+   "video_id": "OqI4M7xZ4Bo",
+   "from": "19 Nov 2026",
+   "to": "19 Nov 2026"
+  },
+  {
+   "gi": 174,
+   "key": "nato",
+   "theme": "NATO / KFOR",
+   "icon": "🛡️",
+   "accounts": 3,
+   "avg_risk": 29,
+   "max_risk": 31,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Was für ein Kind hat so eine komische idee gehabt das ist wie wenn Deutschland Bayern angreifen würde..... Rezulution 12…",
+   "themes": [
+    {
+     "label": "NATO",
+     "value": 33
+    },
+    {
+     "label": "War",
+     "value": 33
+    },
+    {
+     "label": "Leaders",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 2,
+   "sync": 0,
+   "videos": 3,
+   "video": "Team Kosovo or Team Serbia? Let's find out who wins!",
+   "video_id": "egBpCjwPVxk",
+   "from": "24 Sep 2026",
+   "to": "21 Nov 2026"
+  },
+  {
+   "gi": 175,
+   "key": "none",
+   "theme": "Other copied lines",
+   "icon": "💬",
+   "accounts": 3,
+   "avg_risk": 31,
+   "max_risk": 34,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Gott sei Dank nicht mehr... auf jeden fall ohne Albaner💪",
+   "themes": [],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 2,
+   "video": "What if Serbia Re-established Yugoslavia Today?  #history #yugoslavia",
+   "video_id": "8tKOTn_9Vr0",
+   "from": "22 Oct 2026",
+   "to": "28 Oct 2026"
+  },
+  {
+   "gi": 176,
+   "key": "russia",
+   "theme": "Russia",
+   "icon": "🇷🇺",
+   "accounts": 3,
+   "avg_risk": 16,
+   "max_risk": 18,
+   "flagged": 0,
+   "shared": false,
+   "repeated_by": 0,
+   "text": "Car Dusan!!!",
+   "themes": [
+    {
+     "label": "Russia",
+     "value": 33
+    }
+   ],
+   "copy": 0,
+   "co_thread": 3,
+   "sync": 0,
+   "videos": 1,
+   "video": "INTERVJU: Vasko Eftov – Putin neće slati vojsku zbog Kosova, ma koliko ga Srbi voleli! (21.11.2026)",
+   "video_id": "daG9f5qTdSI",
+   "from": "21 Nov 2026",
+   "to": "21 Nov 2026"
+  }
+ ],
  "showcase": [
   {
    "label": "Account A",
@@ -748,7 +5853,7 @@
   }
  },
  "checks": {
-  "generated": "2026-11-21 20:46 UTC",
+  "generated": "2026-11-21 20:52 UTC",
   "groups": [
    {
     "name": "Security",
@@ -789,6 +5894,11 @@
       "detail": "10 examples, each ≤160 characters, labelled Account A–J"
      },
      {
+      "name": "Group examples are shortened and carry no account IDs",
+      "status": "PASS",
+      "detail": "176 groups, one line of at most 120 characters each"
+     },
+     {
       "name": "No author names stored",
       "status": "PASS",
       "detail": "comments table has no name column; display names are dropped on ingest"
@@ -810,13 +5920,8 @@
      },
      {
       "name": "Live site sends security headers",
-      "status": "PASS",
-      "detail": "https://htccip-graph-yll3.vercel.app/: content-security-policy, referrer-policy, x-content-type-options, x-frame-options"
-     },
-     {
-      "name": "Live site served over HTTPS",
-      "status": "PASS",
-      "detail": "HTTP 200"
+      "status": "FAIL",
+      "detail": "request failed: <urlopen error timed out>"
      }
     ]
    },
@@ -886,12 +5991,12 @@
      {
       "name": "Detector test suite",
       "status": "PASS",
-      "detail": "43 passed, 1 warning in 8.34s"
+      "detail": "43 passed, 1 warning in 9.43s"
      },
      {
       "name": "Backend test suite",
       "status": "PASS",
-      "detail": "32 passed, 1 warning in 5.14s"
+      "detail": "32 passed, 1 warning in 5.27s"
      }
     ]
    }

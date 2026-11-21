@@ -47,6 +47,52 @@
   }
   if (bnodes.length) pick([...bnodes].sort((a, b) => b.risk - a.risk)[0]);
 
+  /* ---------- all bot families, packed by topic ---------- */
+  const CL = S.clades || [];
+  const TCOL = { contests_independence: "#E4572E", supports_independence: "#3A7BD5", religion: "#9B5DE5", nato: "#2A9D8F", russia: "#C1121F",
+    war: "#F4A259", albania: "#B5179E", eu_us: "#00A6D6", politicians: "#E9B824", none: "#8D99AE" };
+  $("famtitle").textContent = `${fmt(CL.length)} bot families, grouped by what they talk about`;
+  const ctree = d3.hierarchy({ children: [...d3.group(CL, d => d.key)].map(([k, v]) => ({ key: k, name: v[0].theme, icon: v[0].icon, n: v.length, acc: d3.sum(v, x => x.accounts), children: v })) })
+    .sum(d => d.accounts ? Math.pow(d.accounts, 0.7) : 0).sort((a, b) => b.value - a.value);
+  d3.pack().size([900, 900]).padding(d => d.depth === 0 ? 40 : 3)(ctree);
+  const csvg = d3.select("#clades").attr("viewBox", `${ctree.x - ctree.r} ${ctree.y - ctree.r - 22} ${2 * ctree.r} ${2 * ctree.r + 30}`);
+  const tg = csvg.append("g").selectAll("g").data(ctree.children || []).join("g");
+  tg.append("circle").attr("cx", d => d.x).attr("cy", d => d.y).attr("r", d => d.r).attr("fill", d => TCOL[d.data.key]).attr("fill-opacity", 0.09)
+    .attr("stroke", d => TCOL[d.data.key]).attr("stroke-width", 1.5).attr("stroke-dasharray", "6 4");
+  const cb = csvg.append("g").selectAll("g").data(ctree.leaves()).join("g").attr("class", "bub").attr("tabindex", 0).attr("role", "button")
+    .attr("aria-label", d => `Family ${d.data.gi}, ${d.data.theme}, ${d.data.accounts} accounts`).attr("transform", d => `translate(${d.x},${d.y})`)
+    .on("click", (e, d) => cpick(d.data)).on("keydown", (e, d) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); cpick(d.data); } });
+  cb.append("circle").attr("class", "ring").attr("r", d => d.r + 3).attr("fill", "none");
+  cb.append("circle").attr("r", d => Math.max(2, d.r - 1)).attr("fill", d => TCOL[d.data.key]).attr("fill-opacity", d => 0.45 + 0.55 * Math.min(1, d.data.avg_risk / 45)).attr("stroke", "#fff").attr("stroke-width", 1.5);
+  cb.filter(d => d.r > 9).append("text").attr("text-anchor", "middle").attr("dy", "0.35em").attr("fill", "#fff").style("font-weight", 700)
+    .style("font-size", d => `${Math.max(9, Math.min(34, d.r * 0.75))}px`).text(d => d.data.accounts);
+  const tl = csvg.append("g").selectAll("g").data(ctree.children || []).join("g").attr("transform", d => `translate(${d.x},${d.y - d.r - 7})`);
+  tl.append("text").attr("class", "theme-label").attr("text-anchor", "middle").text(d => `${d.data.icon} ${d.data.name} · ${d.data.n} ${d.data.n === 1 ? "family" : "families"}`)
+    .each(function () { const b = this.getBBox(); d3.select(this.parentNode).insert("rect", "text").attr("x", b.x - 5).attr("y", b.y - 2).attr("width", b.width + 10).attr("height", b.height + 4).attr("rx", 9).attr("fill", "#fff").attr("fill-opacity", 0.92); });
+  function cpick(d) {
+    cb.classed("sel", n => n.data === d);
+    const col = TCOL[d.key];
+    const how = [d.copy && `${fmt(d.copy)} pairs posted the same text`, d.co_thread && `${fmt(d.co_thread)} pairs showed up together on the same videos`, d.sync && `${fmt(d.sync)} pairs posted within seconds of each other`].filter(Boolean);
+    $("cpick").innerHTML = `<div class="pick-head"><span class="pick-icon" style="background:${col}">${d.icon}</span>
+        <div><h3>Family ${d.gi}</h3><p>${esc(d.theme)}</p></div></div>
+      <p class="bigline"><b>${fmt(d.accounts)}</b> accounts acting together on ${fmt(d.videos)} video${d.videos === 1 ? "" : "s"}</p>
+      <div class="meter"><div style="width:${Math.min(100, d.avg_risk)}%;background:${d.avg_risk >= 35 ? "#e8a33b" : "#4C8EDA"}"></div></div>
+      <p class="score"><b>${d.avg_risk}/100</b> average bot-likeness · top member ${d.max_risk} · ${fmt(d.flagged)} flagged</p>
+      <h4>${d.shared ? `The line ${fmt(d.repeated_by)} of them posted` : "Example comment"}</h4><blockquote>“${esc(d.text)}”</blockquote>
+      ${d.themes.length ? `<h4>What they talk about (% of accounts)</h4>${barsHtml(d.themes, "%")}` : ""}
+      <h4 class="mt12">Why we link them</h4><ul>${how.map(h => `<li>${h}</li>`).join("")}</ul>
+      <p class="where">▶️ Most active on: <a href="https://www.youtube.com/watch?v=${encodeURIComponent(d.video_id)}" target="_blank" rel="noopener noreferrer">${esc(d.video)}</a><br>🕒 ${esc(d.from)} – ${esc(d.to)}</p>
+      <button class="gobtn" type="button" id="famgo">See this family as a graph →</button>
+      <p class="fine">Signs of coordination, not proof. A human checks before anyone acts.</p>`;
+    $("famgo").onclick = () => {
+      openFull();
+      runQuery({ name: `Family ${d.gi}`, cypher: `MATCH (a:Account {cluster: ${d.gi}})-[r:COPY|SYNC|CO_THREAD]-(b:Account) RETURN a, r, b LIMIT 160`,
+        run: () => sub(accounts.filter(n => n.props.cluster === d.gi).sort((x, y) => y.props.risk - x.props.risk).map(n => n.id), r => COORD.includes(r.type)) });
+      $("graph").scrollIntoView({ behavior: "smooth" });
+    };
+  }
+  if (CL.length) cpick([...CL].sort((a, b) => b.accounts - a.accounts)[0]);
+
   /* ---------- what we found, by certainty ---------- */
   const F = S.findings || {}, CFf = S.model.confidence || {};
   const top99 = (CFf.rows || []).find(r => r.band === "99–100%") || {};
@@ -484,7 +530,7 @@
   let lastQ = 0;
   function run(i) {
     lastQ = i;
-    const q = QUERIES[i], t0 = performance.now();
+    const q = typeof i === "number" ? QUERIES[i] : i, t0 = performance.now();
     const res = q.run();
     current = { ...res, q: { name: q.name, notes: [["nodes", fmt(res.nodes.length)], ["relationships", fmt(res.rels.length)]] } };
     hidden = new Set(); selected = null;

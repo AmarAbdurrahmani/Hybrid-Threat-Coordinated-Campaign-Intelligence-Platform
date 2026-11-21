@@ -73,6 +73,10 @@ def main() -> int:
     check(S, "Only 10 example comments shown, shortened, no names or IDs",
           len(show) <= 10 and all(len(s["comment"]) <= 161 and not PSEUDO.search(json.dumps(s)) and not re.search(r"yt_[0-9a-f]{12}", json.dumps(s)) for s in show),
           f"{len(show)} examples, each ≤160 characters, labelled Account A–J")
+    cl = summary.get("clades", [])
+    check(S, "Group examples are shortened and carry no account IDs",
+          all(len(c["text"]) <= 121 for c in cl) and not re.search(r"yt_[0-9a-f]{12}|UC[0-9A-Za-z_-]{22}", json.dumps(cl)),
+          f"{len(cl)} groups, one line of at most 120 characters each")
     cols = [r[1] for r in db.execute("PRAGMA table_info(comments)")]
     check(S, "No author names stored", not any(c in cols for c in ("author", "display_name", "name")), "comments table has no name column; display names are dropped on ingest")
     raw = db.execute("SELECT COUNT(*) FROM comments WHERE account LIKE '%UC%' AND account GLOB '*UC[0-9A-Za-z_-]*'").fetchone()[0]
