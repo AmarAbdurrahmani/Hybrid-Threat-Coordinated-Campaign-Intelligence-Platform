@@ -11,7 +11,6 @@ from typing import Callable, Iterator
 
 import numpy as np
 import pandas as pd
-from sklearn.metrics import average_precision_score, cohen_kappa_score, roc_auc_score
 
 __all__ = [
     "metrics", "bootstrap_ci", "best_threshold", "calibration_table",
@@ -96,8 +95,10 @@ def metrics(y, p, threshold=0.5) -> dict:
         confusion={"tp": tp, "fp": fp, "fn": fn, "tn": tn},
     )
     if pos > 0:
+        from sklearn.metrics import average_precision_score
         out["pr_auc"] = float(average_precision_score(y, p))
     if 0 < pos < n:
+        from sklearn.metrics import roc_auc_score
         out["roc_auc"] = float(roc_auc_score(y, p))
     return out
 
@@ -429,6 +430,11 @@ def evaluate_in_domain(labels_csv, scores_csv, threshold=0.5, n_boot=1000, seed=
 
     a = pd.to_numeric(labels["annotator_a"], errors="coerce")
     b = pd.to_numeric(labels["annotator_b"], errors="coerce")
+    unsure = labels[["annotator_a", "annotator_b"]].apply(
+        lambda col: col.astype("string").str.strip().str.lower().eq("unsure").fillna(False))
+    for name, numeric in (("annotator_a", a), ("annotator_b", b)):
+        if (labels[name].notna() & numeric.isna() & ~unsure[name]).any():
+            raise ValueError(f"{name} must be 0, 1, unsure or blank")
     for name, col in (("annotator_a", a), ("annotator_b", b)):
         if not col.dropna().isin([0, 1]).all():
             raise ValueError(f"{name} must be 0, 1 or blank")
@@ -437,11 +443,14 @@ def evaluate_in_domain(labels_csv, scores_csv, threshold=0.5, n_boot=1000, seed=
 
     kappa = None
     if both.sum() > 0:
+        from sklearn.metrics import cohen_kappa_score
         k = cohen_kappa_score(a[both].astype(int), b[both].astype(int), labels=[0, 1])
         kappa = None if math.isnan(k) else float(k)  # undefined when both used one class only
 
     truth = pd.DataFrame({"account_id": labels.loc[agree, "account_id"], "y": a[agree].astype(int)})
     prob = pd.to_numeric(scores["bot_probability"], errors="coerce") / 100.0
+    if "verdict" in scores:
+        prob = prob.mask(scores["verdict"].eq("INSUFFICIENT EVIDENCE"))
     merged = truth.merge(pd.DataFrame({"account_id": scores["account_id"], "p": prob}).dropna(),
                          on="account_id", how="left")
     scored = merged.dropna(subset=["p"])
@@ -451,6 +460,7 @@ def evaluate_in_domain(labels_csv, scores_csv, threshold=0.5, n_boot=1000, seed=
     return {
         "kappa": kappa,
         "n_labelled_rows": int(len(labels)),
+        "n_unsure": int(unsure.any(axis=1).sum()),
         "n_both_labelled": int(both.sum()),
         "n_agreed": int(agree.sum()),
         "n_disagreements": int((both & (a != b)).sum()),

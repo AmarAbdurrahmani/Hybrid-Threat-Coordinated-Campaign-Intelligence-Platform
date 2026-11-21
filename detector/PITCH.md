@@ -180,3 +180,14 @@ Also ready: **"Who runs these bots?"** "We cannot say and do not try. We measure
 | Running over time | Timer, hard stop, close with the labelling plan, not a feature list |
 | Jargon | Say "learned weights", "share of the decision", "bot types never seen"; keep SHAP and isotonic for Q&A |
 | Vague impact | One user, one action: an analyst reviews a ranked, explained list |
+# External snapshot check (21 November 2026)
+
+The five-count profile network and the full LightGBM/GNN ensemble were compared on the same public account snapshots. Thresholds for this experiment were fixed using the 95th percentile of human scores on Botometer Feedback 2019 (higher order statistic, then the next representable value to handle ties). These are experimental thresholds, separate from the shipping thresholds. Duplicate accounts across sources were excluded.
+
+| Held-out population | Accounts | Profile above threshold | Ensemble above threshold |
+|---|---:|---:|---:|
+| Political Bots 2019 | 62 bots | 0 | 0 |
+| Verified 2019 | 1,985 human-labelled accounts | 0 | 0 |
+
+Both systems incurred zero false alarms on the verified cohort. Neither recovered a political bot at this operating point. The ensemble saturated at 1 on enough validation humans that its conservative threshold exceeded 1. All test accounts had one observed post. The evidence-aware verdict abstains for all of them. This experiment establishes no graph advantage on sparse histories. Kosovo accuracy requires independent local labels.
+

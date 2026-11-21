@@ -726,12 +726,14 @@ async def bot_account(body: AccountCountsIn):
     total = sum(abs(d) for d in deltas) or 1.0
     indicators = sorted(({"indicator": ACCOUNT_LABELS[f], "percent": round(100 * d / total, 1), "direction": "+" if d >= 0 else "−"}
                          for f, d in zip(account_bot.FIELDS, deltas)), key=lambda r: -abs(r["percent"]))
-    return {"model": {"name": "account-profile network", "checkpoint": path.name, "threshold_pct": round(100 * thr, 1),
+    return {"score_kind": "model score", "indicator_scope": "relative logit change when each count is reset to its training mean",
+            "model": {"name": "account-profile network", "checkpoint": path.name, "version": hashlib.sha256(path.read_bytes()).hexdigest()[:16], "threshold_pct": round(100 * thr, 1),
                       "trained_on": "gilani-2017, cresci-rtbust-2019, midterm-2018, cresci-stock-2018, pronbots-2019, celebrity-2019, botwiki-2019, vendor-purchased-2019 (+ verified/political/botometer-feedback held out)"},
             "bot_probability": round(100 * p, 1), "verdict": "BOT" if p >= thr else "NOT BOT", "indicators": indicators}
 
 
 class BotScoreIn(BaseModel):
+    prior: float | None = Field(default=None, gt=0, lt=1)
     # Either score the accounts behind stored threads, or post accounts + posts directly (schema: detector/SPEC.md).
     thread_ids: list[str] = Field(default_factory=list, max_length=50)
     accounts: list[dict] = Field(default_factory=list, max_length=5000)
@@ -766,7 +768,7 @@ async def bot_score(body: BotScoreIn, x_api_key: str | None = Header(default=Non
         for col in ("thread_id", "parent_id", "urls"):
             if col not in posts:
                 posts[col] = ""
-        recs, *_ = bm["mod"].score(accounts, posts, bm["m"])
+        recs, *_ = bm["mod"].score(accounts, posts, bm["m"], prior=body.prior) if body.prior is not None else bm["mod"].score(accounts, posts, bm["m"])
         # The benchmark model was trained with full profile metadata; without it a score is out of distribution.
         need = ("created_ts", "followers", "following", "posts_total")
         meta = accounts.drop_duplicates("account_id").set_index("account_id").reindex([r["account_id"] for r in recs])
@@ -779,9 +781,9 @@ async def bot_score(body: BotScoreIn, x_api_key: str | None = Header(default=Non
 
     recs = await asyncio.to_thread(run)
     meta = bm["m"]["meta"]
-    return {"model": {"trained_on": meta.get("trained_on"), "trained_at": meta.get("trained_at"),
+    return {"model": {"version": meta.get("model_version"), "trained_on": meta.get("trained_on"), "trained_at": meta.get("trained_at"),
                       "benchmark_f1": meta.get("metrics_random_split", {}).get("f1"), "benchmark_f1_ci": meta.get("f1_ci"),
-                      "unseen_bot_type_f1": meta.get("lofo_f1"), "threshold_pct": round(100 * meta["threshold"], 1),
+                      "unseen_bot_type_f1": meta.get("lofo_f1"), "threshold_pct": 50.0 if body.prior is not None else round(100 * meta["threshold"], 1),
                       "domain_note": "Trained and measured on the Cresci-2017 Twitter benchmark. On other platforms "
                                      "(e.g. YouTube) scores are uncalibrated leads until local labels give an in-domain F1."},
             "accounts": recs}

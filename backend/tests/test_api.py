@@ -360,7 +360,12 @@ def test_bot_score_returns_only_bot_probability_and_indicator_percentages(api):
     for acc in body["accounts"]:
         assert {"account_id", "bot_probability", "verdict", "threshold", "indicators", "reliable"} <= set(acc)
         assert acc["reliable"] is False and "warning" in acc  # no profile metadata supplied in this test
-        assert 0 <= acc["bot_probability"] <= 100 and acc["verdict"] in ("BOT", "NOT BOT")
+        assert 0 <= acc["bot_probability"] <= 100
+        if acc["account_id"] == "human":
+            assert acc["verdict"] == "INSUFFICIENT EVIDENCE" and acc["observed_posts"] == 1
+        else:
+            assert acc["verdict"] in ("BOT", "NOT BOT") and acc["observed_posts"] == 6
+        assert acc["model_version"] == body["model"]["version"]
         assert abs(sum(abs(i["percent"]) for i in acc["indicators"]) - 100) < 0.5
         assert not any("narrative" in i["indicator"].lower() or "intent" in i["indicator"].lower() for i in acc["indicators"])
     assert client.post("/api/bot/score", json={"posts": posts}).status_code == 200   # posts in body: public

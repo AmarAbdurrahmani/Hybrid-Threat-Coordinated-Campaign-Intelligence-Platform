@@ -178,6 +178,8 @@ LOAD CSV WITH HEADERS FROM 'file:///nodes_account.csv' AS row
 MERGE (a:Account {account_id: row.account_id})
 SET a.bot_probability = toFloat(row.bot_probability),
     a.verdict = row.verdict,
+    a.observed_posts = toInteger(row.observed_posts),
+    a.model_version = row.model_version,
     a.family = row.family,
     a.label = CASE WHEN row.label = '' THEN null ELSE toInteger(row.label) END;
 
@@ -272,6 +274,9 @@ def export_neo4j(out_dir, scored: pd.DataFrame, graph: Graph, contrib_long: pd.D
         "label": _label(label),
     })
 
+    for key in ("observed_posts", "model_version"):
+        if key in sc:
+            nodes_account[key] = sc[key]
     gates = _gate_map(relation_w)
     ids = list(graph.ids)
     rel_rows = []
