@@ -186,6 +186,33 @@ def cmd_explain(args):
     print("\n  Learned relation weights:", ", ".join(f"{k} {v:.2f}" for k, v in gates.items()))
 
 
+def cmd_motives(args):
+    """Top motive clades (what accounts push, where it is aimed); verdicts stay BOT %."""
+    from .motives import export_neo4j_motives, motive_clades
+    accounts, posts = _load(args)
+    scores = pd.read_csv(args.scores, dtype={"account_id": str}) if args.scores else None
+    threads = None
+    if args.db:
+        import sqlite3
+        with sqlite3.connect(f"file:{args.db}?mode=ro", uri=True) as c:
+            threads = dict(c.execute("select id, coalesce(title, id) from threads").fetchall())
+    clades, assign = motive_clades(accounts, posts, scores, k=args.k, threads=threads, top=args.top)
+    out = Path(args.out or DATA / f"motives_{args.data}{'_test' if args.split == 'test' else ''}"); out.mkdir(parents=True, exist_ok=True)
+    (out / "motives.json").write_text(json.dumps(clades, indent=1, ensure_ascii=False), encoding="utf-8")
+    export_neo4j_motives(out / "neo4j", clades, assign)
+    print(f"\nTop {len(clades)} motive clades in {args.data} ({len(assign)} accounts clustered) → {out}\n")
+    for i, c in enumerate(clades, 1):
+        bot = f" · BOT {100 * c['bot_share']:.0f}% of accounts" if "bot_share" in c else ""
+        truth = f" (true {100 * c['true_bot_share']:.0f}%)" if "true_bot_share" in c else ""
+        print(f"{i:2}. {' / '.join(c['motive_terms'][:4])}")
+        print(f"    {c['accounts']} accounts ({c['coordinated_accounts']} in copy-paste groups) · {c['posts']} posts · copy-paste {100 * c['copy_paste_share']:.0f}%{bot}{truth}")
+        if c["known_narratives"]:
+            print(f"    known narratives: {', '.join(c['known_narratives'])}")
+        print(f"    aimed at: {', '.join(c['targets'][:4]) or 'n/a'}")
+        for e in c["examples"][:2]:
+            print(f"    e.g. {e!r}")
+
+
 def cmd_local_f1(args):
     print(json.dumps(E.evaluate_in_domain(args.labels, args.scores), indent=1, default=float))
 
@@ -207,6 +234,9 @@ def main():
     s.add_argument("--prior", type=float, default=0.10, help="expected bot share in the scored population (base rate); -1 = benchmark threshold"); s.set_defaults(fn=cmd_score)
     x = sub.add_parser("explain"); x.add_argument("account", nargs="?", default=""); x.add_argument("--data", default="youtube_kosovo"); x.add_argument("--model-dir")
     x.add_argument("--split", choices=["all", "test"], default="all"); x.set_defaults(fn=cmd_explain)
+    mo = sub.add_parser("motives"); mo.add_argument("--data", default="youtube10k"); mo.add_argument("--scores"); mo.add_argument("--db")
+    mo.add_argument("--k", type=int); mo.add_argument("--top", type=int, default=10); mo.add_argument("--out")
+    mo.add_argument("--split", choices=["all", "test"], default="all"); mo.set_defaults(fn=cmd_motives)
     l = sub.add_parser("local-f1"); l.add_argument("--labels", required=True); l.add_argument("--scores", required=True); l.set_defaults(fn=cmd_local_f1)
     a = ap.parse_args(); a.fn(a)
 

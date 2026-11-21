@@ -41,6 +41,29 @@ blind sheet and `local-f1` reports an in-domain F1.
   Neo4j import.
 - `python -m detector explain --data cresci2017 --split test` shows one decision with its true label.
 
+## Motive clades (`python -m detector motives`)
+
+The verdict stays BOT %. The motive layer *looks for* what accounts push and groups them into clades. Each account
+becomes one document; TF-IDF plus k-means clusters the accounts, with stop words removed for English,
+Serbian/Bosnian/Croatian/Montenegrin and Albanian. For each clade the command reports:
+- the motive terms;
+- known campaign narratives it matches;
+- examples of copy-pasted text;
+- **targets**: videos, #hashtags, @accounts and link domains it is aimed at;
+- the share of BOT accounts in it.
+
+Clades are ranked by how many accounts took part in copy-paste. The Neo4j export adds
+`(:Account)-[:PURSUES]->(:Motive)-[:TARGETS]->(:Target)`.
+
+On held-out benchmark accounts the clades separate cleanly:
+- bot-dominated motives: retweet-selling, #TALNTS follow-spam, the Italian "earn money" scam, SEO link farms (98–100% BOT,
+  true share the same);
+- a mixed human clade (31% BOT, true 30%).
+
+On 7,182 real Kosovo/Serbia YouTube accounts, the most organised pushes are sovereignty-denial slogans ("Kosovo is
+Serbia", "Kosovo je Srbija", "Part of Serbia"). Each is posted verbatim by 30–70 accounts across the same few geopolitics
+videos, with 75–84% copy-paste. That is a coordination signal for an analyst, not proof of automation.
+
 ## How it works
 
 1. **The graph (a knowledge graph you can open in Neo4j).**
