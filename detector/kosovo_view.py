@@ -24,31 +24,31 @@ CYR = str.maketrans({"а": "a", "б": "b", "в": "v", "г": "g", "д": "d", "ђ"
                      "к": "k", "л": "l", "љ": "lj", "м": "m", "н": "n", "њ": "nj", "о": "o", "п": "p", "р": "r", "с": "s", "т": "t",
                      "ћ": "ć", "у": "u", "ф": "f", "х": "h", "ц": "c", "ч": "č", "џ": "dž", "ш": "š"})
 PUSHES = {
-    "“Kosovo is Serbia”": r"kosovo\s*(?:je|is|=)\s*(?:srbija|serbia|srpsko|serbian)|^\W*kosovo\s+(?:srbija|serbia)\W*$|kosovo i metohija je srbija",
-    "“Part / heart of Serbia”": r"(?:part|piece|heart)\s+of\s+serbia|srce\s+srbije|deo\s+srbije|dio\s+srbije|kim\s+je\s+srbija",
+    "Kosovo independence denial": r"kosovo\s*(?:je|is|=)\s*(?:srbija|serbia|srpsko|serbian)|^\W*kosovo\s+(?:srbija|serbia)\W*$|kosovo i metohija je srbija",
+    "Territorial claim on Kosovo": r"(?:part|piece|heart)\s+of\s+serbia|srce\s+srbije|deo\s+srbije|dio\s+srbije|kim\s+je\s+srbija",
     "Russia / Putin as protector": r"\b(?:putin\w*|rusij\w*|russia\w*|rusi)\b",
-    "Albanians as enemies (slurs, “terrorists”, “occupiers”)": r"[šs]iptar|teroris|terroris|okupator|occupier|albanian\s+(?:mafia|terror)",
+    "Anti-Albanian hostility": r"[šs]iptar|teroris|terroris|okupator|occupier|albanian\s+(?:mafia|terror)",
     "NATO aggression / 1999 bombing": r"nato\s+(?:agres|bomb|aggress)|agresij|bombing\s+of\s+(?:serbia|yugoslavia)|\b1999\b",
-    "Orthodox “holy land” / cradle claim": r"svet[ae]?\s+zemlj|holy\s+land|kolevk|cradle\s+of\s+serb|manastir|monaster|\bzavet",
-    "“Kosovo is not a country / fake state”": r"(?:not|isn'?t)\s+a\s+(?:real\s+)?country|fake\s+(?:country|state)|la[žz]na\s+dr[žz]ava|nije\s+dr[žz]ava|nije\s+zemlja",
-    "“We will never give Kosovo”": r"nikad[a]?\s+(?:ga\s+)?(?:ne\s+)?(?:damo|dati|predati|odreći|odreci)|never\s+give\s+(?:up\s+)?kosovo|ne\s+damo\s+kosov",
+    "Religious-historical claim": r"svet[ae]?\s+zemlj|holy\s+land|kolevk|cradle\s+of\s+serb|manastir|monaster|\bzavet",
+    "Statehood delegitimisation": r"(?:not|isn'?t)\s+a\s+(?:real\s+)?country|fake\s+(?:country|state)|la[žz]na\s+dr[žz]ava|nije\s+dr[žz]ava|nije\s+zemlja",
+    "Sovereignty rejection rhetoric": r"nikad[a]?\s+(?:ga\s+)?(?:ne\s+)?(?:damo|dati|predati|odreći|odreci)|never\s+give\s+(?:up\s+)?kosovo|ne\s+damo\s+kosov",
     "West’s double standards / Crimea": r"double\s+standard|dvostruk|crimea|\bkrim\b",
-    "“Kosovo will return to Serbia”": r"(?:kosovo|kim)\s+(?:će|ce)\s+(?:biti|se\s+vratiti)|will\s+return\s+to\s+serbia|we\s+will\s+be\s+back|vrati(?:ćemo|cemo)",
+    "Reconquest rhetoric": r"(?:kosovo|kim)\s+(?:će|ce)\s+(?:biti|se\s+vratiti)|will\s+return\s+to\s+serbia|we\s+will\s+be\s+back|vrati(?:ćemo|cemo)",
 }
 
 
 # Motive clades: a fixed taxonomy, measured (not assumed) in the comments. Matched on lower-cased text with Serbian
 # Cyrillic transliterated to Latin. A comment can carry more than one motive.
 MOTIVES = {
-    "Serbian sovereignty denial": (r"kosovo\s*(?:je|is|=)\s*(?:srbija|serbia|srpsk|serbian)|(?:part|piece|heart)\s+of\s+serbia|srce\s+srbije|"
+    "Kosovo independence denial": (r"kosovo\s*(?:je|is|=)\s*(?:srbija|serbia|srpsk|serbian)|(?:part|piece|heart)\s+of\s+serbia|srce\s+srbije|"
                                    r"de?o\s+srbije|nikad[a]?\s+(?:ga\s+)?(?:ne\s+)?(?:damo|dati|predati)|kim\s+je\s+srbija|kosovo\s+i\s+metohija", "#991b1b"),
     "Russian / pan-Slavic brotherhood": (r"\b(?:putin\w*|rusij\w*|russia\w*|rusi|rusk\w*|bratsk\w*|bra[ćc]a\s+rus\w*|slaven\w*|slavic|pan-?slav\w*|"
                                          r"slovens\w*|majka\s+rusija)\b", "#1e3a8a"),
     "Anti-NATO / anti-West": (r"\bnato\b.*(?:agres|bomb|aggress|zlo[čc]in|crime|occup|okup)|agresij|double\s+standard|dvostruk|"
                               r"(?:usa|america|amerika|zapad|west)\w*\s+(?:is|je|su)?\s*(?:evil|zlo|imperij|kriv|guilty)", "#7c2d12"),
-    "Anti-Albanian hostility / slurs": (r"[šs]iptar|teroris|terroris|okupator|occupier|albanian\s+(?:mafia|terror)", "#111827"),
-    "Orthodox “holy land” claim": (r"svet[ae]?\s+zemlj|holy\s+land|kolevk|cradle\s+of\s+serb|manastir|monaster|\bzavet|pe[ćc]k\w*\s+patrijar", "#6b21a8"),
-    "Kosovo statehood denied": (r"(?:not|isn'?t)\s+a\s+(?:real\s+)?country|fake\s+(?:country|state)|la[žz]na\s+dr[žz]ava|nije\s+dr[žz]ava|"
+    "Anti-Albanian hostility": (r"[šs]iptar|teroris|terroris|okupator|occupier|albanian\s+(?:mafia|terror)", "#111827"),
+    "Religious-historical claim": (r"svet[ae]?\s+zemlj|holy\s+land|kolevk|cradle\s+of\s+serb|manastir|monaster|\bzavet|pe[ćc]k\w*\s+patrijar", "#6b21a8"),
+    "Statehood delegitimisation": (r"(?:not|isn'?t)\s+a\s+(?:real\s+)?country|fake\s+(?:country|state)|la[žz]na\s+dr[žz]ava|nije\s+dr[žz]ava|"
                                 r"nije\s+zemlja|not\s+recogni[sz]", "#b45309"),
     "Islamist / Sharia advocacy": (r"\b(?:sharia\w*|sheriat\w*|[šs]erijat\w*|khilaf\w*|hilafet\w*|caliphat\w*|kalifat\w*|halifat\w*|"
                                    r"jihad\w*|d[žz]ihad\w*|xhihad\w*|ummah)\b", "#065f46"),
@@ -394,17 +394,8 @@ const ICO = {
   nostate: '<svg viewBox="0 0 24 24" width="100%" height="100%"><rect x="4" y="5" width="16" height="13" rx="2" fill="#04408b"/><path d="M9 9h6v5H9z" fill="#d2ab67"/><path d="M3 21 21 3" stroke="#dc2626" stroke-width="2.6" stroke-linecap="round"/></svg>',
   scale: '<svg viewBox="0 0 24 24" width="100%" height="100%"><rect x="11" y="4" width="2" height="15" fill="#374151"/><rect x="7" y="19" width="10" height="2" rx="1" fill="#374151"/><path d="M4 7h16" stroke="#374151" stroke-width="2"/><path d="M4 7 1.5 13h5Z M20 7l-2.5 6h5Z" fill="#9ca3af"/></svg>'};
 const FLAG = (cc) => `<img src="https://flagcdn.com/h40/${cc}.png" style="width:100%;height:100%;object-fit:cover;display:block">`;
-function pushIcon(name) {
-  const n = name.toLowerCase();
-  if (n.includes("russia") || n.includes("putin")) return FLAG("ru");
-  if (n.includes("orthodox") || n.includes("holy")) return ICO.cross;
-  if (n.includes("albanians as enemies") || n.includes("hostility")) return ICO.warn;
-  if (n.includes("nato")) return ICO.target;
-  if (n.includes("not a country") || n.includes("fake state") || n.includes("statehood")) return ICO.nostate;
-  if (n.includes("double standard") || n.includes("crimea")) return ICO.scale;
-  return FLAG("rs");
-}
-const badge = (name, size = 30) => `<span style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;display:inline-grid;place-items:center;background:#fff;box-shadow:0 0 0 2px #fff,0 0 0 3px #d2ab67;flex:none">${pushIcon(name)}</span>`;
+const EMBLEM = (size) => `<span title="Republika e Kosovës" style="width:${Math.round(size * 0.86)}px;height:${size}px;display:inline-block;flex:none;background:url(mod-logo.png) 0 50% / auto ${Math.round(size * 1.08)}px no-repeat"></span>`;
+const badge = (name, size = 30) => name === "Kosovo independence denial" ? EMBLEM(size) : "";
 function tick() {
   link.attr("x1", (l) => l.source.x).attr("y1", (l) => l.source.y).attr("x2", (l) => l.target.x).attr("y2", (l) => l.target.y);
   node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
@@ -413,7 +404,7 @@ function tick() {
   gH.selectAll("path").data(D.pushes).join("path").attr("fill", "#dc262606").attr("stroke", "#dc262633").attr("stroke-width", 1.2)
     .attr("d", (p, k) => { const ps = (g.get(k) || []).flatMap((d) => [[d.x - 12, d.y - 12], [d.x + 12, d.y - 12], [d.x - 12, d.y + 12], [d.x + 12, d.y + 12]]); const h = ps.length > 2 && d3.polygonHull(ps); return h ? "M" + h.join("L") + "Z" : null; });
   gT.selectAll("g").data(D.pushes).join((en) => { const t = en.append("g");
-      t.append("foreignObject").attr("x", -17).attr("y", -52).attr("width", 34).attr("height", 34).html((p) => `<div xmlns="http://www.w3.org/1999/xhtml" style="width:34px;height:34px;display:grid;place-items:center">${badge(p.name, 30)}</div>`);
+      t.filter((p) => badge(p.name)).append("foreignObject").attr("x", -18).attr("y", -58).attr("width", 36).attr("height", 40).html((p) => `<div xmlns="http://www.w3.org/1999/xhtml" style="width:36px;height:40px;display:grid;place-items:center">${badge(p.name, 36)}</div>`);
       t.append("text").attr("class", "hlabel"); t.append("text").attr("class", "hsub").attr("dy", 15); return t; })
     .attr("transform", (p, k) => { const ps = g.get(k) || []; return ps.length ? `translate(${d3.mean(ps, (d) => d.x)},${d3.min(ps, (d) => d.y) - 24})` : "translate(-999,-999)"; })
     .call((t) => { t.select(".hlabel").attr("text-anchor", "middle").text((p, k) => `#${k + 1} ${p.name}`);
