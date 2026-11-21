@@ -53,6 +53,9 @@ def _model_dir(args):
 
 def cmd_train(args):
     t0 = time.time()
+    from uuid import uuid4
+    run_dir = Path(args.model_dir) if args.model_dir else M.MODEL_DIR.parent / "runs" / uuid4().hex
+    run_dir.mkdir(parents=True, exist_ok=False)
     accounts, posts = datasets.load(args.data)
     accounts = accounts.drop_duplicates("account_id")
     accounts = accounts[accounts.account_id.isin(set(posts.account_id))]  # accounts need observable behaviour
@@ -104,8 +107,8 @@ def cmd_train(args):
     M.save(m, {"trained_on": args.data, "profile": args.profile, "obs": args.obs, "trained_at": time.strftime("%Y-%m-%d %H:%M"), "n_accounts": int(len(accounts)),
                "metrics_random_split": {k: pm["ensemble"][k] for k in ("precision", "recall", "f1", "pr_auc", "roc_auc", "brier", "ece")},
                "f1_ci": results["protocols"]["random_split"]["f1_ci"],
-               "lofo_f1": {k: v["f1"] for k, v in lofo.items()}}, Path(args.model_dir))
-    report = Path(__file__).resolve().parent / ("REPORT.md" if args.profile == "full" else f"REPORT_{args.profile}.md")
+               "lofo_f1": {k: v["f1"] for k, v in lofo.items()}}, run_dir)
+    report = run_dir / "REPORT.md"
     E.write_report(results, report)
     with open(report, "a", encoding="utf-8") as fh:
         fh.write("\n## Learned indicator weights (share of total evidence, test-time mean |SHAP|)\n\n| Indicator | Group | Weight | Pushes towards BOT |\n|---|---|---|---|\n")
@@ -114,9 +117,8 @@ def cmd_train(args):
         fh.write("\n## Learned relation weights (GNN gates)\n\n| Relation | Weight | Share |\n|---|---|---|\n")
         for r in results["relation_weights"]:
             fh.write(f"| {r['relation']} | {r['weight']:.3f} | {r['weight_pct']:.1f}% |\n")
-    (DATA / "processed").mkdir(parents=True, exist_ok=True)
-    (DATA / "processed" / "train_results.json").write_text(json.dumps(results, indent=1, default=float), encoding="utf-8")
-    print(f"done in {time.time() - t0:.0f}s → {args.model_dir}, {report.name}")
+    (run_dir / "train_results.json").write_text(json.dumps(results, indent=1, default=float), encoding="utf-8")
+    print(f"done in {time.time() - t0:.0f}s → {run_dir}")
 
 
 def _load(args):
@@ -147,6 +149,7 @@ def cmd_score(args):
     sheet = scored[["account_id"]].sample(frac=1, random_state=0)
     sheet["sample_posts"] = sheet.account_id.map(sample).fillna("")
     sheet["annotator_a"] = ""; sheet["annotator_b"] = ""
+    sheet["allowed_labels"] = "0=human, 1=bot, unsure=insufficient evidence"
     sheet.to_csv(out / "label_sheet.csv", index=False, encoding="utf-8-sig")
     n_bot = int((scored.verdict == "BOT").sum())
     print(f"{len(scored)} accounts scored, {n_bot} BOT ({'base rate ' + format(100 * prior, '.0f') + '%, BOT if ≥ 50%' if prior is not None else 'threshold ' + format(100 * m['threshold'], '.1f') + '%'}) → {out}")
@@ -166,12 +169,15 @@ def cmd_explain(args):
     p, thr = float(out["ensemble"][i]), m["threshold"]
     gates = m["meta"]["relation_gates"]
     bar = lambda v, w=30: "█" * int(round(abs(v) / 100 * w)) or "·"
-    print(f"\nAccount {ids[i]}")
+    prior = None if args.prior < 0 else args.prior
+    records, *_ = M.score(accounts, posts, m, prior=prior)
+    record = records[i]
+    print(f"\nAccount {ids[i]} | model {record['model_version']} | posts {record['observed_posts']}")
     lab = accounts.set_index("account_id")["label"].get(ids[i], float("nan"))
     truth = "" if lab != lab else f"   true label: {'BOT' if lab == 1 else 'HUMAN'}"
-    print(f"  BOT probability {100 * p:5.1f}%   → {'BOT' if p >= thr else 'NOT BOT'} (threshold {100 * thr:.1f}%){truth}")
+    print(f"  Model score {record['bot_probability']:.1f}%   → {record['verdict']} (threshold {record['threshold']:.1f}%){truth}")
     print(f"  model parts: indicator model {100 * out['lightgbm'][i]:.1f}% · graph network {100 * out['gnn'][i]:.1f}% · calibrated ensemble {100 * p:.1f}%\n")
-    print("  Evidence (share of the decision; + pushes towards BOT, − towards human)")
+    print("  Evidence (relative contribution to the LightGBM component)")
     for r in pct[pct.row == i].itertuples():
         print(f"   {r.direction}{abs(r.percent):5.1f}%  {bar(r.percent):30}  {r.indicator}")
     print("\n  Graph neighbourhood (learned relation weight × edge count)")
@@ -201,12 +207,12 @@ def main():
     sub = ap.add_subparsers(dest="cmd", required=True)
     t = sub.add_parser("train"); t.add_argument("--data", default="cresci2017"); t.add_argument("--fast", action="store_true")
     t.add_argument("--profile", choices=sorted(M.PROFILES), default="full"); t.add_argument("--obs", type=int, default=0, help="keep a random 1..N posts per account")
-    t.add_argument("--model-dir", default=str(M.MODEL_DIR)); t.set_defaults(fn=cmd_train)
+    t.add_argument("--model-dir", help="New output directory; defaults to a unique detector/runs folder"); t.set_defaults(fn=cmd_train)
     s = sub.add_parser("score"); s.add_argument("--data", default="youtube_kosovo"); s.add_argument("--out"); s.add_argument("--top", type=int, default=10); s.add_argument("--model-dir")
     s.add_argument("--split", choices=["all", "test"], default="all", help="test = held-out benchmark accounts only")
     s.add_argument("--prior", type=float, default=0.10, help="expected bot share in the scored population (base rate); -1 = benchmark threshold"); s.set_defaults(fn=cmd_score)
     x = sub.add_parser("explain"); x.add_argument("account", nargs="?", default=""); x.add_argument("--data", default="youtube_kosovo"); x.add_argument("--model-dir")
-    x.add_argument("--split", choices=["all", "test"], default="all"); x.set_defaults(fn=cmd_explain)
+    x.add_argument("--split", choices=["all", "test"], default="all"); x.add_argument("--prior", type=float, default=0.10); x.set_defaults(fn=cmd_explain)
     l = sub.add_parser("local-f1"); l.add_argument("--labels", required=True); l.add_argument("--scores", required=True); l.set_defaults(fn=cmd_local_f1)
     a = ap.parse_args(); a.fn(a)
 

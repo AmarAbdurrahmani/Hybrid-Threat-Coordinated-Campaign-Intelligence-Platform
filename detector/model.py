@@ -6,6 +6,7 @@ Indicator percentages come from LightGBM's exact per-prediction contributions (T
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 
 import numpy as np
@@ -100,6 +101,11 @@ def load(out: Path = MODEL_DIR) -> dict:
     out = Path(out)
     import lightgbm as lgb
     meta = json.loads((out / "model.json").read_text())
+    digest = hashlib.sha256()
+    for filename in ("model.json", "lightgbm.txt", "gnn.npz"):
+        data = (out / filename).read_bytes()
+        digest.update(data if filename.endswith(".npz") else data.replace(b"\r\n", b"\n"))
+    meta["model_version"] = digest.hexdigest()[:16]
     z = np.load(out / "gnn.npz")
     gm = {"params": {k[2:]: z[k] for k in z.files if k.startswith("p_")},
           "scaler": {k[2:]: z[k] for k in z.files if k.startswith("s_")}, "relations": meta["relations"],
@@ -133,13 +139,20 @@ def score(accounts: pd.DataFrame, posts: pd.DataFrame, m: dict | None = None, pr
         out["ensemble"] = prior_shift(np.clip(out["ensemble"], 1e-6, 1 - 1e-6), m["meta"].get("train_prior", 0.5), prior)
         thr = 0.5
     meta = accounts.set_index("account_id").reindex(graph.ids)
+    observations = posts.groupby(posts.account_id.astype(str)).post_id.nunique()
     recs = []
     for i, aid in enumerate(graph.ids):
         p = float(out["ensemble"][i])
-        recs.append({"account_id": aid, "bot_probability": round(100 * p, 1), "verdict": "BOT" if p >= thr else "NOT BOT",
+        n_posts = int(observations.get(aid, 0))
+        verdict = ("BOT" if p >= thr else "NOT BOT") if n_posts >= 2 else "INSUFFICIENT EVIDENCE"
+        recs.append({"account_id": aid, "bot_probability": round(100 * p, 1), "verdict": verdict,
+                     "observed_posts": n_posts, "model_version": m["meta"]["model_version"],
+                     "indicator_scope": "LightGBM component",
                      "threshold": round(100 * thr, 1), **({"base_rate": round(100 * prior, 1)} if prior is not None else {}),
                      "indicators": top_indicators(pct, i)})
     scored = pd.DataFrame({"account_id": graph.ids, "bot_probability": [r["bot_probability"] for r in recs],
                            "verdict": [r["verdict"] for r in recs], "family": meta.get("family", pd.Series(index=graph.ids)).fillna("").to_numpy(),
                            "label": meta.get("label", pd.Series(index=graph.ids)).to_numpy()})
+    scored["observed_posts"] = [r["observed_posts"] for r in recs]
+    scored["model_version"] = m["meta"]["model_version"]
     return recs, scored, graph, out["contrib"]
