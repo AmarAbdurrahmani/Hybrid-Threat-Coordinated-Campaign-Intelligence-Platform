@@ -176,9 +176,29 @@ def build(db: Path, out: Path, max_nodes: int = 520) -> Path:
                 continue
             idx[u] = len(nodes)
             nodes.append({"id": _pseudo(u), "k": k, "s": round(float(r.score), 0), "cp": bool(r.copied), "b": bool(r.burst),
-                          "new": bool(r.age < 180) if r.age == r.age else None})
+                          "new": bool(r.age < 180) if r.age == r.age else None, "u": u})
+    # node details: the account's comments, profile, the pushes it is in, and how many accounts share its texts
+    in_push = {name: set(members[name].index) for name in members}
+    pk = {pu["name"]: k for k, pu in enumerate(pushes)}
+    def fol_of(a):
+        try:
+            return json.loads(a).get("followers")
+        except Exception:
+            return None
+    for nd in nodes:
+        u = nd.pop("u")
+        mine = p[p.user == u].sort_values("ts", ascending=False)
+        nd["age"] = None if mine.age_days.isna().all() else int(mine.age_days.min())
+        f = mine.account.map(fol_of).dropna()
+        nd["fol"] = None if f.empty else int(f.max())
+        nd["cm"] = [[str(r.text)[:220], pd.to_datetime(r.ts, unit="s").strftime("%Y-%m-%d %H:%M"), str(r.title or "")[:60],
+                     int(shared.get(r.norm, 1))] for r in mine.head(5).itertuples()]
+        nd["n"] = int(len(mine))
+        nd["pk"] = [pk[name] for name in pk if u in in_push.get(name, ())]
+        nd["partners"] = int(max([int(shared.get(x, 1)) for x in mine.norm] + [1]) - 1)
     links = []
     sub = p[p.user.isin(idx) & p.copied]
+    idx = {u: i for i, u in enumerate(idx)} if False else idx
     for _, g in sub.groupby("norm"):
         us = list(dict.fromkeys(g.user))[:25]
         for i in range(len(us) - 1):
@@ -252,9 +272,9 @@ TEMPLATE = r"""<!doctype html>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <style>
-:root{--bg:#f4f5f7;--card:#fff;--line:#e5e7eb;--ink:#0b0f19;--mut:#6b7280}
+:root{--bg:#f4f5f7;--card:#fff;--line:#e5e7eb;--ink:#0b0f19;--mut:#6b7280;--kblue:#244aa5;--kgold:#d0a650;--knavy:#13235b}
 *{box-sizing:border-box}html,body{margin:0;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
-header{position:sticky;top:0;z-index:5;height:72px;display:flex;align-items:center;gap:22px;padding:0 26px;background:var(--card);border-bottom:1px solid var(--line)}
+header{position:sticky;top:0;z-index:5;height:72px;border-top:3px solid var(--kgold);display:flex;align-items:center;gap:22px;padding:0 26px;background:var(--card);border-bottom:1px solid var(--line)}
 h1{font-size:16px;margin:0;font-weight:700;letter-spacing:-.015em;white-space:nowrap}.sub{color:var(--mut);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:520px}
 .tabs{display:flex;gap:6px;margin-left:18px}.tabs a{white-space:nowrap;font:600 12.5px Inter;padding:8px 12px;border-radius:8px;color:#374151;text-decoration:none;border:1px solid var(--line)}
 .tabs a.on{background:#0b0f19;color:#fff;border-color:#0b0f19}
@@ -269,7 +289,7 @@ section.s .lead{color:var(--mut);font-size:15px;max-width:760px;margin:0 0 26px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
 .tile{background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px}
 .tile .n{font:800 44px/1 Inter;letter-spacing:-.04em;font-variant-numeric:tabular-nums}.tile .l{font-weight:650;margin-top:8px}
-.tile .d{color:var(--mut);font-size:13px;margin-top:6px}.tile.dark{background:#0b0f19;color:#fff;border-color:#0b0f19}.tile.dark .d{color:#9ca3af}
+.tile .d{color:var(--mut);font-size:13px;margin-top:6px}.tile.dark{background:var(--knavy);color:#fff;border-color:var(--knavy)}.tile.dark .d{color:#9ca3af}
 .tag{display:inline-block;font:700 10.5px Inter;letter-spacing:.07em;text-transform:uppercase;padding:4px 8px;border-radius:6px;margin-bottom:10px}
 .ok{background:#d1fae5;color:#065f46}.warn{background:#fef3c7;color:#92400e}
 .plain{display:grid;grid-template-columns:repeat(auto-fit,minmax(330px,1fr));gap:14px}
@@ -288,7 +308,7 @@ aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;pad
 .ramp{width:240px;height:10px;border-radius:6px;margin:7px 0 4px;background:linear-gradient(90deg,#e5e7eb,#fca5a5 35%,#dc2626 62%,#7f1d1d 84%,#120202)}
 .note{font-size:12px;color:var(--mut);background:#f9fafb;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:14px}
 </style></head><body>
-<header><div style="display:flex;align-items:center;gap:11px"><svg class="kodlogo" viewBox="0 0 40 44" width="34" height="37" aria-label="KOD logo" role="img"><path d="M20 2 L36 8 V21 C36 31 29 38.5 20 42 C11 38.5 4 31 4 21 V8 Z" fill="#0b0f19"/><path d="M20 5.5 L33 10.4 V21 C33 29.3 27.4 35.6 20 38.7 C12.6 35.6 7 29.3 7 21 V10.4 Z" fill="none" stroke="#ffffff" stroke-opacity=".16"/><line x1="13" y1="17" x2="27" y2="15" stroke="#cbd5e1" stroke-width="1.6"/><line x1="13" y1="17" x2="20" y2="29" stroke="#cbd5e1" stroke-width="1.6"/><line x1="27" y1="15" x2="20" y2="29" stroke="#ef4444" stroke-width="1.8"/><circle cx="13" cy="17" r="3.6" fill="#e5e7eb"/><circle cx="27" cy="15" r="3.6" fill="#e5e7eb"/><circle cx="20" cy="29" r="4.8" fill="#dc2626"/><circle cx="20" cy="29" r="7.6" fill="none" stroke="#dc2626" stroke-opacity=".45" stroke-width="1.4"/></svg><div><h1 style="font:800 20px/1 Inter;letter-spacing:.02em;margin:0">KOD</h1><div style="font:600 11px/1.3 Inter;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap">Kosova OSINT Defender</div></div></div><div class="sub" id="sub" style="margin-left:4px;border-left:1px solid #e5e7eb;padding-left:16px"></div>
+<header><div style="display:flex;align-items:center;gap:11px"><svg class="kodlogo" viewBox="0 0 40 44" width="34" height="37" aria-label="KOD logo" role="img"><path d="M20 2 L36 8 V21 C36 31 29 38.5 20 42 C11 38.5 4 31 4 21 V8 Z" fill="#244aa5"/><path d="M20 5.5 L33 10.4 V21 C33 29.3 27.4 35.6 20 38.7 C12.6 35.6 7 29.3 7 21 V10.4 Z" fill="none" stroke="#ffffff" stroke-opacity=".16"/><line x1="13" y1="17" x2="27" y2="15" stroke="#cbd5e1" stroke-width="1.6"/><line x1="13" y1="17" x2="20" y2="29" stroke="#cbd5e1" stroke-width="1.6"/><line x1="27" y1="15" x2="20" y2="29" stroke="#ef4444" stroke-width="1.8"/><circle cx="13" cy="17" r="3.6" fill="#e5e7eb"/><circle cx="27" cy="15" r="3.6" fill="#e5e7eb"/><circle cx="20" cy="29" r="4.8" fill="#dc2626"/><circle cx="20" cy="29" r="7.6" fill="none" stroke="#dc2626" stroke-opacity=".45" stroke-width="1.4"/></svg><div><h1 style="font:800 20px/1 Inter;letter-spacing:.02em;margin:0">KOD</h1><div style="font:600 11px/1.3 Inter;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap">Kosova OSINT Defender</div></div></div><div style="margin-left:4px;border-left:1px solid #e5e7eb;padding-left:16px;min-width:0"><div style="font:700 12px Inter;color:var(--kblue);letter-spacing:.02em;white-space:nowrap">Prototype for Ministria e Mbrojtjes · Republika e Kosovës</div><div class="sub" id="sub"></div></div>
 
 <div class="kpis" id="kpis"></div></header>
 <main><div id="stage"><svg id="g"></svg><a class="scrollcue" href="#numbers">Scroll for motives, bot farms &amp; accuracy ↓</a><div class="zoomhint">Ctrl + scroll to zoom · drag to pan</div>
@@ -319,7 +339,31 @@ aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;pad
 <section class="s" id="farms"><h2>Bot farms</h2><p class="lead">Where the truth is known we confirm. Where it is not yet known we detect, and we say which is which.</p><div class="grid" id="farmTiles"></div></section>
 <section class="s"><h2>How sure are we? In plain words</h2><p class="lead">Tested on accounts the model had never seen, against labels checked by humans.</p><div class="plain" id="plain"></div></section>
 <section class="s sec"><h2>How secure is it?</h2><div class="plain" id="secure"></div></section>
-<footer>KOD · Kosova OSINT Defender · one question per account: is it a bot? · trained model: LightGBM + relational graph network · benchmark: Cresci-2017 (human-labelled) · Kosovo data: public YouTube comments via the official API, authors pseudonymised. It measures automation and coordination; it never attributes activity to a state, group or person.</footer>
+<section class="s" id="roadmap"><h2>Where KOD goes next</h2><p class="lead">Built for Ministria e Mbrojtjes. The same detector transfers to any theatre where coordinated accounts fight for opinion.</p>
+<div class="plain" style="grid-template-columns:repeat(auto-fit,minmax(460px,1fr))">
+<div class="tile"><b class="k">Milestones</b><ol style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.7">
+ <li><b style="color:#065f46">Done</b>: bot detector trained and blind-tested (F1 0.996, 97–99.7% on unseen bot types).</li>
+ <li><b style="color:#065f46">Done</b>: Kosovo collection, pro-Serbian pushes and motive clades on 10,275 real comments.</li>
+ <li><b style="color:#92400e">Next</b>: two analysts label a blind Kosovo sample, which gives a Kosovo accuracy with its margin.</li>
+ <li><b style="color:#92400e">Next</b>: retrain on Kosovo labels, with an Albanian/Serbian language model in the loop.</li>
+ <li>Telegram connector live, then TikTok / Meta through research access.</li>
+ <li>On-premise deployment inside the Ministry: no data leaves Kosovo.</li></ol></div>
+<div class="tile"><b class="k">What it is for</b><ul style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.7">
+ <li>Early warning when a coordinated push starts, for example around incidents in the north, elections or KFOR decisions.</li>
+ <li>Strategic communication: know which narrative is pushed, where, and how hard, before answering it.</li>
+ <li>Evidence packs for platform takedown requests: accounts, texts, timing, copy groups.</li>
+ <li>Training and exercises for analysts on real, pseudonymised patterns.</li></ul></div>
+<div class="tile"><b class="k">Same method, other theatres</b><ul style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.7">
+ <li><b>Ukraine – Russia</b>: cloned-media and bot-amplification networks of the “Doppelganger” type.</li>
+ <li><b>Taiwan – China</b>: “Spamouflage”-style mass accounts pushing the same lines across platforms.</li>
+ <li><b>Moldova, Romania</b>: paid and coordinated accounts around referendums and elections.</li>
+ <li><b>Western Balkans</b>: Bosnia and Herzegovina, Montenegro, North Macedonia, Serbia.</li></ul></div>
+<div class="tile"><b class="k">Who gains</b><ul style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.7">
+ <li><b>Ministria e Mbrojtjes / FSK</b>: its own measured picture of the information space, on its own infrastructure, with a human always deciding.</li>
+ <li><b>NATO / KFOR</b>: shared, explainable indicators of coordinated activity for situational awareness and StratCom.</li>
+ <li><b>Partners</b>: a method that is published, measured and transferable, not a black box.</li></ul></div>
+</div></section>
+<footer>KOD · Kosova OSINT Defender · a hackathon prototype prepared for Ministria e Mbrojtjes, not an official Ministry product · one question per account: is it a bot? · trained model: LightGBM + relational graph network · benchmark: Cresci-2017 (human-labelled) · Kosovo data: public YouTube comments via the official API, authors pseudonymised. It measures automation and coordination; it never attributes activity to a state, group or person.</footer>
 <script>
 const D = __DATA__, S = D.stats;
 const shade = d3.scaleLinear().domain([0, 30, 55, 80, 100]).range(["#e5e7eb", "#fca5a5", "#dc2626", "#7f1d1d", "#120202"]).clamp(true);
@@ -333,7 +377,8 @@ const gH = root.append("g"), gL = root.append("g"), gN = root.append("g"), gT = 
 const n = D.pushes.length, cx = (k) => W() / 2 + Math.cos(2 * Math.PI * k / n - 1.57) * W() * 0.33, cy = (k) => H() / 2 + Math.sin(2 * Math.PI * k / n - 1.57) * H() * 0.34;
 const nodes = D.nodes.map((d) => ({ ...d })), links = D.links.map((l) => ({ source: l.s, target: l.t }));
 const link = gL.selectAll("line").data(links).join("line").attr("stroke", "#dc2626").attr("stroke-opacity", 0.18).attr("stroke-width", 1);
-const node = gN.selectAll("circle").data(nodes).join("circle").attr("r", (d) => 4.5 + d.s / 14).attr("fill", (d) => shade(d.s)).attr("stroke", "#fff").attr("stroke-width", 1.2);
+const node = gN.selectAll("circle").data(nodes).join("circle").attr("r", (d) => 4.5 + d.s / 14).attr("fill", (d) => shade(d.s)).attr("stroke", "#fff").attr("stroke-width", 1.2)
+  .style("cursor", "pointer").on("click", (e, d) => { e.stopPropagation(); showAccount(d); });
 d3.forceSimulation(nodes).force("link", d3.forceLink(links).distance(14).strength((l) => l.source.k === l.target.k ? 0.15 : 0))
   .force("charge", d3.forceManyBody().strength(-10)).force("x", d3.forceX((d) => cx(d.k)).strength(0.2)).force("y", d3.forceY((d) => cy(d.k)).strength(0.2))
   .force("collide", d3.forceCollide((d) => 5.5 + d.s / 14)).on("tick", tick).on("end", fit);
@@ -357,11 +402,8 @@ document.getElementById("side").innerHTML = `<div class="note"><b style="color:#
   ${p.examples.map(([t, c]) => `<div class="q">${t.replace(/</g, "&lt;")}<span>${c} account${c > 1 ? "s" : ""}</span></div>`).join("")}
   <div class="tg">Aimed at: ${p.targets.map(([t, c]) => `${t.replace(/</g, "&lt;")} (${c})`).join(" · ")}</div>
   <div class="tg">Languages: ${Object.entries(p.langs).map(([l, c]) => `${l} ${c}`).join(" · ")}</div><div class="more">Click for examples and targeted videos</div></div>`).join("");
-document.querySelectorAll(".card").forEach((el) => el.onclick = () => { const k = +el.dataset.k, open = !el.classList.contains("on");
-  document.querySelectorAll(".card").forEach((c) => c.classList.toggle("on", open && c === el));
-  if (!open) { node.attr("opacity", 1); link.attr("stroke-opacity", 0.18); return; }
-  node.attr("opacity", (d) => d.k === k ? 1 : 0.12); link.attr("stroke-opacity", (l) => l.source.k === k ? 0.5 : 0.03); });
-svg.on("click", () => { document.querySelectorAll(".card").forEach((c) => c.classList.remove("on")); node.attr("opacity", 1); link.attr("stroke-opacity", 0.18); });
+
+svg.on("click", () => goHome());
 
 
 (() => {
@@ -433,6 +475,38 @@ document.getElementById("mcards").innerHTML = D.clades.motives.filter((m) => m.c
      <div style="font-size:13.5px;margin-top:3px;overflow-wrap:anywhere">${e.text.replace(/</g, "&lt;")}</div>
      <div style="font-size:11.5px;color:#6b7280;margin-top:3px">${e.copies > 1 ? `<b style="color:#b91c1c">posted word-for-word by ${e.copies} accounts</b> · ` : ""}under “${e.video.replace(/</g, "&lt;")}”</div></div></div>`).join("")}
   </div>`; }).join("");
+
+const sideHome = document.getElementById("side").innerHTML;
+function bindCards() {
+  document.querySelectorAll(".card").forEach((el) => el.onclick = () => { const k = +el.dataset.k, open = !el.classList.contains("on");
+    document.querySelectorAll(".card").forEach((c) => c.classList.toggle("on", open && c === el));
+    if (!open) { node.attr("opacity", 1); link.attr("stroke-opacity", 0.18); return; }
+    node.attr("opacity", (d) => d.k === k ? 1 : 0.12); link.attr("stroke-opacity", (l) => l.source.k === k ? 0.5 : 0.03); });
+}
+function showAccount(d) {
+  const nb = new Set([d]); links.forEach((l) => { if (l.source === d) nb.add(l.target); if (l.target === d) nb.add(l.source); });
+  node.attr("opacity", (n) => nb.has(n) ? 1 : 0.12).attr("stroke", (n) => n === d ? "#244aa5" : "#fff").attr("stroke-width", (n) => n === d ? 3 : 1.2);
+  link.attr("stroke-opacity", (l) => l.source === d || l.target === d ? 0.7 : 0.03);
+  const parts = [["Posted word-for-word copies", d.cp, 55], ["In a 10-minute burst with others", d.b, 30], ["Channel under 6 months old", d.new, 15]];
+  const ageTxt2 = d.age == null ? "unknown" : d.age < 31 ? `${d.age} days` : d.age < 365 ? `${Math.round(d.age / 30.4)} months` : `${(d.age / 365).toFixed(1)} years`;
+  document.getElementById("side").innerHTML = `<a href="#" id="home" style="font:600 12.5px Inter;color:#244aa5;text-decoration:none">← all pushes</a>
+   <div style="display:flex;gap:12px;align-items:center;margin:14px 0 6px">${avatar(d.id, 46)}<div><div style="font:700 15px 'JetBrains Mono'">${d.id}</div>
+   <div class="muted" style="font-size:12.5px;color:#6b7280">pseudonymised YouTube author · ${d.n} comment${d.n > 1 ? "s" : ""} in the data</div></div></div>
+   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:12px 0">
+    ${[[d.s.toFixed(0), "coordination score"], [ageTxt2, "channel age"], [d.fol == null ? "hidden" : d.fol.toLocaleString(), "subscribers"]].map(([v, l]) => `<div style="background:#f9fafb;border:1px solid #eef0f3;border-radius:9px;padding:9px 10px"><div style="font:700 18px Inter">${v}</div><div style="font-size:11px;color:#6b7280">${l}</div></div>`).join("")}</div>
+   <div style="font:600 11px Inter;text-transform:uppercase;letter-spacing:.07em;color:#6b7280;margin:16px 0 8px">Why this score</div>
+   ${parts.map(([l, on, w]) => `<div style="display:flex;justify-content:space-between;font-size:13px;margin:5px 0"><span>${on ? "●" : "○"} ${l}</span><b style="font-family:'JetBrains Mono';color:${on ? "#b91c1c" : "#9ca3af"}">${on ? "+" + w : "0"}</b></div>`).join("")}
+   <div style="font-size:12px;color:#6b7280;margin-top:4px">${d.partners ? `Shares a text with <b style="color:#111827">${d.partners}</b> other account${d.partners > 1 ? "s" : ""}.` : "No other account posted its texts."}</div>
+   <div style="font:600 11px Inter;text-transform:uppercase;letter-spacing:.07em;color:#6b7280;margin:16px 0 8px">Pushes it is part of</div>
+   <div style="display:flex;flex-wrap:wrap;gap:6px">${d.pk.map((k) => `<span class="chipx">#${k + 1} ${D.pushes[k].name}</span>`).join("")}</div>
+   <div style="font:600 11px Inter;text-transform:uppercase;letter-spacing:.07em;color:#6b7280;margin:16px 0 4px">Its comments</div>
+   ${d.cm.map(([t, when, vid, c]) => `<div style="border-top:1px solid #f3f4f6;padding:9px 0"><div style="font-size:11.5px;color:#6b7280">${when} · under “${vid.replace(/</g, "&lt;")}”</div>
+     <div style="font-size:13.5px;margin-top:3px;overflow-wrap:anywhere">${t.replace(/</g, "&lt;")}</div>${c > 1 ? `<div style="font-size:11.5px;color:#b91c1c;font-weight:600;margin-top:2px">posted word-for-word by ${c} accounts</div>` : ""}</div>`).join("")}
+   <p style="font-size:11.5px;color:#6b7280;margin-top:14px">A coordination score is a lead for an analyst, not a verdict that the account is a bot.</p>`;
+  document.getElementById("home").onclick = (e) => { e.preventDefault(); goHome(); };
+}
+function goHome() { document.getElementById("side").innerHTML = sideHome; bindCards(); node.attr("opacity", 1).attr("stroke", "#fff").attr("stroke-width", 1.2); link.attr("stroke-opacity", 0.18); }
+bindCards();
 const B = D.bench, K = D.kosovo, P = (x, d = 1) => (100 * x).toFixed(d) + "%";
 document.getElementById("farmTiles").innerHTML = (B.farms != null ? `
  <div class="tile dark"><span class="tag ok">Confirmed · ground truth</span><div class="n">${B.farms}</div><div class="l">bot farms confirmed</div>
