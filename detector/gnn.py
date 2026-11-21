@@ -88,14 +88,18 @@ def train_gnn(X: np.ndarray, rels: dict, y: np.ndarray, train_idx, val_idx, *, h
 
 
 def relation_gates(model: dict) -> dict[str, float]:
-    th = model["params"]["theta"]
-    return {r: float(np.log1p(np.exp(t))) for r, t in zip(model["relations"], th)}
+    """Learned relation weights; relations never seen in training are reported as 0 (switched off)."""
+    th, trained = model["params"]["theta"], model.get("relation_trained") or {}
+    return {r: float(np.log1p(np.exp(t))) if trained.get(r, True) else 0.0 for r, t in zip(model["relations"], th)}
 
 
 def numpy_forward(model: dict, X: np.ndarray, rels: dict) -> np.ndarray:
     """Bot logit for every node, numpy only."""
     s = model["scaler"]; Xs = Scaler(s["med"], s["mu"], s["sd"]).transform(X)
     P, g = model["params"], np.log1p(np.exp(model["params"]["theta"]))
+    # a relation with no edges in the training data has untrained (random) weights: switch it off
+    trained = model.get("relation_trained") or {}
+    g = np.array([gi if trained.get(r, True) else 0.0 for gi, r in zip(g, model["relations"])])
     A = {r: norm_adj(rels[r]) for r in model["relations"]}
     h = Xs @ P["W0"] + P["b1"]
     for i, r in enumerate(model["relations"]):

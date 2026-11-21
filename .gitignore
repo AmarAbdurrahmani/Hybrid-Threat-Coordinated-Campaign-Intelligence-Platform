@@ -23,3 +23,6 @@ models/
 
 # bot detector: downloaded datasets and trained artefacts
 detector/data/
+
+# local experiment: YouTube-profile model (not shipped; see REPORT_youtube.md)
+detector/model_youtube/

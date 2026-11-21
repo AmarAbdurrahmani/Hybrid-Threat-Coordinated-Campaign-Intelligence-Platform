@@ -738,9 +738,12 @@ class BotScoreIn(BaseModel):
     posts: list[dict] = Field(default_factory=list, max_length=50000)
 
 
-@app.post("/api/bot/score", dependencies=[Depends(require_key)])
-async def bot_score(body: BotScoreIn):
-    """BOT probability (calibrated %) + percentage contribution of every indicator, per account. Nothing else."""
+@app.post("/api/bot/score")
+async def bot_score(body: BotScoreIn, x_api_key: str | None = Header(default=None)):
+    """BOT probability (calibrated %) + percentage contribution of every indicator, per account. Nothing else.
+    Posts sent in the request are scored without a key (pure computation); reading stored threads needs the key."""
+    if not body.posts:
+        require_key(x_api_key)
     bm = _bot_model()
 
     def run():
@@ -770,7 +773,9 @@ async def bot_score(body: BotScoreIn):
     meta = bm["m"]["meta"]
     return {"model": {"trained_on": meta.get("trained_on"), "trained_at": meta.get("trained_at"),
                       "benchmark_f1": meta.get("metrics_random_split", {}).get("f1"), "benchmark_f1_ci": meta.get("f1_ci"),
-                      "unseen_bot_type_f1": meta.get("lofo_f1"), "threshold_pct": round(100 * meta["threshold"], 1)},
+                      "unseen_bot_type_f1": meta.get("lofo_f1"), "threshold_pct": round(100 * meta["threshold"], 1),
+                      "domain_note": "Trained and measured on the Cresci-2017 Twitter benchmark. On other platforms "
+                                     "(e.g. YouTube) scores are uncalibrated leads until local labels give an in-domain F1."},
             "accounts": recs}
 
 

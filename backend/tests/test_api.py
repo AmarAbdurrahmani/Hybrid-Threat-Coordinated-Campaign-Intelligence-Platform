@@ -362,7 +362,8 @@ def test_bot_score_returns_only_bot_probability_and_indicator_percentages(api):
         assert 0 <= acc["bot_probability"] <= 100 and acc["verdict"] in ("BOT", "NOT BOT")
         assert abs(sum(abs(i["percent"]) for i in acc["indicators"]) - 100) < 0.5
         assert not any("narrative" in i["indicator"].lower() or "intent" in i["indicator"].lower() for i in acc["indicators"])
-    assert client.post("/api/bot/score", json={"posts": posts}).status_code == 401
+    assert client.post("/api/bot/score", json={"posts": posts}).status_code == 200   # posts in body: public
+    assert client.post("/api/bot/score", json={"thread_ids": ["x"]}).status_code == 401  # stored data: key
 
 
 def test_bot_account_profile_network(api):

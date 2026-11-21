@@ -1,0 +1,105 @@
+{
+  "trained_on": "cresci2017",
+  "trained_at": "2026-11-21 20:22",
+  "n_accounts": 10197,
+  "metrics_random_split": {
+    "precision": 0.9950657894736842,
+    "recall": 0.9961580680570802,
+    "f1": 0.9956116291826659,
+    "pr_auc": 0.9990319986785807,
+    "roc_auc": 0.9956370423953017,
+    "brier": 0.006377984031420573,
+    "ece": 0.00599193467641628
+  },
+  "f1_ci": [
+    0.9933147632311977,
+    0.9975419227148362
+  ],
+  "lofo_f1": {
+    "fake_followers": 0.971830985915493,
+    "social_spambots_1": 0.9820236260914227,
+    "social_spambots_2": 0.9973935708079931,
+    "social_spambots_3": 0.9742489270386266,
+    "traditional_spambots_1": 0.9930486593843099
+  },
+  "features": [
+    "age_days_log",
+    "followers_log",
+    "following_log",
+    "follow_ratio",
+    "posts_total_log",
+    "posts_per_day_log",
+    "n_obs_log",
+    "gap_median_log",
+    "gap_cv",
+    "burstiness",
+    "frac_gap_lt_60",
+    "hour_entropy",
+    "self_dup_ratio",
+    "cross_dup_ratio",
+    "cross_dup_max_log",
+    "url_ratio",
+    "url_repeat_ratio",
+    "mention_ratio",
+    "hashtag_ratio",
+    "len_mean_log",
+    "upper_ratio",
+    "excl_ratio",
+    "digit_ratio",
+    "script_mix_ratio",
+    "reply_ratio",
+    "narrative_ratio",
+    "narrative_kinds",
+    "deg_copy_log",
+    "deg_sync_log",
+    "deg_link_log",
+    "deg_reply_log",
+    "deg_cothread_log",
+    "component_log"
+  ],
+  "relations": [
+    "COPY",
+    "SYNC",
+    "LINK",
+    "REPLY",
+    "CO_THREAD"
+  ],
+  "relation_trained": {
+    "COPY": true,
+    "SYNC": true,
+    "LINK": false,
+    "REPLY": true,
+    "CO_THREAD": false
+  },
+  "relation_gates": {
+    "COPY": 0.8395826816558838,
+    "SYNC": 0.82874995470047,
+    "LINK": 0.6931471824645996,
+    "REPLY": 0.6978939771652222,
+    "CO_THREAD": 0.6931471824645996
+  },
+  "threshold": 0.3333333333333333,
+  "isotonic": {
+    "x": [
+      0.00027798881263899376,
+      0.16111663642055804,
+      0.16752569927806518,
+      0.21332837356422224,
+      0.41620069747495153,
+      0.5011988383708909,
+      0.5048733944003674,
+      0.9999607682325407
+    ],
+    "y": [
+      0.0,
+      0.0,
+      0.6666666666666666,
+      0.6666666666666666,
+      0.75,
+      0.75,
+      1.0,
+      1.0
+    ]
+  },
+  "train_prior": 0.8938
+}

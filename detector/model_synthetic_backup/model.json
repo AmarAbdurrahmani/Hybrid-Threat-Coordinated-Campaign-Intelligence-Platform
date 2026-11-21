@@ -1,0 +1,94 @@
+{
+  "trained_on": "synthetic",
+  "trained_at": "2026-11-21 17:50",
+  "n_accounts": 640,
+  "metrics_random_split": {
+    "precision": 1.0,
+    "recall": 1.0,
+    "f1": 1.0,
+    "pr_auc": 1.0,
+    "roc_auc": 1.0,
+    "brier": 2.8382255151750856e-09,
+    "ece": 4.708889129862587e-06
+  },
+  "f1_ci": [
+    1.0,
+    1.0
+  ],
+  "lofo_f1": {
+    "bots_copy": 1.0,
+    "bots_fast": 0.5798816568047337,
+    "bots_link": 0.0
+  },
+  "features": [
+    "age_days_log",
+    "followers_log",
+    "following_log",
+    "follow_ratio",
+    "posts_total_log",
+    "posts_per_day_log",
+    "n_obs_log",
+    "gap_median_log",
+    "gap_cv",
+    "burstiness",
+    "frac_gap_lt_60",
+    "hour_entropy",
+    "self_dup_ratio",
+    "cross_dup_ratio",
+    "cross_dup_max_log",
+    "url_ratio",
+    "url_repeat_ratio",
+    "mention_ratio",
+    "hashtag_ratio",
+    "len_mean_log",
+    "upper_ratio",
+    "excl_ratio",
+    "digit_ratio",
+    "script_mix_ratio",
+    "reply_ratio",
+    "narrative_ratio",
+    "narrative_kinds",
+    "deg_copy_log",
+    "deg_sync_log",
+    "deg_link_log",
+    "deg_reply_log",
+    "deg_cothread_log",
+    "component_log"
+  ],
+  "relations": [
+    "COPY",
+    "SYNC",
+    "LINK",
+    "REPLY",
+    "CO_THREAD"
+  ],
+  "relation_trained": {
+    "COPY": true,
+    "SYNC": true,
+    "LINK": true,
+    "REPLY": false,
+    "CO_THREAD": false
+  },
+  "relation_gates": {
+    "COPY": 0.7124174237251282,
+    "SYNC": 0.7275403738021851,
+    "LINK": 0.696998655796051,
+    "REPLY": 0.6931471824645996,
+    "CO_THREAD": 0.6931471824645996
+  },
+  "threshold": 0.5,
+  "isotonic": {
+    "x": [
+      0.00010789916065632988,
+      0.043704086149192516,
+      0.9979343168963004,
+      0.9999276144765705
+    ],
+    "y": [
+      0.0,
+      0.0,
+      1.0,
+      1.0
+    ]
+  }
+}

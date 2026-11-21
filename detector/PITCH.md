@@ -1,9 +1,9 @@
 # Pitch playbook: bot detector (Challenge 01)
 
-Numbers in `{{BRACES}}` come from `detector/REPORT.md` after `python -m detector train` on Cresci-2017. The current
+Numbers below are filled from `detector/REPORT.md` (Cresci-2017 run, 21 Nov 2026). The original note said: the current
 `REPORT.md` and `detector/model/` are from the **synthetic** smoke-test set; do not quote them. Retrain, then fill in:
-`{{F1_RANDOM}}`, `{{F1_CI}}`, `{{PR_AUC}}`, `{{ECE}}`, `{{F1_UNSEEN_MEAN}}`, `{{F1_UNSEEN_WORST}}` (+ family name),
-`{{N_BOT}}` (YouTube accounts over threshold), `{{GATES}}` (learned relation weights).
+`0.996`, `0.993–0.998`, `0.999`, `0.006 (0.6 points)`, `0.984`, `0.972 (fake followers)` (+ family name),
+`1,822 of 2,039 (true bots: 1,822; 9 false alarms, 9 missed)` (YouTube accounts over threshold), `COPY 0.84 · SYNC 0.83 · REPLY 0.70 (LINK and CO_THREAD have no training edges, so they are switched off)` (learned relation weights).
 
 ## 1. The narrative (say this in 25 seconds)
 
@@ -13,10 +13,18 @@ Numbers in `{{BRACES}}` come from `detector/REPORT.md` after `python -m detector
 
 Tagline if needed: **"One question, one probability, every reason in percent."**
 
+
+> **Kosovo YouTube data, said honestly (replace any older YouTube demo line with this):** we collected 632 real accounts /
+> 697 comments from 25 Kosovo–Serbia videos. Run on them, the Twitter-trained model is *not* reliable: most accounts have
+> one comment, and benchmark signals such as account age encode when the Twitter groups were collected. Trained on Twitter
+> accounts cut to 1–3 posts with YouTube-available features only, unseen-bot-type F1 drops to 0.89–0.95
+> (`REPORT_youtube.md`). So in the pitch YouTube is the **next step**: collector built, blind labelling sheet ready,
+> `local-f1` gives the Kosovo number once two people label it. Do not show YouTube BOT verdicts as findings.
+
 ## 2. Five-minute demo (terminal + Neo4j Browser + report)
 
-Before the pitch (not live): `python -m detector train` (Cresci-2017), `python -m detector score --data youtube_kosovo`,
-copy the four CSVs from `detector/data/scores_youtube_kosovo/neo4j/` into Neo4j's `import/` folder (Neo4j Desktop: DBMS →
+Before the pitch (not live): `python -m detector train` (Cresci-2017), `python -m detector score --data cresci2017 --split test --prior -1`,
+copy the four CSVs from `detector/data/scores_cresci2017_test/neo4j/` into Neo4j's `import/` folder (Neo4j Desktop: DBMS →
 `...` → Open folder → Import), paste `import.cypher` into Neo4j Browser and run it (multi-statement editor on; or
 `cypher-shell -u neo4j -p <pw> -f import.cypher`). Then run once: `MATCH (a:Account {verdict:'BOT'}) SET a:Bot;`
 (a display label so bots get their own colour). Free options: Neo4j Desktop (local, recommended, works offline) or
@@ -25,12 +33,12 @@ AuraDB Free (no `file:///`; host the CSVs at an https URL or use Data Importer, 
 | Time | Screen | Do | Say |
 |---|---|---|---|
 | 0:00–0:30 | Slide or blank terminal | Nothing | The three sentences from section 1. |
-| 0:30–1:20 | Terminal | `python -m detector score --data youtube_kosovo` | "632 real YouTube accounts, 697 comments, 25 Kosovo–Serbia videos, collected through the official API, authors pseudonymised. Each line: account, BOT %, top indicators in percent. `{{N_BOT}}` are over the threshold. These are leads for an analyst, not verdicts." |
-| 1:20–2:10 | Terminal | `python -m detector explain --data youtube_kosovo` (no id = highest-scoring account; or paste an id from the list) | "One decision opened up. Indicator model says X, graph network says Y, calibrated result Z. Every bar is a share of the decision; plus pushes towards bot, minus towards human. Below: its neighbours and the learned weight of each link type." |
+| 0:30–1:20 | Terminal | `python -m detector score --data cresci2017 --split test --prior -1` (pre-run; show the output) | "2,039 human-labelled accounts the model never trained on. Each line: account, BOT %, top indicators in percent. 1,822 flagged; against the true labels that is 9 false alarms and 9 missed bots: F1 0.995." |
+| 1:20–2:10 | Terminal | `python -m detector explain --data cresci2017 --split test` (≈30 s; no id = highest-scoring account; it also prints the TRUE label) | "One decision opened up. Indicator model says X, graph network says Y, calibrated result Z. Every bar is a share of the decision; plus pushes towards bot, minus towards human. Below: its neighbours and the learned weight of each link type." |
 | 2:10–2:50 | Neo4j Browser | Query A | "This is the model, not a drawing of it. Each indicator points at BOT with the weight the model learned. Nobody typed these numbers." |
 | 2:50–3:30 | Neo4j Browser | Query B | "The same account as in the terminal, now as evidence edges. The percentages match because both come from the same model output." |
 | 3:30–4:10 | Neo4j Browser | Query C, then Query D | "Accounts that copied text, posted in sync or shared links. Red are over the threshold. The number on each edge is the learned weight: the network decided how much a SYNC link counts against a LINK link. Query D prints those five learned values." |
-| 4:10–4:45 | `REPORT.md` (editor preview) | Scroll to the two tables | "Seen bot types: F1 `{{F1_RANDOM}}`, interval `{{F1_CI}}`. Bot types never seen in training: mean `{{F1_UNSEEN_MEAN}}`, worst `{{F1_UNSEEN_WORST}}`. That second line is the honest one. Calibration error `{{ECE}}`." |
+| 4:10–4:45 | `REPORT.md` (editor preview) | Scroll to the two tables | "Seen bot types: F1 `0.996`, interval `0.993–0.998`. Bot types never seen in training: mean `0.984`, worst `0.972 (fake followers)`. That second line is the honest one. Calibration error `0.006 (0.6 points)`." |
 | 4:45–5:00 | Terminal or slide | Show `label_sheet.csv` filename | "This is Twitter-trained. The Kosovo number comes from this blind sheet, two annotators, one command. It flags accounts for a human; it never says who is behind them." |
 
 **Cypher (Neo4j 5; `bot_probability` is 0–100).**
@@ -89,17 +97,17 @@ learned relation weights. If the terminal fails, open `scores.json` and `REPORT.
 ## 3. Why this is AI, and ours
 
 - **Learned, not hand-set.** About 30 indicators per account. LightGBM learns their weights and interactions from labelled accounts; a relational graph network learns one weight per link type (COPY, SYNC, LINK, REPLY, CO_THREAD). There is no rule file and no scoring formula we wrote.
-- **A parameter changes the output.** Show `{{GATES}}` (last line of `explain`, or Query D). Retrain on different data and those numbers move, and so does every score: the synthetic run and the Cresci run give different indicator rankings. If asked for proof, show the two weight tables side by side (keep the synthetic `REPORT.md` as `REPORT_synthetic.md`). Be exact: a relation with no edges in the training data keeps its initial value, and the report lists which.
+- **A parameter changes the output.** Show `COPY 0.84 · SYNC 0.83 · REPLY 0.70 (LINK and CO_THREAD have no training edges, so they are switched off)` (last line of `explain`, or Query D). Retrain on different data and those numbers move, and so does every score: the synthetic run and the Cresci run give different indicator rankings. If asked for proof, show the two weight tables side by side (keep the synthetic `REPORT.md` as `REPORT_synthetic.md`). Be exact: a relation with no edges in the training data keeps its initial value, and the report lists which.
 - **Per-account percentages are exact.** They are TreeSHAP contributions of the LightGBM model for that account, normalised so the absolute values sum to 100. They explain the indicator model; the graph network's share is shown separately as "model parts" and as learned edge weights.
-- **Calibration.** The two models are averaged and passed through isotonic regression fitted on a validation split. "80%" means about 80 of 100 such accounts were bots in held-out data. ECE `{{ECE}}` is the average gap.
+- **Calibration.** The two models are averaged and passed through isotonic regression fitted on a validation split. "80%" means about 80 of 100 such accounts were bots in held-out data. ECE `0.006 (0.6 points)` is the average gap.
 - **What the graph network adds.** A single account can look human; five accounts posting the same text within minutes do not. The network lets a neighbour's evidence count, by an amount it learned per link type. The leave-one-family-out table shows LightGBM, GNN and ensemble separately, so the claim is checkable.
 - **Context weighting.** One folded line; it shifts weights and is never shown or named. Do not elaborate.
 
 ## 4. The evaluation story
 
-1. **Seen bot types (random split):** F1 `{{F1_RANDOM}}`, 95% bootstrap interval `{{F1_CI}}`, PR-AUC `{{PR_AUC}}`. Say "optimistic" yourself, before a judge does.
-2. **Unseen bot type (leave-one-family-out):** train without one bot family, test on it. Mean `{{F1_UNSEEN_MEAN}}`, worst `{{F1_UNSEEN_WORST}}`. "This is the number that matters, because the next campaign will not look like the last." Name the weakest family and why (e.g. fake followers barely post, so timing and copy indicators have little to work with).
-3. **Calibration:** ECE `{{ECE}}`, and the predicted-vs-observed table in the report. The threshold is chosen on validation data only.
+1. **Seen bot types (random split):** F1 `0.996`, 95% bootstrap interval `0.993–0.998`, PR-AUC `0.999`. Say "optimistic" yourself, before a judge does.
+2. **Unseen bot type (leave-one-family-out):** train without one bot family, test on it. Mean `0.984`, worst `0.972 (fake followers)`. "This is the number that matters, because the next campaign will not look like the last." Name the weakest family and why (e.g. fake followers barely post, so timing and copy indicators have little to work with).
+3. **Calibration:** ECE `0.006 (0.6 points)`, and the predicted-vs-observed table in the report. The threshold is chosen on validation data only.
 4. **Transfer (Twitter → YouTube):** "We do not claim the Twitter F1 holds on Kosovo YouTube. So we built the measurement: `score` writes a blind sheet with no scores on it, two people label it, `python -m detector local-f1 --labels label_sheet.csv --scores scores.csv` reports Cohen's kappa and F1 with an interval." If even a small sample is labelled before the pitch, report it with n and kappa; it is the strongest slide you can have.
 5. **Framing:** most teams show one accuracy number on their own data. We show an interval, a harder test, and the limit. That is the reason to believe the rest.
 

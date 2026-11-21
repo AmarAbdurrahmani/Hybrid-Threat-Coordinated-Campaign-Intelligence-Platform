@@ -13,6 +13,34 @@ line, "Context weighting".
                 {"indicator": "Account age (days, log)", "percent": 12.2, "direction": "+"}, …]}
 ```
 
+## Results (Cresci-2017, 10,197 human-labelled accounts with tweets: 1,083 genuine, 9,114 bots)
+
+| Test | F1 | Notes |
+|---|---|---|
+| Held-out random split (2,039 accounts) | **0.996** (95% CI 0.993–0.998) | PR-AUC 0.999, calibration error 0.6 points; 9 false alarms, 9 missed bots |
+| Unseen bot type, fake followers | 0.972 | That bot family was never seen in training |
+| Unseen bot type, social spambots 1 / 2 / 3 | 0.982 / 0.997 / 0.974 | |
+| Unseen bot type, traditional spambots 1 | 0.993 | |
+| Twitter accounts cut to 1–3 posts, YouTube-available features only | 0.89–0.95 unseen | `REPORT_youtube.md` |
+
+- **Learned relation weights:** COPY 0.84, SYNC 0.83, REPLY 0.70. LINK and CO_THREAD have no edges in the training
+  data, so they are switched off at inference.
+- **Top learned indicators:**
+  - account age 22%;
+  - near-duplicate posts shared with other accounts 21%;
+  - lifetime post count 9%;
+  - followers/following balance 9%.
+  See `REPORT.md` for all of them.
+
+**On YouTube**, a Twitter-trained model is not reliable yet. Most Kosovo commenters have a single comment, and account age
+partly encodes when each benchmark group was collected. Treat YouTube scores as leads until two annotators label the
+blind sheet and `local-f1` reports an in-domain F1.
+
+**Live demo, no UI:**
+- `python -m detector score --data cresci2017 --split test --prior -1` scores the held-out accounts and writes the
+  Neo4j import.
+- `python -m detector explain --data cresci2017 --split test` shows one decision with its true label.
+
 ## How it works
 
 1. **The graph (a knowledge graph you can open in Neo4j).**
