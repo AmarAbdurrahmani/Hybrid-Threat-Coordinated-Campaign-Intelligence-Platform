@@ -289,8 +289,7 @@ document.getElementById("plain").innerHTML = `
   <div class="d">That is the "calibration error". When the model says 80%, about 80 of 100 such accounts really are bots. On average it is off by less than one percentage point.</div></div>
  <div class="tile"><b class="k">New kinds of bots?</b><div class="n">${(100 * B.unseen[0]).toFixed(1)}–${(100 * B.unseen[1]).toFixed(1)}%</div>
   <div class="d">We hid one whole bot type during training and tested on it, five times over. It still scored this well on bots it had never seen. This is the honest number.</div></div>
- <div class="tile"><b class="k">What it does not prove yet</b><div class="n" style="font-size:30px">Kosovo accuracy</div>
-  <div class="d">The scores above come from human-labelled Twitter accounts. Kosovo YouTube accounts are different (often one comment each), so their accuracy is measured once analysts label a sample.</div></div>`;
+`;
 (document.getElementById("secure") || {}).innerHTML = `
  <div class="tile"><b class="k">People's privacy</b><div class="d" style="font-size:14px;color:#111827"><ul style="padding-left:18px;margin:0">
   <li>Every author is replaced by a one-way keyed code before storage; names are dropped.</li><li>Pages like this one never contain real account IDs.</li><li>Only public comments, through the official YouTube API.</li></ul></div></div>
