@@ -26,8 +26,9 @@
 
 <section id="pipeline" class="wrap">
   <h2>The pipeline, with real counts</h2>
-  <p class="sub">One run, end to end. Each stage hands the next a concrete artefact.</p>
-  <ol class="pipe" id="pipe"></ol>
+  <p class="sub">One run, end to end. Click a stage to see why it exists, how it works and its real numbers.</p>
+  <div class="pipe" id="pipe"></div>
+  <div class="stage card" id="stage" aria-live="polite"></div>
 </section>
 
 <section id="graph" class="wrap">
@@ -68,8 +69,8 @@
   <p class="sub" id="modelsub"></p>
   <div class="two">
     <div class="card">
-      <h3>Indicator weights</h3>
-      <p class="note">Share of the evidence the model uses, learned from human-labelled accounts. Nobody typed these numbers.</p>
+      <h3>All instruments, strongest first</h3>
+      <p class="note">Every indicator the model uses and its share of the evidence, learned from human-labelled accounts. Nobody typed these numbers.</p>
       <div id="weights" class="bars"></div>
     </div>
     <div class="card">
@@ -81,12 +82,30 @@
       <p class="warn" id="transfer"></p>
     </div>
   </div>
+  <div class="two mt">
+    <div class="card">
+      <h3>Confidence: what does "X% bot" actually mean?</h3>
+      <p class="note" id="confnote"></p>
+      <table class="kv conf" id="conf"></table>
+    </div>
+    <div class="card">
+      <h3>How much we tested</h3>
+      <p class="note">Accounts with known true labels that the models were scored on but never trained on.</p>
+      <table class="kv" id="tested"></table>
+      <p class="note mt" id="stress"></p>
+    </div>
+  </div>
 </section>
 
 <section id="checks" class="wrap">
   <h2>Security and sanity checks</h2>
   <p class="sub" id="checksub"></p>
   <div class="checks" id="checklist"></div>
+  <div class="card mt" id="selftest-card">
+    <h3>Browser self-test <button class="gobtn" id="selftest-run" type="button">Run self-test now</button></h3>
+    <p class="note">Runs every saved query in this page, renders it, and checks that it returns nodes and relationships, that nothing is dangling, and that no account is captioned with a raw hash.</p>
+    <div id="selftest"></div>
+  </div>
 </section>
 
 <footer class="wrap foot">

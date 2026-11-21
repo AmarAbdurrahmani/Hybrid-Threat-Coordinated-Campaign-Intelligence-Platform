@@ -21,12 +21,14 @@ import numpy as np
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT))
 from detector import datasets, model as M  # noqa: E402
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+from themes import THEMES, tag as tag_theme  # noqa: E402
 
 COORD = ("COPY", "SYNC", "LINK", "REPLY", "CO_THREAD")
 SAFE_REASON = re.compile(r"^[^\"“”«»']*$")  # drop any reason that quotes comment text
 
 
-def report_weights(path: Path, top: int = 14) -> list[dict]:
+def report_weights(path: Path, top: int = 100) -> list[dict]:
     rows, on = [], False
     for line in path.read_text(encoding="utf-8").splitlines():
         if line.startswith("## Learned indicator weights"):
@@ -39,6 +41,77 @@ def report_weights(path: Path, top: int = 14) -> list[dict]:
     return sorted(rows, key=lambda r: -r["pct"])[:top]
 
 
+def confidence_table(path: Path) -> dict:
+    """What a stated BOT % actually meant on held-out labelled accounts."""
+    import pandas as pd
+    if not path.exists():
+        return {}
+    d = pd.read_csv(path)
+    bands = [(0, 10, "under 10%"), (10, 50, "10–49%"), (50, 70, "50–69%"), (70, 80, "70–79%"), (80, 90, "80–89%"), (90, 99, "90–98%"), (99, 100.01, "99–100%")]
+    rows = []
+    for lo, hi, lab in bands:
+        s = d[(d.bot_probability >= lo) & (d.bot_probability < hi)]
+        if len(s):
+            rows.append({"band": lab, "accounts": int(len(s)), "bots": int(s.label.sum()), "bot_rate": round(100 * float(s.label.mean()), 1)})
+    correct = int(((d.verdict == "BOT") == (d.label == 1)).sum())
+    return {"rows": rows, "n": int(len(d)), "correct": correct, "accuracy": round(100 * correct / len(d), 1),
+            "fp": int(((d.verdict == "BOT") & (d.label == 0)).sum()), "fn": int(((d.verdict != "BOT") & (d.label == 1)).sum())}
+
+
+def tested_totals(report: Path, meta: dict) -> list[list]:
+    lofo = 0
+    on = False
+    for line in report.read_text(encoding="utf-8").splitlines():
+        on = on or line.startswith("## Leave-one-family-out")
+        if on and line.startswith("| ") and line[2:3].isalpha() and not line.startswith("| Held-out"):
+            lofo += int(line.strip("|").split("|")[-2])
+        if on and line.startswith("## Notes"):
+            break
+    return [["Cresci-2017 held-out test (random split)", 2039],
+            ["Cresci-2017 unseen-bot-type tests (5 runs)", lofo],
+            ["Account-profile model: held-out test (Botometer sets)", 9157],
+            ["Account-profile model: external sets never used in training", 515 + 62 + 1983]]
+
+
+def stress_test(path: Path) -> dict:
+    if not path.exists():
+        return {}
+    d = json.loads(path.read_text(encoding="utf-8"))
+    if "profile youtube" not in str(d.get("dataset", "")):
+        return {}
+    p = d["protocols"]["random_split"]
+    return {"dataset": d["dataset"], "f1": round(p["f1"], 3), "precision": round(p["precision"], 3), "recall": round(p["recall"], 3), "n": p["support"]["n"]}
+
+
+def stage_stats(col, threads, tmeta, per_thread_n, per_user_n, best, risk, relc, levels, weights, meta) -> dict:
+    """Small real-number series behind each pipeline stage, for the clickable pipeline graph."""
+    def hist(values, edges, labels):
+        out = [0] * len(labels)
+        for v in values:
+            for i in range(len(edges) - 1):
+                if edges[i] <= v < edges[i + 1]:
+                    out[i] += 1; break
+        return [{"label": l, "value": n} for l, n in zip(labels, out)]
+    top = sorted(threads, key=lambda t: -per_thread_n[t])[:8]
+    flagged = [best[u] for u, s in risk.items() if s >= 35]
+    avg = lambda k: round(sum(it.get(k, 0) for it in flagged) / max(1, len(flagged)), 1)
+    return {
+        "collect": {"series": [{"label": "candidate videos found", "value": col.get("videos_found", 0)},
+                               {"label": "videos with comments used", "value": len(threads)},
+                               {"label": "quota units spent", "value": col.get("quota_units", 0)}],
+                    "queries": col.get("queries", [])},
+        "protect": {"series": hist(list(per_user_n.values()), [1, 2, 3, 6, 11, 10**9], ["1 comment", "2", "3–5", "6–10", "11+"])},
+        "store": {"series": [{"label": (threads[t]["title"] or "")[:48], "value": per_thread_n[t]} for t in top]},
+        "score": {"series": hist(list(risk.values()), [0, 15, 35, 60, 101], ["0–14 organic", "15–34 low", "35–59 medium", "60+ high"]),
+                  "signals": [{"label": "Timing", "value": avg("temporal")}, {"label": "Language", "value": avg("linguistic")},
+                              {"label": "Talking points", "value": avg("narrative")}, {"label": "Network", "value": avg("network")}]},
+        "link": {"series": [{"label": k, "value": v} for k, v in relc.most_common()]},
+        "learn": {"series": [{"label": w["name"], "value": w["pct"]} for w in weights[:8]],
+                  "lofo": [{"label": k.replace("_", " "), "value": round(v, 3)} for k, v in sorted(meta.get("lofo_f1", {}).items(), key=lambda kv: kv[1])]},
+        "decide": {"series": [{"label": f"Level {k}", "value": levels.get(k, 0)} for k in (1, 2, 3, 4)]},
+    }
+
+
 def main() -> None:
     ap = argparse.ArgumentParser()
     ap.add_argument("--db", required=True)
@@ -49,11 +122,14 @@ def main() -> None:
     meta = json.loads((ROOT / "detector" / "model" / "model.json").read_text())
 
     threads = {r["id"]: dict(r) for r in db.execute("SELECT id, external_id, title, published FROM threads WHERE simulated=0")}
-    comments = db.execute("SELECT id, thread_id, user, ts, account FROM comments WHERE simulated=0").fetchall()
+    comments = db.execute("SELECT id, thread_id, user, ts, account, text FROM comments WHERE simulated=0").fetchall()
     per_user_threads, per_user_n, per_thread_n = defaultdict(Counter), Counter(), Counter()
+    user_themes, theme_comments, theme_users = defaultdict(Counter), Counter(), defaultdict(set)
     acct_meta = {}
     for c in comments:
         per_user_threads[c["user"]][c["thread_id"]] += 1; per_user_n[c["user"]] += 1; per_thread_n[c["thread_id"]] += 1
+        for th in tag_theme(c["text"]):   # text is read here and never written out
+            user_themes[c["user"]][th] += 1; theme_comments[th] += 1; theme_users[th].add(c["user"])
         if c["account"] and c["user"] not in acct_meta:
             acct_meta[c["user"]] = json.loads(c["account"])
 
@@ -110,13 +186,32 @@ def main() -> None:
             return None
         return int((time.time() - datetime.fromisoformat(cr.replace("Z", "+00:00")).timestamp()) // 86400)
 
+    # name each coordination group after what its members talk about most
+    group_name, groups = {}, []
+    for gi, members in enumerate(ranked, start=1):
+        if len(members) < 3:
+            continue
+        tc = Counter()
+        for u in members:
+            tc.update(set(user_themes[u]))
+        tagged_members = sum(1 for u in members if user_themes[u])
+        top = [(t, n) for t, n in tc.most_common(3) if n / len(members) >= 0.15]
+        name = (" + ".join(THEMES[t]["short"] for t, _ in top[:2]) if top else "No clear theme") + f" · group {gi}"
+        group_name[gi] = name
+        vids = Counter(); lt = Counter()
+        for u in members:
+            vids.update(per_user_threads[u].keys())
+        groups.append({"gi": gi, "name": name, "members": members, "themes": tc, "tagged": tagged_members, "videos": len(vids)})
+
     nodes, rels = [], []
     for u in sorted(keep):
         it = best.get(u, {})
         reasons = [x for k in ("tReasons", "lReasons", "nReasons", "gReasons") for x in it.get(k, [])
                    if not x.startswith("No ") and SAFE_REASON.match(x)][:4]
         s = risk.get(u, 0.0)
+        ut = [THEMES[t]["short"] for t, _ in user_themes[u].most_common()]
         nodes.append({"id": u, "labels": ["Account"] + (["Flagged"] if u in flagged else []), "props": {
+            "main_theme": ut[0] if ut else "no tagged theme", "themes": ut, "group": group_name.get(cluster_of.get(u, 0), "not in a group"),
             "account_id": u, "risk": round(s), "tier": "high" if s >= 60 else "medium" if s >= 35 else "low",
             "comments": per_user_n[u], "videos": len(per_user_threads[u]), "cluster": cluster_of.get(u, 0),
             "timing": it.get("temporal", 0), "language": it.get("linguistic", 0), "talking_points": it.get("narrative", 0), "network": it.get("network", 0),
@@ -136,6 +231,27 @@ def main() -> None:
         for tid, n in per_user_threads[u].items():
             if tid in threads:
                 k += 1; rels.append({"id": f"r{k}", "type": "POSTED_ON", "start": u, "end": tid, "props": {"comments": n}})
+
+    # Theme and Group nodes
+    for key, th in THEMES.items():
+        nodes.append({"id": f"theme:{key}", "labels": ["Theme"], "props": {"name": th["short"], "key": key, "description": th["label"],
+            "comments": theme_comments[key], "accounts": len(theme_users[key]), "keywords": th["patterns"]}})
+    for g in groups[:80]:
+        mem = g["members"]; risks = [risk.get(u, 0) for u in mem]
+        nodes.append({"id": f"group:{g['gi']}", "labels": ["Group"], "props": {"name": g["name"], "accounts": len(mem),
+            "accounts_with_theme": g["tagged"], "videos": g["videos"], "avg_risk": round(sum(risks) / len(risks), 1), "max_risk": round(max(risks)),
+            "medium_or_high_risk": sum(1 for r in risks if r >= 35),
+            "themes": [f"{THEMES[t]['short']} {round(100 * n / len(mem))}%" for t, n in g["themes"].most_common(5)]}})
+        for t, n in g["themes"].most_common():
+            if n / len(mem) >= 0.10:
+                k += 1; rels.append({"id": f"r{k}", "type": "ABOUT", "start": f"group:{g['gi']}", "end": f"theme:{t}",
+                                     "props": {"share_pct": round(100 * n / len(mem)), "accounts": n}})
+        for u in mem:
+            if u in keep:
+                k += 1; rels.append({"id": f"r{k}", "type": "MEMBER_OF", "start": u, "end": f"group:{g['gi']}", "props": {}})
+    for u in sorted(keep):
+        for t in user_themes[u]:
+            k += 1; rels.append({"id": f"r{k}", "type": "TALKS_ABOUT", "start": u, "end": f"theme:{t}", "props": {"comments": user_themes[u][t]}})
 
     weights = report_weights(ROOT / "detector" / "REPORT.md")
     nodes.append({"id": "verdict:BOT", "labels": ["Verdict"], "props": {"name": "BOT", "threshold": round(m["threshold"], 3)}})
@@ -187,12 +303,20 @@ def main() -> None:
                       ["F1 on bot types never seen in training", f"{min(lofo.values()):.3f} – {max(lofo.values()):.3f} ({len(lofo)} tests)" if lofo else "n/a"],
                       ["Weakest unseen type", f"{worst[0].replace('_', ' ')} · {worst[1]:.3f}"]],
             "gates": [{"relation": r, "weight": float(gates.get(r, 0)), "trained": bool(meta.get("relation_trained", {}).get(r, True))} for r in COORD if r in gates],
+            "confidence": confidence_table(ROOT / "detector" / "data" / "scores_cresci2017_test" / "scores.csv"),
+            "tested": tested_totals(ROOT / "detector" / "REPORT.md", meta),
+            "stress": stress_test(ROOT / "detector" / "data" / "processed" / "train_results.json"),
             "transfer": f"Transfer check: applied to these {len(users):,} YouTube accounts, the Twitter-trained model flags {100 * flagged_by_model:.0f}% of them as bots. "
                         "Most YouTube commenters post once and have no follower data, which the Twitter model never saw. So this page does not label anyone a bot: "
                         "accounts are ranked by the coordination engine, and a Kosovo-labelled sample is the next step.",
         },
         "counts": {"comments": len(comments), "videos": len(threads), "accounts": len(users), "nodes": len(nodes), "rels": len(rels)},
+        "stats": stage_stats(col, threads, tmeta, per_thread_n, per_user_n, best, risk, relc, levels, weights, meta),
     }
+    review = sum(levels.get(k, 0) for k in (1, 2, 3))
+    summary["kpis"][5] = {"value": review, "label": "videos raised for review"}
+    summary["pipeline"][6]["detail"] = (f"{levels.get(1, 0)} videos at Level 1, {levels.get(2, 0)} at Level 2, {levels.get(3, 0)} at Level 3, "
+                                        f"{levels.get(4, 0)} quiet. A human decides.")
     (out / "summary.json").write_text(json.dumps(summary, ensure_ascii=False, indent=1), encoding="utf-8")
     print(json.dumps({**summary["counts"], "linked": len(linked), "flagged": len(flagged), "rel_types": dict(relc),
                       "levels": dict(levels), "model_flags_pct": round(100 * flagged_by_model, 1)}))

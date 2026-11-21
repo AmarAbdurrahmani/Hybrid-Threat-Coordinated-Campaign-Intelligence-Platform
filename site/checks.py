@@ -45,6 +45,7 @@ def main() -> int:
     ap = argparse.ArgumentParser()
     ap.add_argument("--db", required=True)
     ap.add_argument("--url")
+    ap.add_argument("--pytest", action="store_true", help="also run the detector and backend test suites")
     a = ap.parse_args()
     db = sqlite3.connect(a.db)
     blob = "\n".join(p.read_text(encoding="utf-8", errors="ignore") for p in PUBLISHED if p.name != "summary.json")
@@ -116,6 +117,14 @@ def main() -> int:
     check(Q, "Model trained on real labelled data", meta.get("trained_on") == "cresci2017", f"trained_on={meta.get('trained_on')}, {meta.get('n_accounts'):,} accounts")
     f1 = meta["metrics_random_split"]["f1"]
     check(Q, "Model metrics present and plausible", 0.5 < f1 < 1.0, f"F1 {f1:.4f} (a perfect 1.000 would signal a broken evaluation)")
+
+    # ---------------- automated test suites ----------------
+    if a.pytest:
+        import subprocess
+        for label, cwd, target in (("Detector test suite", ROOT, "detector/tests"), ("Backend test suite", ROOT / "backend", ".")):
+            p = subprocess.run([sys.executable, "-m", "pytest", "-q", target], cwd=cwd, capture_output=True, text=True, timeout=1200)
+            tail = [l for l in p.stdout.strip().splitlines() if " passed" in l or " failed" in l or " error" in l]
+            check("Tests", label, p.returncode == 0, (tail[-1] if tail else p.stdout[-200:]).strip())
 
     groups = {}
     for g, n, s, d in results:

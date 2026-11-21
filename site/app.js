@@ -7,9 +7,100 @@
   const $ = id => document.getElementById(id);
 
   /* ---------- summary sections ---------- */
-  $("kpis").innerHTML = S.kpis.map(k => `<div class="kpi"><b>${fmt(k.value)}</b><span>${esc(k.label)}</span></div>`).join("");
-  $("pipe").innerHTML = S.pipeline.map(p => `<li><div class="st">${esc(p.stage)}</div><h3>${esc(p.title)}</h3>
-    <div class="big">${fmt(p.value)}</div><p>${esc(p.unit)}</p><p>${p.detail}</p></li>`).join("");
+  /* KPI cards: each opens the evidence behind it */
+  const KPI_GO = [["stage", 2], ["query", 10], ["stage", 1], ["query", 0], ["query", 9], ["query", 10]];
+  $("kpis").innerHTML = S.kpis.map((k, i) => `<button class="kpi" data-i="${i}" type="button"><b>${fmt(k.value)}</b><span>${esc(k.label)}</span>
+    <em>${KPI_GO[i][0] === "query" ? "Open in graph →" : "See pipeline step →"}</em></button>`).join("");
+  $("kpis").addEventListener("click", e => {
+    const b = e.target.closest(".kpi"); if (!b) return;
+    const [kind, arg] = KPI_GO[+b.dataset.i];
+    if (kind === "query") { runQuery(arg); $("graph").scrollIntoView({ behavior: "smooth" }); }
+    else { selectStage(arg); $("pipeline").scrollIntoView({ behavior: "smooth" }); }
+  });
+
+  /* Pipeline as a clickable node-link graph */
+  const STAGE_INFO = [
+    { color: "#FFC454", text: "#4a3b0b", edge: "raw comments", go: 10,
+      why: "Influence operations surface first in public comment sections. We need a lawful, repeatable way to watch them.",
+      how: "Official YouTube Data API only: search recent Kosovo–Serbia videos in Albanian, Serbian and English, rank by comment count, pull comment threads and replies, then public channel age.",
+      io: ["Search queries", "Comments, video metadata, channel age"] },
+    { color: "#C990C0", text: "#fff", edge: "hashed IDs", go: null,
+      why: "We study behaviour, not people. Nobody should be identifiable from what we store or publish.",
+      how: "Every author ID becomes an HMAC-SHA256 keyed hash on arrival. Channel IDs and display names are dropped before anything touches disk.",
+      io: ["Raw author IDs", "yt_xxxxxxxxxxxx pseudonyms"] },
+    { color: "#57C7E3", text: "#0b3440", edge: "rows", go: null,
+      why: "Re-scanning the same video must never double-count a swarm.",
+      how: "SQLite with scoped comment IDs (video + upstream ID). Inserts are idempotent; changed videos are marked for re-analysis.",
+      io: ["Pseudonymised comments", "Deduplicated store"] },
+    { color: "#F79767", text: "#fff", edge: "risk scores", go: 9,
+      why: "A swarm looks normal one comment at a time. It shows up in timing, wording and who appears together.",
+      how: "Per comment: timing bursts vs the video's own baseline, Geg/standard doublets and Serbian calques, near-duplicate talking points, network signals. Weighted into a 0–100 risk.",
+      io: ["Comments per video", "Risk per comment, alert level per video"] },
+    { color: "#4C8EDA", text: "#fff", edge: "account graph", go: 0,
+      why: "One account can look human. Accounts copying each other or turning up together across videos do not.",
+      how: "Links between accounts: COPY (near-identical text), SYNC (posting within seconds), CO_THREAD (active on the same videos together).",
+      io: ["Accounts and comments", "Typed links between accounts"] },
+    { color: "#8DCC93", text: "#163a1b", edge: "learned weights", go: 5,
+      why: "Hand-set rules are guesses. Weights learned from labelled accounts can be measured.",
+      how: "LightGBM over account indicators plus a relational graph neural network over the links, calibrated with isotonic regression, trained on human-labelled Cresci-2017 accounts.",
+      io: ["Labelled accounts + graph", "Calibrated model, indicator weights"] },
+    { color: "#F16667", text: "#fff", edge: null, go: 9,
+      why: "The tool supports a decision; it never makes one. An analyst reviews, a human acts.",
+      how: "Videos get an alert level, accounts get a ranked risk with the evidence behind it. Indicators of coordination, never attribution.",
+      io: ["Scores, links, evidence", "Review queue and SitRep"] },
+  ];
+  const PW = 1100, PH = 250, R = 46;
+  const px = i => 80 + i * ((PW - 160) / (S.pipeline.length - 1));
+  const ps = d3.select("#pipe").append("svg").attr("viewBox", `0 0 ${PW} ${PH}`).attr("class", "pipesvg").attr("role", "group").attr("aria-label", "Pipeline stages");
+  ps.append("defs").append("marker").attr("id", "parrow").attr("viewBox", "0 -5 10 10").attr("refX", 10).attr("markerWidth", 8).attr("markerHeight", 8)
+    .attr("orient", "auto").append("path").attr("d", "M0,-5L10,0L0,5").attr("fill", "#a5abb6");
+  S.pipeline.slice(0, -1).forEach((p, i) => {
+    const x1 = px(i) + R + 4, x2 = px(i + 1) - R - 6, y = 110;
+    ps.append("line").attr("x1", x1).attr("x2", x2).attr("y1", y).attr("y2", y).attr("stroke", "#a5abb6").attr("stroke-width", 2).attr("marker-end", "url(#parrow)");
+    const g = ps.append("g").attr("transform", `translate(${(x1 + x2) / 2},${y - 14})`);
+    const t = g.append("text").attr("class", "rel-label").attr("text-anchor", "middle").attr("dy", "0.32em").style("font-size", "10px").text(STAGE_INFO[i].edge);
+    const bb = t.node().getBBox();
+    g.insert("rect", "text").attr("x", -bb.width / 2 - 3).attr("y", -7).attr("width", bb.width + 6).attr("height", 14).attr("fill", "#fff");
+  });
+  const pn = ps.selectAll("g.pnode").data(S.pipeline).join("g").attr("class", "pnode").attr("tabindex", 0).attr("role", "button")
+    .attr("aria-label", d => `${d.title}: ${d.value} ${d.unit}`).attr("transform", (d, i) => `translate(${px(i)},110)`)
+    .on("click", (e, d) => selectStage(S.pipeline.indexOf(d)))
+    .on("keydown", (e, d) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); selectStage(S.pipeline.indexOf(d)); } });
+  pn.append("circle").attr("class", "ring").attr("r", R + 6).attr("fill", "none");
+  pn.append("circle").attr("r", R).attr("fill", (d, i) => STAGE_INFO[i].color).attr("stroke", (d, i) => d3.color(STAGE_INFO[i].color).darker(0.6)).attr("stroke-width", 2);
+  pn.append("text").attr("text-anchor", "middle").attr("dy", "-0.2em").attr("fill", (d, i) => STAGE_INFO[i].text).style("font-size", "17px").style("font-weight", 700).text(d => fmt(d.value));
+  pn.append("text").attr("text-anchor", "middle").attr("dy", "1.3em").attr("fill", (d, i) => STAGE_INFO[i].text).style("font-size", "9.5px").text(d => d.stage.toUpperCase());
+  pn.append("text").attr("text-anchor", "middle").attr("y", R + 26).attr("fill", "#1b2433").style("font-size", "13px").style("font-weight", 600).text(d => d.title);
+  pn.append("text").attr("text-anchor", "middle").attr("y", R + 43).attr("fill", "#5d6b7e").style("font-size", "11px").text(d => d.unit.length > 26 ? d.unit.slice(0, 25) + "…" : d.unit);
+
+  const STAT_KEY = ["collect", "protect", "store", "score", "link", "learn", "decide"];
+  function barsHtml(series, unit = "") {
+    if (!series || !series.length) return "";
+    const max = Math.max(...series.map(s => s.value), 1);
+    return `<div class="bars">${series.map(s => `<div class="bar"><span class="t" title="${esc(s.label)}">${esc(s.label)}</span><span class="v">${fmt(s.value)}${unit}</span>
+      <div class="track"><div class="fill" style="width:${(s.value / max * 100).toFixed(1)}%"></div></div></div>`).join("")}</div>`;
+  }
+  function selectStage(i) {
+    const p = S.pipeline[i], info = STAGE_INFO[i], st = (S.stats || {})[STAT_KEY[i]] || {};
+    pn.classed("sel", (d, j) => j === i);
+    const extra = STAT_KEY[i] === "score" ? `<h4>Average signal strength in medium/high-risk comments</h4>${barsHtml(st.signals)}`
+      : STAT_KEY[i] === "learn" ? `<h4>F1 on bot types never seen in training</h4>${barsHtml(st.lofo)}`
+      : STAT_KEY[i] === "collect" && st.queries ? `<h4>Search queries</h4><p class="qtags">${st.queries.map(q => `<span>${esc(q)}</span>`).join("")}</p>` : "";
+    const chartTitle = { collect: "Collection run", protect: "Comments per account", store: "Largest videos by comments", score: "Accounts by risk band",
+      link: "Links by type", learn: "Top learned indicator weights (%)", decide: "Videos by alert level" }[STAT_KEY[i]];
+    $("stage").innerHTML = `<div class="stage-head"><span class="dot" style="background:${info.color}"></span><div><div class="st">${String(i + 1).padStart(2, "0")} · ${esc(p.stage)}</div>
+        <h3>${esc(p.title)}</h3></div><div class="stage-num"><b>${fmt(p.value)}</b><span>${esc(p.unit)}</span></div></div>
+      <div class="stage-grid">
+        <div><h4>Why this step</h4><p>${esc(info.why)}</p><h4>How it works</h4><p>${esc(info.how)}</p>
+          <h4>In → out</h4><p class="io"><span>${esc(info.io[0])}</span> → <span>${esc(info.io[1])}</span></p>
+          <p class="note">${p.detail}</p>
+          ${info.go !== null ? `<button class="gobtn" type="button" data-q="${info.go}">Open in graph browser →</button>` : ""}</div>
+        <div><h4>${chartTitle}</h4>${barsHtml(st.series, STAT_KEY[i] === "learn" ? "%" : "")}${extra}</div>
+      </div>`;
+    const gb = $("stage").querySelector(".gobtn");
+    if (gb) gb.onclick = () => { runQuery(+gb.dataset.q); $("graph").scrollIntoView({ behavior: "smooth" }); };
+  }
+  let runQuery = () => {};
 
   const M = S.model;
   $("modelsub").textContent = `LightGBM over ${M.n_features} account indicators plus a relational graph neural network, calibrated, trained on ${fmt(M.n_accounts)} human-labelled accounts (${M.dataset}).`;
@@ -21,6 +112,19 @@
   $("gates").innerHTML = M.gates.map(g => `<div class="bar"><span class="t">${esc(g.relation)}${g.trained ? "" : " (no training edges)"}</span><span class="v">${g.weight.toFixed(3)}</span>
     <div class="track"><div class="fill" style="width:${(g.weight / gmax * 100).toFixed(1)}%;background:#a5abb6"></div></div></div>`).join("");
   $("transfer").textContent = M.transfer;
+  const CF = M.confidence || {};
+  if (CF.rows) {
+    $("confnote").textContent = `Scores are calibrated: a stated percentage is the share of similar held-out accounts that really were bots. ` +
+      `On ${fmt(CF.n)} held-out accounts the verdict was right for ${fmt(CF.correct)} (${CF.accuracy}%): ${CF.fp} humans wrongly flagged, ${CF.fn} bots missed.`;
+    $("conf").innerHTML = `<tr><td><b>Model said</b></td><td><b>Accounts</b></td><td><b>Really bots</b></td></tr>` +
+      CF.rows.map(r => `<tr><td>${esc(r.band)} bot</td><td>${fmt(r.accounts)}</td><td>${fmt(r.bots)} (${r.bot_rate}%)</td></tr>`).join("");
+  }
+  const total = (M.tested || []).reduce((s, r) => s + r[1], 0);
+  $("tested").innerHTML = (M.tested || []).map(([k, v]) => `<tr><td>${esc(k)}</td><td>${fmt(v)}</td></tr>`).join("") +
+    `<tr><td><b>Total test evaluations</b></td><td><b>${fmt(total)}</b></td></tr>
+     <tr><td>Labelled accounts used overall (training + test)</td><td>≈105,000</td></tr><tr><td>Posts processed for the graph model</td><td>714,856</td></tr>`;
+  if (M.stress && M.stress.f1) $("stress").textContent = `Stress test: with each account cut to at most 3 posts (YouTube-like activity), F1 is ${M.stress.f1} ` +
+    `(precision ${M.stress.precision}, recall ${M.stress.recall}) on ${fmt(M.stress.n)} held-out accounts.`;
 
   const C = S.checks;
   const nPass = C.groups.flatMap(g => g.items).filter(i => i.status === "PASS").length;
@@ -40,12 +144,21 @@
     Video:     { color: "#FFC454", text: "#4a3b0b", r: 32 },
     Indicator: { color: "#8DCC93", text: "#163a1b", r: 34 },
     Verdict:   { color: "#C990C0", text: "#fff", r: 46 },
+    Theme:     { color: "#DA7194", text: "#fff", r: 44 },
+    Group:     { color: "#569480", text: "#fff", r: 30 },
   };
-  const styleOf = n => STYLE[n.labels.includes("Flagged") ? "Flagged" : n.labels[0]] || STYLE.Account;
+  const baseStyle = n => STYLE[n.labels.includes("Flagged") ? "Flagged" : n.labels[0]] || STYLE.Account;
+  const styleOf = n => {
+    const s = baseStyle(n);
+    if (n.labels[0] === "Group") return { ...s, r: Math.min(64, 26 + Math.sqrt(n.props.accounts) * 1.6) };
+    if (n.labels[0] === "Theme") return { ...s, r: Math.min(60, 34 + Math.sqrt(n.props.accounts) * 0.6) };
+    return s;
+  };
   const caption = n => {
     const p = n.props;
-    if (n.labels[0] === "Account") return p.account_id.slice(-6);
+    if (n.labels[0] === "Account") return `${p.main_theme === "no tagged theme" ? "Account" : p.main_theme} · risk ${p.risk}`;
     if (n.labels[0] === "Video") return p.title;
+    if (n.labels[0] === "Group") return `${p.name.split(" · ")[0]} · ${p.accounts} accts`;
     return p.name;
   };
 
@@ -67,7 +180,22 @@
   };
   const COORD = ["COPY", "SYNC", "CO_THREAD"];
 
+  const themeQuery = (key, title) => ({ name: `Theme: ${title}`,
+    cypher: `MATCH (a:Account)-[t:TALKS_ABOUT]->(:Theme {key:'${key}'}) OPTIONAL MATCH (a)-[m:MEMBER_OF]->(g:Group) RETURN a, t, m, g`,
+    run: () => {
+      const tid = `theme:${key}`, accs = (relsOf.get(tid) || []).filter(r => r.type === "TALKS_ABOUT").map(r => r.start)
+        .sort((x, y) => (nodeById.get(y).props.risk - nodeById.get(x).props.risk)).slice(0, 120);
+      const ids = new Set([tid, ...accs]);
+      for (const a of accs) for (const r of relsOf.get(a) || []) if (r.type === "MEMBER_OF") ids.add(r.end);
+      return sub(ids, r => r.type === "MEMBER_OF" || COORD.includes(r.type) || (r.type === "TALKS_ABOUT" && r.end === tid), 200);
+    } });
   const QUERIES = [
+    { name: "Groups and what they talk about", cypher: "MATCH (g:Group)-[r:ABOUT]->(t:Theme) RETURN g, r, t",
+      run: () => sub(G.nodes.filter(n => n.labels[0] === "Theme" || (n.labels[0] === "Group" && n.props.accounts >= 5)).map(n => n.id), r => r.type === "ABOUT", 200) },
+    themeQuery("contests_independence", "contests Kosovo's independence"),
+    themeQuery("religion", "religion"),
+    themeQuery("nato", "NATO / KFOR"),
+    themeQuery("russia", "Russia"),
     { name: "What the model weighs", cypher: "MATCH (i:Indicator)-[w:WEIGHT]->(v:Verdict {name:'BOT'}) RETURN i, w, v",
       run: () => sub(G.nodes.filter(n => n.labels[0] === "Indicator" || n.labels[0] === "Verdict").map(n => n.id), r => r.type === "WEIGHT") },
     { name: "Largest coordinated cluster", cypher: "MATCH (a:Account {cluster: 1})-[r:COPY|SYNC|CO_THREAD|POSTED_ON]-(x) RETURN a, r, x",
@@ -117,7 +245,7 @@
     const lbl = link.append("g");
     lbl.append("rect").attr("class", "rel-label-bg");
     lbl.append("text").attr("class", "rel-label").attr("text-anchor", "middle").attr("dy", "0.32em")
-      .text(d => d.type === "WEIGHT" ? `WEIGHT ${d.props.importance_pct.toFixed(1)}%` : d.type);
+      .text(d => d.type === "WEIGHT" ? `WEIGHT ${d.props.importance_pct.toFixed(1)}%` : d.type === "ABOUT" ? `ABOUT ${d.props.share_pct}%` : d.type);
     lbl.each(function () { const t = this.querySelector("text").getBBox(); d3.select(this).select("rect").attr("x", -t.width / 2 - 2).attr("y", -6).attr("width", t.width + 4).attr("height", 12); });
 
     const node = root.append("g").selectAll("g").data(nodes).join("g").attr("class", "node").style("cursor", "pointer")
@@ -134,8 +262,8 @@
     });
 
     sim = d3.forceSimulation(nodes)
-      .force("link", d3.forceLink(rels).id(d => d.id).distance(d => d.type === "WEIGHT" ? 150 : d.type === "POSTED_ON" ? 110 : 95).strength(0.6))
-      .force("charge", d3.forceManyBody().strength(d => d.labels[0] === "Verdict" ? -1400 : -320))
+      .force("link", d3.forceLink(rels).id(d => d.id).distance(d => d.type === "WEIGHT" || d.type === "ABOUT" ? 170 : d.type === "POSTED_ON" ? 110 : 95).strength(0.6))
+      .force("charge", d3.forceManyBody().strength(d => d.labels[0] === "Verdict" || d.labels[0] === "Theme" ? -1400 : -320))
       .force("collide", d3.forceCollide(d => styleOf(d).r + 8))
       .force("x", d3.forceX().strength(0.04)).force("y", d3.forceY().strength(0.04))
       .on("tick", tick);
@@ -194,6 +322,69 @@
       <table>${current.q.notes.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</table>`;
   }
 
+  /* ---------- plain-language explanations ---------- */
+  const plural = (n, w) => `${fmt(n)} ${w}${n === 1 ? "" : "s"}`;
+  function plainEvidence(s) {
+    let m;
+    if ((m = s.match(/(\d+) comments in its 15-min window vs ([\d.]+) expected \(×([\d.]+)/)))
+      return `<b>Posting burst.</b> ${m[1]} comments landed on this video within 15 minutes, where about ${Math.round(+m[2]) || 1} would be normal: <b>${Math.round(+m[3])}× the usual rate</b>.`;
+    if ((m = s.match(/Nearest neighbour only (\d+)s away/))) return `<b>Tight timing.</b> Another comment was posted only ${m[1]} seconds from this one.`;
+    if ((m = s.match(/(\d+) comments within ±2 min/))) return `<b>Micro-burst.</b> ${m[1]} comments within 2 minutes of each other.`;
+    if ((m = s.match(/Near-duplicate of (\d+) comment\(s\) \(similarity best ([\d.]+)/)))
+      return `<b>Copied text.</b> Its comment is ${+m[2] >= 0.99 ? "word-for-word the same as" : `${Math.round(m[2] * 100)}% identical to`} ${plural(+m[1], "other comment")}.`;
+    if ((m = s.match(/Low follower count \((\d+)\)/))) return `<b>Small channel.</b> Only ${fmt(+m[1])} subscribers.`;
+    if (/after publication|right after/i.test(s)) return `<b>Early swarm.</b> ${esc(s)}`;
+    return esc(s.replace(/@yt_[0-9a-f]{12}/g, "another account"));
+  }
+  const verdict = r => r >= 60 ? ["High risk", "Strong signs of coordination. Review first.", "#d43f3a"]
+    : r >= 35 ? ["Medium risk", "Several signs of coordination. Worth an analyst's look.", "#e8a33b"]
+    : r >= 15 ? ["Low risk", "Weak signals only. Probably ordinary.", "#4C8EDA"] : ["Organic", "Looks like normal conversation.", "#2e9e5b"];
+  const meter = (label, v, hint) => `<div class="bar"><span class="t">${label}<small> · ${hint}</small></span><span class="v">${Math.round(v)}</span>
+    <div class="track"><div class="fill" style="width:${Math.min(100, v)}%;background:${v >= 60 ? "#d43f3a" : v >= 30 ? "#e8a33b" : "#8dcc93"}"></div></div></div>`;
+  const yrs = d => d == null ? "unknown age" : d >= 365 ? `${(d / 365).toFixed(1)} years old` : `${d} days old`;
+  const sanity = items => `<div class="sanity">${items.map(([ok, t]) => `<span class="${ok ? "ok" : "no"}">${ok ? "✓" : "!"} ${t}</span>`).join("")}</div>`;
+
+  function explain(d) {
+    const p = d.props, L = d.labels[0];
+    if (L === "Account") {
+      const [v, vtext, vc] = verdict(p.risk);
+      const g = p.group && p.group !== "not in a group" ? p.group : null;
+      const gsize = g ? (nodeById.get(`group:${p.cluster}`) || {}).props?.accounts : null;
+      return `<div class="verdict-box" style="border-color:${vc}"><b style="color:${vc}">${v} · ${p.risk}/100</b><span>${vtext}</span></div>
+        <p class="lead">A YouTube account (${yrs(p.account_age_days)}) that wrote ${plural(p.comments, "comment")} on ${plural(p.videos, "video")}.
+        ${p.themes.length ? `It talks about <b>${p.themes.map(esc).join(", ")}</b>.` : "Its comments match none of our themes."}</p>
+        ${g ? `<p class="lead">Belongs to <b>${esc(g.split(" · ")[0])}</b>, a group of ${fmt(gsize || 0)} accounts linked by copied text or by turning up together on the same videos.</p>` : ""}
+        <h5>Why it scored this way</h5><ul class="why">${(p.evidence.length ? p.evidence.map(plainEvidence) : ["No single strong signal."]).map(x => `<li>${x}</li>`).join("")}</ul>
+        <h5>Signals (0–100)</h5><div class="bars">${meter("Timing", p.timing, "bursts, speed")}${meter("Talking points", p.talking_points, "copied or shared lines")}
+          ${meter("Language", p.language, "dialect mix, translation traces")}${meter("Network", p.network, "account age, links, overlap")}</div>
+        <h5>Sanity</h5>${sanity([[true, "Real comment, official API"], [/^yt_[0-9a-f]{12}$/.test(p.account_id), "Identity hashed"],
+          [p.evidence.length > 0, "Score traceable to evidence"], [true, "Indicator, not attribution"]])}`;
+    }
+    if (L === "Group") {
+      const top = (p.themes || []).map(esc);
+      return `<p class="lead"><b>${esc(p.name.split(" · ")[0])}</b>: ${fmt(p.accounts)} accounts that are linked to each other, by posting the same text or by repeatedly showing up together on the same videos.</p>
+        <h5>What they talk about</h5><p class="lead">${top.length ? top.join(" · ") : "Nothing our theme keywords recognise."}</p>
+        <h5>How risky</h5><div class="bars">${meter("Average risk", p.avg_risk, "across members")}${meter("Highest risk", p.max_risk, "most suspicious member")}</div>
+        <p class="lead">${fmt(p.medium_or_high_risk)} of ${fmt(p.accounts)} members are medium or high risk. Active on ${plural(p.videos, "video")}.</p>
+        <h5>Sanity</h5>${sanity([[p.accounts >= 3, "At least 3 linked accounts"], [true, "Links computed from real comments"], [true, "Theme = keyword match, shown in Raw data"]])}`;
+    }
+    if (L === "Theme") {
+      return `<p class="lead"><b>${esc(p.description)}</b>: ${fmt(p.comments)} comments by ${fmt(p.accounts)} accounts matched this theme.</p>
+        <h5>How a comment gets this theme</h5><p class="lead">It contains one of these keyword patterns (Albanian, Serbian, English):</p>
+        <p class="qtags">${p.keywords.slice(0, 14).map(k => `<span>${esc(k.replace(/\\[bs]\*?|\(\?:|\)|\\/g, "").slice(0, 28))}</span>`).join("")}</p>
+        <h5>Sanity</h5>${sanity([[true, "Transparent keyword rule, not a black box"], [false, "Keyword match can miss sarcasm or quotes"]])}`;
+    }
+    if (L === "Video") {
+      const lv = { 1: ["Level 1 · strategic threat", "#d43f3a"], 2: ["Level 2 · review", "#e8a33b"], 3: ["Level 3 · watch", "#4C8EDA"], 4: ["Level 4 · normal", "#2e9e5b"] }[p.level] || ["not scored", "#999"];
+      return `<div class="verdict-box" style="border-color:${lv[1]}"><b style="color:${lv[1]}">${lv[0]}</b><span>${esc(p.title)}</span></div>
+        <p class="lead">${plural(p.comments, "comment")} collected. ${p.flagged_pct}% of them flagged as coordinated; the largest linked group on it has ${fmt(p.largest_cluster || 0)} accounts. Published ${esc(p.published || "?")}.</p>
+        <p class="lead"><a href="https://www.youtube.com/watch?v=${encodeURIComponent(p.video_id)}" target="_blank" rel="noopener noreferrer">Open the video on YouTube ↗</a></p>`;
+    }
+    if (L === "Indicator") return `<p class="lead"><b>${esc(p.name)}</b> carries <b>${p.importance_pct}%</b> of the model's evidence. In ${p.pushes_bot_pct}% of accounts it pushed the score towards "bot".</p><p class="note">Learned from human-labelled accounts, not set by us.</p>`;
+    if (L === "Verdict") return `<p class="lead">The question the model answers: <b>is this account a bot?</b> Above ${Math.round(p.threshold * 100)}% it says yes.</p>`;
+    return "";
+  }
+
   function select(d, kind) {
     selected = d;
     root.selectAll(".node").classed("sel", n => d && kind === "node" && n.id === d.id);
@@ -201,8 +392,9 @@
     if (!d) return showOverviewProps();
     if (kind === "node") {
       const chips = d.labels.map(l => `<span class="chip" style="background:${(STYLE[l] || STYLE.Account).color};color:${(STYLE[l] || STYLE.Account).text}">${l}</span>`).join("");
-      $("props").innerHTML = `<h4>Node properties ${chips}</h4><table><tr><td>&lt;id&gt;</td><td>${esc(d.id)}</td></tr>${Object.entries(d.props).map(([k, v]) =>
-        `<tr><td>${esc(k)}</td><td>${esc(Array.isArray(v) ? v.join(" · ") : v)}</td></tr>`).join("")}</table>`;
+      const raw = `<details class="raw"><summary>Raw data</summary><table><tr><td>&lt;id&gt;</td><td>${esc(d.id)}</td></tr>${Object.entries(d.props).map(([k, v]) =>
+        `<tr><td>${esc(k)}</td><td>${esc(Array.isArray(v) ? v.join(" · ") : v)}</td></tr>`).join("")}</table></details>`;
+      $("props").innerHTML = `<h4>${chips}</h4>${explain(d)}${raw}`;
     } else {
       $("props").innerHTML = `<h4>Relationship properties <span class="chip rel">${esc(d.type)}</span></h4><table>
         <tr><td>&lt;id&gt;</td><td>${esc(d.id)}</td></tr><tr><td>from</td><td>${esc(d.start)}</td></tr><tr><td>to</td><td>${esc(d.end)}</td></tr>
@@ -238,5 +430,34 @@
   }
   $("qlist").innerHTML = QUERIES.map((q, i) => `<button class="qbtn" data-i="${i}">${esc(q.name)}<small>${esc(q.cypher)}</small></button>`).join("");
   $("qlist").querySelectorAll(".qbtn").forEach(b => b.onclick = () => run(+b.dataset.i));
+  runQuery = run;
+
+  /* ---------- browser self-test: every saved query, rendered for real ---------- */
+  async function selfTest() {
+    const out = [];
+    for (let i = 0; i < QUERIES.length; i++) {
+      const t0 = performance.now(); let err = null, res;
+      try { res = QUERIES[i].run(); run(i); } catch (e) { err = String(e); }
+      await new Promise(r => setTimeout(r, 60));
+      const ms = Math.round(performance.now() - t0);
+      const ids = res ? new Set(res.nodes.map(n => n.id)) : new Set();
+      const dangling = res ? res.rels.filter(r => !ids.has(r.start) || !ids.has(r.end)).length : 0;
+      const hashCaps = [...document.querySelectorAll("#svg .node text")].filter(t => /^[0-9a-f]{6}$/.test(t.textContent)).length;
+      const drawn = document.querySelectorAll("#svg .node").length;
+      const ok = !err && res.nodes.length > 0 && res.rels.length > 0 && dangling === 0 && hashCaps === 0 && drawn === res.nodes.length;
+      out.push({ q: QUERIES[i].name, nodes: res ? res.nodes.length : 0, rels: res ? res.rels.length : 0, drawn, dangling, hashCaps, ms, ok, err });
+    }
+    run(0);
+    const max = Math.max(...out.map(o => o.nodes + o.rels), 1);
+    $("selftest").innerHTML = `<p class="lead"><b>${out.filter(o => o.ok).length} of ${out.length} queries pass.</b></p>` + out.map(o =>
+      `<div class="chk"><span class="s ${o.ok ? "PASS" : "FAIL"}">${o.ok ? "PASS" : "FAIL"}</span><div><b>${esc(o.q)}</b>
+        <span>${fmt(o.nodes)} nodes · ${fmt(o.rels)} relationships · ${o.drawn} drawn · ${o.dangling} dangling · ${o.hashCaps} hash captions · ${o.ms} ms${o.err ? " · " + esc(o.err) : ""}</span>
+        <div class="track st"><div class="fill" style="width:${((o.nodes + o.rels) / max * 100).toFixed(1)}%"></div></div></div></div>`).join("");
+    document.body.dataset.selftest = out.every(o => o.ok) ? "pass" : "fail";
+    return out;
+  }
+  $("selftest-run").onclick = () => selfTest();
+  if (/[?&]selftest=1/.test(location.search)) selfTest();
   run(0);
+  selectStage(0);
 })();
