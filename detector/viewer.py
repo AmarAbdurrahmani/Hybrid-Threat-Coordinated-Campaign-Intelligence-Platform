@@ -1,189 +1,301 @@
-"""Static graph view of scored accounts: one self-contained HTML file, no server.
+"""Static, self-contained graph view of the detector deciding (no server): python -m detector.viewer
 
-  python -m detector.viewer [--scores DIR] [--out FILE] [--max-nodes 450]
-
-Node colour is a continuous ramp on BOT %: light grey (human) → red → near-black (certain bot); size grows with BOT %.
-Edges = coordination links (COPY / SYNC / REPLY …) weighted by the GNN's learned relation weight. Wrongly classified
-accounts (when true labels exist) get an amber ring. Clicking a node lists every indicator's share of the decision.
+Built from the held-out benchmark split (accounts the model never trained on):
+  * nodes shade from light grey (human) through red to near-black with BOT probability; size grows with it;
+  * accounts are grouped into motive clades (motives.py), drawn as labelled hulls;
+  * "Run detector" animates the model scoring every account;
+  * clicking an account draws its decision: indicators → indicator model, neighbours → graph network → calibrated BOT %.
+Account ids are pseudonymised because the page is published.
 """
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 from pathlib import Path
 
+import numpy as np
 import pandas as pd
 
 HERE = Path(__file__).resolve().parent
 
 
 def _pseudo(a: str) -> str:
-    import hashlib
     return "acct_" + hashlib.blake2b(str(a).encode(), digest_size=4, key=b"htccip-viewer").hexdigest()
 
 
-def build(scores_dir: Path, out: Path, max_nodes: int = 450, title: str = "", pseudonymize: bool = True) -> Path:
-    recs = json.loads((scores_dir / "scores.json").read_text(encoding="utf-8"))
-    sc = pd.read_csv(scores_dir / "scores.csv", dtype={"account_id": str})
-    rels = pd.read_csv(scores_dir / "neo4j" / "rels_account.csv", dtype={"src": str, "dst": str})
-    meta = json.loads((HERE / "model" / "model.json").read_text(encoding="utf-8"))
-    label = dict(zip(sc.account_id, sc.label))
-    by_id = {r["account_id"]: r for r in recs}
-    # pick a readable subgraph: the most connected accounts, every mistake, and a sample of clear humans
-    deg = pd.concat([rels.src, rels.dst]).value_counts()
-    rels["w"] = rels.learned_weight.fillna(0) * rels.weight.fillna(1)
-    pred = {r["account_id"]: r["verdict"] == "BOT" for r in recs}
-    wrong = [a for a in by_id if label.get(a) == label.get(a) and pred[a] != bool(label.get(a))]
-    # balanced sample across the whole probability range: every human/uncertain account the budget allows, then
-    # the most connected bots (a pure "most connected" pick is ~100% bots and hides how the model separates them)
-    humans = [a for a in sc.sort_values("bot_probability").account_id if pred.get(a) is False]
-    mid = [a for a in sc[(sc.bot_probability > 5) & (sc.bot_probability < 95)].account_id]
-    bots = [a for a in deg.index if pred.get(a)]
-    budget_bots = max(120, max_nodes - len(wrong) - min(len(humans), max_nodes // 2) - len(mid))
-    pick = list(dict.fromkeys(wrong + mid + humans[: max_nodes // 2] + bots[:budget_bots]))[:max_nodes]
-    keep = set(pick)
-    e = rels[rels.src.isin(keep) & rels.dst.isin(keep)].sort_values("w", ascending=False).head(max_nodes * 6)
+def _clade_name(c: dict) -> str:
+    if c.get("true_bot_share", c.get("bot_share", 1)) < 0.5:
+        return "Mostly ordinary accounts"
+    tags = [t.rsplit(" (", 1) for t in c["targets"] if t.startswith("#")]
+    tags = [(t, int(n.rstrip(")"))) for t, n in tags]
+    if tags and tags[0][1] >= 15:
+        return f"{tags[0][0]} push"
+    import html
+    ex = html.unescape((c["examples"] or [""])[0]).replace("RT @", "@").strip()
+    return "“" + (ex[:44] + "…" if len(ex) > 44 else ex) + "”" if ex else " / ".join(c["motive_terms"][:3])
+
+
+def build(out: Path, data: str = "cresci2017", per_clade: int = 42, max_nodes: int = 520) -> Path:
+    from . import datasets, evaluate as E, model as M
+    from .graph import RELATIONS
+    from .motives import motive_clades
+    from .weights import percent_contributions
+
+    accounts, posts = datasets.load(data)
+    accounts = accounts.drop_duplicates("account_id")
+    accounts = accounts[accounts.account_id.isin(set(posts.account_id))]
+    _, _, te = E.split_stratified(accounts, test=0.2, val=0.1, seed=0)
+    accounts = accounts[accounts.account_id.isin(set(te))]
+    posts = posts[posts.account_id.isin(set(te))]
+    m = M.load(HERE / "model")
+    X, graph = M.design(accounts, posts)
+    o = M.predict(m, X, graph)
+    pct = percent_contributions(o["contrib"], m["features"])
+    ids = graph.ids
+    lab = accounts.set_index("account_id")["label"].reindex(ids).to_numpy()
+    p = 100 * o["ensemble"]
+    thr = 100 * m["threshold"]
+    scores = pd.DataFrame({"account_id": ids, "bot_probability": p, "verdict": np.where(p >= thr, "BOT", "NOT BOT"), "label": lab})
+    clades, assign = motive_clades(accounts, posts, scores, k=12, top=12)
+    # clades that get the same name (e.g. four "#talnts push" waves) are merged into one
+    name_of = {c["clade"]: _clade_name(c) for c in clades}
+    merged = {}
+    for c in clades:
+        nm = name_of[c["clade"]]
+        if nm not in merged:
+            merged[nm] = {**c, "_ids": [c["clade"]]}
+        else:
+            mm = merged[nm]; n0, n1 = mm["accounts"], c["accounts"]
+            for k in ("bot_share", "true_bot_share"):
+                if k in c and k in mm:
+                    mm[k] = (mm[k] * n0 + c[k] * n1) / (n0 + n1)
+            mm["accounts"] = n0 + n1; mm["_ids"].append(c["clade"])
+    canon = {cid: mm["_ids"][0] for mm in merged.values() for cid in mm["_ids"]}
+    assign = assign.map(lambda x: canon.get(int(x), -1))
+    clades = list(merged.values())
+    cname = {c["clade"]: nm for nm, c in merged.items()}
+    # nodes: per clade a sample (most connected first), plus every wrongly classified account
+    gates = m["meta"]["relation_gates"]
+    coord = sum(graph.relations[r] * gates.get(r, 0) for r in RELATIONS if gates.get(r, 0) > 0)
+    deg = np.asarray((coord > 0).sum(axis=1)).ravel()
+    pos = {a: i for i, a in enumerate(ids)}
+    wrong = [a for a, pp, l in zip(ids, p, lab) if l == l and (pp >= thr) != bool(l)]
+    pick = list(wrong)
+    for c in clades:
+        members = [a for a in assign.index[assign == c["clade"]] if a in pos]
+        members.sort(key=lambda a: -deg[pos[a]])
+        pick += members[:per_clade]
+    pick = list(dict.fromkeys(pick))[:max_nodes]
+    keep = np.array([pos[a] for a in pick])
+    sub = coord[keep][:, keep].tocoo()
+    links = [{"s": int(i), "t": int(j), "w": round(float(w), 2)} for i, j, w in zip(sub.row, sub.col, sub.data) if i < j]
+    links.sort(key=lambda l: -l["w"]); links = links[: max_nodes * 5]
+    neigh_mean = np.asarray(coord.multiply(1 / np.maximum(coord.sum(axis=1), 1e-9)) @ o["ensemble"]).ravel()
     nodes = []
     for a in pick:
-        r = by_id.get(a)
-        if not r:
-            continue
-        lab = label.get(a)
-        nodes.append({"id": _pseudo(a) if pseudonymize else a, "p": r["bot_probability"], "v": r["verdict"], "t": None if lab != lab else int(lab),
-                      "ind": [[i["indicator"], i["percent"]] for i in r["indicators"] if abs(i["percent"]) >= 0.5][:14],
-                      "deg": int(deg.get(a, 0))})
-    pid = _pseudo if pseudonymize else (lambda x: x)
-    links = [{"s": pid(s), "t": pid(t), "type": ty, "w": round(float(w), 3)} for s, t, ty, w in zip(e.src, e.dst, e.type, e.w)]
-    lofo = meta.get("lofo_f1", {})
-    stats = {"f1": meta.get("metrics_random_split", {}).get("f1"), "ci": meta.get("f1_ci"),
-             "unseen": [min(lofo.values()), max(lofo.values())] if lofo else None,
-             "ece": meta.get("metrics_random_split", {}).get("ece"), "gates": meta.get("relation_gates", {}),
-             "n": len(recs), "bots": sum(1 for r in recs if r["verdict"] == "BOT"), "shown": len(nodes), "edges": len(links)}
-    html = TEMPLATE.replace("__DATA__", json.dumps({"nodes": nodes, "links": links, "stats": stats,
-                                                    "title": title or "Held-out benchmark accounts"}, ensure_ascii=False))
+        i = pos[a]
+        rows = pct[pct.row == i]
+        nodes.append({"id": _pseudo(a), "p": round(float(p[i]), 1), "t": None if lab[i] != lab[i] else int(lab[i]),
+                      "c": int(assign.get(a, -1)) if int(assign.get(a, -1)) in cname else -1,
+                      "lgb": round(100 * float(o["lightgbm"][i]), 1), "gnn": round(100 * float(o["gnn"][i]), 1),
+                      "nb": int(deg[i]), "nbp": round(100 * float(neigh_mean[i]), 1),
+                      "ind": [[r.indicator, r.percent] for r in rows.itertuples() if abs(r.percent) >= 0.4][:12]})
+    lofo = m["meta"].get("lofo_f1", {})
+    data_out = {
+        "nodes": nodes, "links": links, "thr": round(thr, 1),
+        "clades": [{"id": c["clade"], "name": cname[c["clade"]], "n": int(c["accounts"]), "bot": c.get("bot_share"),
+                    "true": c.get("true_bot_share"), "ex": __import__("html").unescape((c["examples"] or [""])[0])[:140],
+                    "targets": [t for t in c["targets"][:3]]} for c in clades],
+        "stats": {"f1": m["meta"]["metrics_random_split"]["f1"], "ci": m["meta"].get("f1_ci"),
+                  "unseen": [min(lofo.values()), max(lofo.values())] if lofo else None,
+                  "ece": m["meta"]["metrics_random_split"]["ece"], "gates": {k: v for k, v in gates.items() if v > 0},
+                  "n": len(ids), "bots": int((p >= thr).sum()), "wrong": len(wrong)}}
     out.parent.mkdir(parents=True, exist_ok=True)
-    out.write_text(html, encoding="utf-8")
+    out.write_text(TEMPLATE.replace("__DATA__", json.dumps(data_out, ensure_ascii=False)), encoding="utf-8")
     return out
 
 
 TEMPLATE = r"""<!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Bot detector graph</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@500&display=swap" rel="stylesheet">
+<title>Bot detector · decision graph</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"><link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@500;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/7.9.0/d3.min.js"></script>
 <style>
-  :root { --bg:#f6f7f9; --panel:#ffffff; --line:#e4e7ec; --txt:#101828; --mut:#667085; --red:#d92d20; }
-  * { box-sizing:border-box } html,body { margin:0; height:100%; background:var(--bg); color:var(--txt); font:14px/1.45 Inter,system-ui,sans-serif }
-  header { display:flex; align-items:center; gap:18px; padding:14px 22px; background:var(--panel); border-bottom:1px solid var(--line) }
-  header h1 { font-size:16px; margin:0; font-weight:650; letter-spacing:-.01em } header .sub { color:var(--mut); font-size:12.5px }
-  .chips { display:flex; gap:8px; margin-left:auto; flex-wrap:wrap }
-  .chip { border:1px solid var(--line); border-radius:999px; padding:5px 11px; font-size:12px; background:#fff; white-space:nowrap }
-  .chip b { font-variant-numeric:tabular-nums }
-  main { display:grid; grid-template-columns:minmax(0,1fr) 360px; height:calc(100% - 61px) }
-  #graph { position:relative; overflow:hidden } svg { width:100%; height:100%; display:block; cursor:grab }
-  aside { background:var(--panel); border-left:1px solid var(--line); padding:18px 20px; overflow:auto }
-  .legend { position:absolute; left:18px; bottom:16px; background:#ffffffee; border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:12px; color:var(--mut); box-shadow:0 1px 3px #1018280f }
-  .ramp { width:220px; height:10px; border-radius:5px; margin:6px 0 3px; background:linear-gradient(90deg,#eef1f5,#fca5a5 40%,#dc2626 65%,#7f1d1d 85%,#1a0505) }
-  .ramp-l { display:flex; justify-content:space-between; font-variant-numeric:tabular-nums }
-  .ring { display:inline-block; width:10px; height:10px; border-radius:50%; border:2px solid #f59e0b; vertical-align:-1px; margin-right:5px }
-  .big { font-size:40px; font-weight:700; letter-spacing:-.03em; font-variant-numeric:tabular-nums; line-height:1 }
-  .verdict { display:inline-block; font-size:11px; font-weight:700; letter-spacing:.06em; padding:4px 8px; border-radius:6px; margin-left:8px; vertical-align:8px }
-  .row { display:grid; grid-template-columns:1fr 46px; gap:8px; align-items:center; font-size:12.5px; margin:5px 0 }
-  .bar { height:7px; border-radius:4px; background:#f2f4f7; position:relative; overflow:hidden; margin-top:3px }
-  .bar i { position:absolute; top:0; bottom:0; border-radius:4px }
-  .pct { text-align:right; font:500 12px 'JetBrains Mono',monospace; font-variant-numeric:tabular-nums }
-  h3 { font-size:12px; text-transform:uppercase; letter-spacing:.06em; color:var(--mut); margin:20px 0 8px; font-weight:600 }
-  .muted { color:var(--mut); font-size:12.5px } .gate { display:flex; justify-content:space-between; font-size:12.5px; margin:4px 0 }
-  .tip { position:absolute; pointer-events:none; background:#101828; color:#fff; font-size:12px; padding:6px 9px; border-radius:6px; opacity:0; transition:opacity .1s; white-space:nowrap }
-  @media (max-width:900px){ main{grid-template-columns:1fr; grid-template-rows:60vh auto} aside{border-left:0;border-top:1px solid var(--line)} .chips{display:none} }
+:root{--bg:#f4f5f7;--card:#fff;--line:#e5e7eb;--ink:#0b0f19;--mut:#6b7280;--red:#dc2626;--grn:#059669}
+*{box-sizing:border-box}html,body{margin:0;height:100%;background:var(--bg);color:var(--ink);font:14px/1.45 Inter,system-ui,sans-serif;-webkit-font-smoothing:antialiased}
+header{height:72px;display:flex;align-items:center;gap:22px;padding:0 26px;background:var(--card);border-bottom:1px solid var(--line)}
+.brand{display:flex;align-items:center;gap:12px}.logo{width:34px;height:34px;border-radius:9px;background:#0b0f19;display:grid;place-items:center}
+.logo i{width:12px;height:12px;border-radius:50%;background:linear-gradient(135deg,#fca5a5,#dc2626 55%,#1a0505)}
+h1{font-size:17px;margin:0;font-weight:700;letter-spacing:-.015em}.sub{color:var(--mut);font-size:12.5px}
+.kpis{display:flex;gap:26px;margin-left:auto}.kpi{text-align:right}.kpi b{display:block;font:700 19px/1.1 Inter;letter-spacing:-.02em;font-variant-numeric:tabular-nums}
+.kpi span{font-size:11px;color:var(--mut);text-transform:uppercase;letter-spacing:.06em}
+button.run{font:600 13px Inter;border:0;border-radius:9px;padding:11px 18px;background:#0b0f19;color:#fff;cursor:pointer;box-shadow:0 1px 2px #0003}
+button.run:hover{background:#1f2937}button.run:disabled{opacity:.5;cursor:default}
+main{display:grid;grid-template-columns:minmax(0,1fr) 400px;height:calc(100% - 72px)}
+#stage{position:relative;overflow:hidden}svg#g{width:100%;height:100%;display:block;cursor:grab}
+.hull{stroke-width:1.2;stroke-linejoin:round}.hlabel{font:600 12px Inter;fill:#111827;paint-order:stroke;stroke:#f4f5f7;stroke-width:4px}
+.hsub{font:500 11px Inter;fill:#6b7280;paint-order:stroke;stroke:#f4f5f7;stroke-width:4px}
+.legend{position:absolute;left:20px;bottom:18px;background:#fffffff2;border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:12px;color:var(--mut);box-shadow:0 4px 14px #0b0f1910}
+.ramp{width:240px;height:10px;border-radius:6px;margin:7px 0 4px;background:linear-gradient(90deg,#e5e7eb,#fca5a5 35%,#dc2626 62%,#7f1d1d 84%,#120202)}
+.rl{display:flex;justify-content:space-between;font:500 11px 'JetBrains Mono'}
+.status{position:absolute;left:50%;top:18px;transform:translateX(-50%);background:#0b0f19;color:#fff;font:600 12.5px Inter;padding:8px 14px;border-radius:999px;box-shadow:0 6px 18px #0b0f1930;opacity:0;transition:opacity .3s}
+aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;padding:22px 24px}
+h2{font-size:15px;margin:0 0 4px;font-weight:700;letter-spacing:-.01em}h3{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--mut);margin:22px 0 10px;font-weight:600}
+.muted{color:var(--mut);font-size:12.5px}.mono{font-family:'JetBrains Mono',monospace}
+.big{font:800 46px/1 Inter;letter-spacing:-.04em;font-variant-numeric:tabular-nums}
+.pill{display:inline-block;font:700 11px Inter;letter-spacing:.06em;padding:5px 9px;border-radius:7px;vertical-align:12px;margin-left:10px}
+.clade{display:grid;grid-template-columns:12px 1fr auto;gap:10px;align-items:center;padding:8px 0;border-bottom:1px solid #f3f4f6;cursor:pointer;font-size:12.5px}
+.clade:hover .nm{text-decoration:underline}.sw{width:12px;height:12px;border-radius:4px}.nm{font-weight:600}
+.bar{height:6px;border-radius:3px;background:#f3f4f6;overflow:hidden}.bar i{display:block;height:100%}
+.tip{position:absolute;pointer-events:none;background:#0b0f19;color:#fff;font:500 12px Inter;padding:7px 10px;border-radius:7px;opacity:0;white-space:nowrap;box-shadow:0 6px 18px #0003}
+@media(max-width:980px){main{grid-template-columns:1fr;grid-template-rows:62vh auto}.kpis{display:none}}
 </style></head><body>
-<header><div><h1>Is this account a bot?</h1><div class="sub" id="sub"></div></div><div class="chips" id="chips"></div></header>
-<main><div id="graph"><svg></svg><div class="tip" id="tip"></div>
-  <div class="legend"><div><b style="color:#101828">BOT probability</b> · colour and size</div><div class="ramp"></div>
-  <div class="ramp-l"><span>0%</span><span>50%</span><span>100%</span></div><div style="margin-top:6px"><span class="ring"></span>model was wrong (true label differs)</div>
-  <div style="margin-top:3px">edge thickness = learned relation weight × shared posts</div></div></div>
+<header><div class="brand"><div class="logo"><i></i></div><div><h1>Is this account a bot?</h1><div class="sub" id="sub"></div></div></div>
+<div class="kpis" id="kpis"></div><button class="run" id="run">▶ Run detector</button></header>
+<main><div id="stage"><svg id="g"></svg><div class="status" id="status"></div><div class="tip" id="tip"></div>
+<div class="legend"><b style="color:#0b0f19">BOT probability</b> — shade &amp; size<div class="ramp"></div><div class="rl"><span>0%</span><span>50%</span><span>100%</span></div>
+<div style="margin-top:8px;display:flex;gap:14px"><span><svg width="12" height="12"><circle cx="6" cy="6" r="4.5" fill="#fff" stroke="#f59e0b" stroke-width="2.4"/></svg> model wrong</span><span>outline = motive clade</span></div></div></div>
 <aside id="side"></aside></main>
 <script>
-const D = __DATA__;
-const color = d3.scaleLinear().domain([0, 40, 65, 85, 100]).range(["#eef1f5", "#fca5a5", "#dc2626", "#7f1d1d", "#1a0505"]).clamp(true);
-const size = (p) => 6 + 8 * Math.pow(p / 100, 1.3);
-const S = D.stats, f = (x, d = 3) => x == null ? "–" : (+x).toFixed(d);
-document.getElementById("sub").textContent = `${D.title} · ${S.shown} of ${S.n.toLocaleString()} accounts shown · ${S.edges.toLocaleString()} coordination links`;
-document.getElementById("chips").innerHTML = [
-  `F1 <b>${f(S.f1)}</b>${S.ci ? ` <span style="color:#667085">(${f(S.ci[0])}–${f(S.ci[1])})</span>` : ""}`,
-  S.unseen ? `Unseen bot types <b>${f(S.unseen[0])}–${f(S.unseen[1])}</b>` : "",
-  `Calibration error <b>${f(100 * S.ece, 1)} pts</b>`, `Flagged <b>${S.bots.toLocaleString()}</b> / ${S.n.toLocaleString()}`].filter(Boolean).map((c) => `<span class="chip">${c}</span>`).join("");
+const D = __DATA__, S = D.stats;
+const shade = d3.scaleLinear().domain([0, 35, 62, 84, 100]).range(["#e5e7eb", "#fca5a5", "#dc2626", "#7f1d1d", "#120202"]).clamp(true);
+const R = (p) => 5 + 9 * Math.pow(p / 100, 1.2), f3 = (x) => x == null ? "–" : (+x).toFixed(3);
+const CL = new Map(D.clades.map((c, i) => [c.id, { ...c, i }]));
+document.getElementById("sub").textContent = `Held-out benchmark accounts the model never trained on · ${D.nodes.length} of ${S.n.toLocaleString()} shown · ${D.clades.length} motive clades`;
+const kp = document.getElementById("kpis");
+kp.innerHTML = [[`${f3(S.f1)}`, "F1 held-out"], [S.unseen ? `${f3(S.unseen[0])}–${f3(S.unseen[1]).slice(1)}` : "–", "F1 unseen bot types"],
+  [`${(100 * S.ece).toFixed(1)} pts`, "calibration error"], [`<em id="flag" style="font-style:normal">0</em> / ${S.n.toLocaleString()}`, "flagged BOT"]]
+  .map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("");
 
-const svg = d3.select("svg"), g = svg.append("g"), W = () => svg.node().clientWidth, H = () => svg.node().clientHeight;
-const zoom = d3.zoom().scaleExtent([0.2, 6]).on("zoom", (e) => g.attr("transform", e.transform)); svg.call(zoom);
-function fit() { const b = g.node().getBBox(); if (!b.width) return; const k = Math.min(W() / (b.width + 60), H() / (b.height + 60), 1.6);
-  svg.transition().duration(600).call(zoom.transform, d3.zoomIdentity.translate(W() / 2 - k * (b.x + b.width / 2), H() / 2 - k * (b.y + b.height / 2)).scale(k)); }
-const nodes = D.nodes.map((d) => ({ ...d })), byId = new Map(nodes.map((n) => [n.id, n]));
-const links = D.links.filter((l) => byId.has(l.s) && byId.has(l.t)).map((l) => ({ ...l, source: l.s, target: l.t }));
+const svg = d3.select("#g"), root = svg.append("g"), W = () => svg.node().clientWidth, H = () => svg.node().clientHeight;
+const zoom = d3.zoom().scaleExtent([0.25, 5]).on("zoom", (e) => root.attr("transform", e.transform)); svg.call(zoom);
+const gH = root.append("g"), gL = root.append("g"), gN = root.append("g"), gT = root.append("g");
+const nodes = D.nodes.map((d, i) => ({ ...d, i, shown: 0 })), links = D.links.map((l) => ({ ...l, source: l.s, target: l.t }));
+// clade centres on an ellipse, "other" in the middle
+const nC = D.clades.length, cx = (k) => W() / 2 + (k < 0 ? 0 : Math.cos(2 * Math.PI * k / nC - 1.3) * W() * 0.36), cy = (k) => H() / 2 + (k < 0 ? 0 : Math.sin(2 * Math.PI * k / nC - 1.3) * H() * 0.36);
+const ci = (d) => (CL.get(d.c) || { i: -1 }).i;
 const wmax = d3.max(links, (l) => l.w) || 1;
-const link = g.append("g").selectAll("line").data(links).join("line")
-  .attr("stroke", (l) => l.type === "SYNC" ? "#475467" : "#98a2b3").attr("stroke-opacity", 0.28)
-  .attr("stroke-width", (l) => 0.4 + 2.6 * Math.sqrt(l.w / wmax));
-const node = g.append("g").selectAll("circle").data(nodes).join("circle")
-  .attr("r", (d) => size(d.p)).attr("fill", (d) => color(d.p))
-  .attr("stroke", (d) => d.t != null && (d.t === 1) !== (d.v === "BOT") ? "#f59e0b" : d.p < 40 ? "#98a2b3" : "#ffffff")
-  .attr("stroke-width", (d) => d.t != null && (d.t === 1) !== (d.v === "BOT") ? 3 : 1.2).style("cursor", "pointer")
-  .call(d3.drag().on("start", (e, d) => { if (!e.active) sim.alphaTarget(0.2).restart(); d.fx = d.x; d.fy = d.y; })
-    .on("drag", (e, d) => { d.fx = e.x; d.fy = e.y; }).on("end", (e, d) => { if (!e.active) sim.alphaTarget(0); d.fx = d.fy = null; }));
+const link = gL.selectAll("line").data(links).join("line").attr("stroke", "#9ca3af").attr("stroke-opacity", (l) => l.s === l.t ? 0 : 0.22).attr("stroke-width", (l) => 0.5 + 2.2 * Math.sqrt(l.w / wmax));
+const isWrong = (d) => d.t != null && (d.t === 1) !== (d.p >= D.thr);
+const node = gN.selectAll("circle").data(nodes).join("circle").attr("r", 6).attr("fill", "#e5e7eb")
+  .attr("stroke", (d) => isWrong(d) ? "#f59e0b" : "#fff").attr("stroke-width", (d) => isWrong(d) ? 3 : 1.3).style("cursor", "pointer");
 const tip = document.getElementById("tip");
-node.on("mousemove", (e, d) => { tip.style.opacity = 1; tip.style.left = e.offsetX + 14 + "px"; tip.style.top = e.offsetY + 10 + "px";
-  tip.textContent = `${d.id} · BOT ${d.p.toFixed(1)}%${d.t != null ? " · truly " + (d.t ? "bot" : "human") : ""}`; })
-  .on("mouseleave", () => tip.style.opacity = 0).on("click", (e, d) => show(d));
-const sim = d3.forceSimulation(nodes).force("link", d3.forceLink(links).id((d) => d.id).distance(28).strength(0.25))
-  .force("charge", d3.forceManyBody().strength(-34)).force("center", d3.forceCenter(W() / 2, H() / 2))
-  .force("collide", d3.forceCollide((d) => size(d.p) + 1.5)).force("x", d3.forceX(W() / 2).strength(0.04)).force("y", d3.forceY(H() / 2).strength(0.04))
-  .on("end", fit).on("tick", () => { link.attr("x1", (l) => l.source.x).attr("y1", (l) => l.source.y).attr("x2", (l) => l.target.x).attr("y2", (l) => l.target.y);
-    node.attr("cx", (d) => d.x).attr("cy", (d) => d.y); });
+node.on("mousemove", (e, d) => { tip.style.opacity = 1; tip.style.left = e.offsetX + 14 + "px"; tip.style.top = e.offsetY + 12 + "px";
+  tip.textContent = d.shown ? `BOT ${d.p.toFixed(1)}%${d.t != null ? " · truly " + (d.t ? "bot" : "human") : ""}` : "not scored yet — press Run detector"; })
+  .on("mouseleave", () => tip.style.opacity = 0).on("click", (e, d) => { e.stopPropagation(); decide(d); });
+const sim = d3.forceSimulation(nodes)
+  .force("link", d3.forceLink(links).distance(18).strength((l) => l.source.c === l.target.c ? 0.08 : 0))
+  .force("charge", d3.forceManyBody().strength(-14))
+  .force("x", d3.forceX((d) => cx(ci(d))).strength(0.22)).force("y", d3.forceY((d) => cy(ci(d))).strength(0.22))
+  .force("collide", d3.forceCollide((d) => (d.shown ? R(d.p) : 6) + 1.6))
+  .on("tick", tick).on("end", fit);
+function tick() {
+  link.attr("x1", (l) => l.source.x).attr("y1", (l) => l.source.y).attr("x2", (l) => l.target.x).attr("y2", (l) => l.target.y);
+  node.attr("cx", (d) => d.x).attr("cy", (d) => d.y); hulls();
+}
+const hullSel = () => gH.selectAll("path").data(D.clades, (c) => c.id);
+function hulls() {
+  const pts = d3.group(nodes.filter((d) => d.c >= 0), (d) => d.c);
+  gH.selectAll("path").data(D.clades, (c) => c.id).join("path").attr("class", "hull")
+    .attr("fill", (c) => c.bot > 0.5 ? "#dc262608" : "#05966908").attr("stroke", (c) => c.bot > 0.5 ? "#dc262640" : "#05966940")
+    .attr("d", (c) => { const ps = (pts.get(c.id) || []).map((d) => [d.x, d.y]); if (ps.length < 3) return null;
+      const h = d3.polygonHull(ps.flatMap(([x, y]) => [[x - 14, y - 14], [x + 14, y - 14], [x - 14, y + 14], [x + 14, y + 14]])); return h ? "M" + h.join("L") + "Z" : null; })
+    .style("cursor", "pointer").on("click", (e, c) => { e.stopPropagation(); cladeView(c); });
+  gT.selectAll("g").data(D.clades, (c) => c.id).join((en) => { const g = en.append("g"); g.append("text").attr("class", "hlabel"); g.append("text").attr("class", "hsub").attr("dy", 15); return g; })
+    .attr("transform", (c) => { const ps = pts.get(c.id) || []; if (!ps.length) return "translate(-999,-999)";
+      return `translate(${d3.mean(ps, (d) => d.x)},${d3.min(ps, (d) => d.y) - 26})`; })
+    .call((g) => { g.select(".hlabel").attr("text-anchor", "middle").text((c) => c.name);
+      g.select(".hsub").attr("text-anchor", "middle").text((c) => `${c.n} accounts · ${c.bot != null ? Math.round(100 * c.bot) + "% BOT" : ""}${c.true != null ? " · true " + Math.round(100 * c.true) + "%" : ""}`); });
+}
+function fit() { const b = root.node().getBBox(); if (!b.width) return; const k = Math.min(W() / (b.width + 80), H() / (b.height + 80), 1.4);
+  svg.transition().duration(700).call(zoom.transform, d3.zoomIdentity.translate(W() / 2 - k * (b.x + b.width / 2), H() / 2 - k * (b.y + b.height / 2)).scale(k)); }
 
-function show(d) {
-  node.attr("opacity", (n) => n === d || links.some((l) => (l.source === d && l.target === n) || (l.target === d && l.source === n)) ? 1 : 0.25);
-  link.attr("stroke-opacity", (l) => l.source === d || l.target === d ? 0.8 : 0.08);
-  const bot = d.v === "BOT", wrong = d.t != null && (d.t === 1) !== bot;
-  const mx = d3.max(d.ind, (x) => Math.abs(x[1])) || 1;
-  document.getElementById("side").innerHTML = `
-    <div class="muted">Account</div><div style="font:600 15px 'JetBrains Mono',monospace;margin-bottom:12px">${d.id}</div>
-    <div><span class="big" style="color:${color(Math.max(d.p, 55))}">${d.p.toFixed(1)}%</span>
-      <span class="verdict" style="background:${bot ? "#fee4e2" : "#ecfdf3"};color:${bot ? "#b42318" : "#027a48"}">${bot ? "BOT" : "NOT BOT"}</span></div>
-    <div class="muted" style="margin-top:6px">BOT probability${d.t != null ? ` · true label <b style="color:#101828">${d.t ? "bot" : "human"}</b>${wrong ? ' · <b style="color:#b54708">model was wrong</b>' : " · correct"}` : ""}</div>
-    <h3>Why: share of the decision</h3>
-    ${d.ind.map(([n, v]) => `<div class="row"><div>${n}<div class="bar"><i style="left:0;width:${Math.abs(v) / mx * 100}%;background:${v > 0 ? "#d92d20" : "#12b76a"}"></i></div></div>
-      <div class="pct" style="color:${v > 0 ? "#b42318" : "#027a48"}">${v > 0 ? "+" : "−"}${Math.abs(v).toFixed(1)}%</div></div>`).join("")}
-    <div class="muted" style="margin-top:8px">Red pushes towards bot, green towards human. Shares sum to 100%.</div>
-    <h3>Coordination links</h3><div class="muted">${links.filter((l) => l.source === d || l.target === d).length} shown · ${d.deg} in the full graph</div>`;
+// ---- run: the model scores every account, lowest first, colour + size animate in
+const st = document.getElementById("status");
+document.getElementById("run").onclick = run;
+function run() {
+  const btn = document.getElementById("run"); btn.disabled = true; st.style.opacity = 1;
+  nodes.forEach((d) => d.shown = 0); node.attr("fill", "#e5e7eb").attr("r", 6);
+  const order = d3.shuffle(nodes.slice()); let k = 0, flagged = 0; const per = Math.ceil(order.length / 70);
+  const timer = d3.interval(() => {
+    for (let j = 0; j < per && k < order.length; j++, k++) { const d = order[k]; d.shown = 1; if (d.p >= D.thr) flagged++;
+      d3.select(node.nodes()[d.i]).transition().duration(420).attr("fill", shade(d.p)).attr("r", R(d.p)); }
+    document.getElementById("flag").textContent = Math.round(flagged / D.nodes.length * S.bots).toLocaleString();
+    st.textContent = `Scoring account ${Math.min(k, order.length)} of ${order.length} · indicator model + graph network → calibrated BOT %`;
+    if (k >= order.length) { timer.stop(); document.getElementById("flag").textContent = S.bots.toLocaleString();
+      st.textContent = `Done · ${S.bots.toLocaleString()} of ${S.n.toLocaleString()} flagged · ${S.wrong} wrong against the true labels`; setTimeout(() => st.style.opacity = 0, 2600);
+      sim.alpha(0.3).restart(); btn.disabled = false; btn.textContent = "↻ Run again"; }
+  }, 40);
 }
+
+// ---- right panel
+const side = document.getElementById("side");
 function overview() {
-  const g2 = Object.entries(S.gates || {}).filter(([, v]) => v > 0), gm = d3.max(g2, (x) => x[1]) || 1;
-  document.getElementById("side").innerHTML = `
-    <div style="font-weight:650;font-size:15px">How to read this</div>
-    <p class="muted">Each dot is an account the model never saw during training. The darker and larger it is, the more likely it is a bot. Lines connect accounts that posted the same text or posted it in sync. Click any dot to see why.</p>
-    <h3>Learned relation weights (graph network)</h3>
-    <div class="muted" style="margin:-2px 0 6px">Relations with no examples in the training data are switched off and not shown.</div>
-    ${g2.map(([k, v]) => `<div class="gate"><span>${{ COPY: "Copy-paste", SYNC: "Synchronised posting", REPLY: "Replies", LINK: "Shared links", CO_THREAD: "Same thread, same minutes" }[k] || k}</span><span class="pct">${v.toFixed(2)}</span></div>
-      <div class="bar"><i style="left:0;width:${v / gm * 100}%;background:#344054"></i></div>`).join("")}
-    <h3>Distribution</h3><svg id="hist" width="320" height="90"></svg>`;
-  const bins = d3.bin().domain([0, 100]).thresholds(20)(nodes.map((n) => n.p)), hs = d3.select("#hist"), y = d3.scaleLinear().domain([0, d3.max(bins, (b) => b.length)]).range([0, 70]);
-  hs.selectAll("rect").data(bins).join("rect").attr("x", (b) => b.x0 * 3.15).attr("width", 14).attr("y", (b) => 80 - y(b.length)).attr("height", (b) => y(b.length)).attr("rx", 2).attr("fill", (b) => color((b.x0 + b.x1) / 2));
-  hs.append("text").attr("x", 0).attr("y", 90).attr("font-size", 10).attr("fill", "#667085").text("0% human");
-  hs.append("text").attr("x", 320).attr("y", 90).attr("text-anchor", "end").attr("font-size", 10).attr("fill", "#667085").text("bot 100%");
+  node.attr("opacity", 1); link.attr("stroke-opacity", 0.22);
+  const g = Object.entries(S.gates), gm = d3.max(g, (x) => x[1]) || 1, nm = { COPY: "Copy-paste", SYNC: "Synchronised posting", REPLY: "Replies", LINK: "Shared links", CO_THREAD: "Same thread, same minutes" };
+  side.innerHTML = `<h2>One question: is this account a bot?</h2>
+  <p class="muted">Press <b>Run detector</b> to watch the model score every account. Click any account to open its decision. Click a cluster to see what it pushes.</p>
+  <h3>How a decision is made</h3>${pipeline()}
+  <h3>Learned relation weights · graph network</h3>
+  ${g.map(([k, v]) => `<div style="display:flex;justify-content:space-between;font-size:12.5px;margin:6px 0 4px"><span>${nm[k] || k}</span><span class="mono">${v.toFixed(2)}</span></div><div class="bar"><i style="width:${v / gm * 100}%;background:#111827"></i></div>`).join("")}
+  <h3>Motive clades</h3>
+  ${D.clades.map((c) => `<div class="clade" data-c="${c.id}"><span class="sw" style="background:${shade(100 * (c.bot ?? 0))}"></span><span class="nm">${c.name}</span><span class="mono" style="color:var(--mut)">${c.n} · ${Math.round(100 * (c.bot ?? 0))}%</span></div>`).join("")}`;
+  side.querySelectorAll(".clade").forEach((el) => el.onclick = () => cladeView(D.clades.find((c) => c.id == el.dataset.c)));
 }
-svg.on("click", (e) => { if (e.target.tagName === "svg") { node.attr("opacity", 1); link.attr("stroke-opacity", 0.28); overview(); } });
-overview();
+function pipeline(d) {
+  const box = (x, y, w, t, s, col) => `<rect x="${x}" y="${y}" width="${w}" height="44" rx="9" fill="#fff" stroke="${col || "#d1d5db"}"/><text x="${x + w / 2}" y="${y + 19}" text-anchor="middle" font-size="11.5" font-weight="600" fill="#111827">${t}</text><text x="${x + w / 2}" y="${y + 34}" text-anchor="middle" font-size="11" fill="#6b7280" font-family="JetBrains Mono">${s}</text>`;
+  const arr = (x1, y1, x2, y2) => `<path d="M${x1} ${y1} C ${(x1 + x2) / 2} ${y1}, ${(x1 + x2) / 2} ${y2}, ${x2} ${y2}" fill="none" stroke="#9ca3af" stroke-width="1.4" marker-end="url(#ah)"/>`;
+  return `<svg viewBox="0 0 352 128" width="100%"><defs><marker id="ah" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="7" markerHeight="7" orient="auto"><path d="M0 0L8 4L0 8z" fill="#9ca3af"/></marker></defs>
+    ${box(0, 6, 112, "Indicators", d ? d.ind.length + " active" : "30 per account")}${box(0, 74, 112, "Coordination graph", d ? d.nb + " neighbours" : "5 relation types")}
+    ${box(132, 6, 98, "Indicator model", d ? d.lgb.toFixed(1) + "%" : "LightGBM")}${box(132, 74, 98, "Graph network", d ? d.gnn.toFixed(1) + "%" : "relational GNN")}
+    ${box(252, 40, 100, "Calibrated", d ? "BOT " + d.p.toFixed(1) + "%" : "BOT %", d ? shade(d.p) : "#111827")}
+    ${arr(112, 28, 130, 28)}${arr(112, 96, 130, 96)}${arr(230, 28, 250, 56)}${arr(230, 96, 250, 70)}</svg>`;
+}
+function decide(d) {
+  const nb = new Set([d.i]); links.forEach((l) => { if (l.source === d) nb.add(l.target.i); if (l.target === d) nb.add(l.source.i); });
+  node.attr("opacity", (n) => nb.has(n.i) ? 1 : 0.18); link.attr("stroke-opacity", (l) => l.source === d || l.target === d ? 0.75 : 0.05);
+  const bot = d.p >= D.thr, wrong = isWrong(d), c = CL.get(d.c);
+  const ind = d.ind.slice(0, 10), mx = d3.max(ind, (x) => Math.abs(x[1])) || 1, H2 = ind.length * 25 + 10;
+  // decision network: indicator nodes → Σ (indicator model) → BOT, line width = learned share
+  const net = `<svg viewBox="0 0 352 ${H2}" width="100%">${ind.map(([n, v], k) => { const y = 14 + k * 25, w = 0.8 + 5 * Math.abs(v) / mx, col = v > 0 ? "#dc2626" : "#059669";
+      return `<path d="M168 ${y} C 230 ${y}, 240 ${H2 / 2}, 292 ${H2 / 2}" fill="none" stroke="${col}" stroke-opacity=".75" stroke-width="${w}"><animate attributeName="stroke-dasharray" values="0 400;400 0" dur=".8s" fill="freeze"/></path>
+      <circle cx="168" cy="${y}" r="4.5" fill="${col}"/><text x="160" y="${y + 4}" text-anchor="end" font-size="10.5" fill="#374151">${n.length > 30 ? n.slice(0, 29) + "…" : n}</text>
+      <text x="176" y="${y - 4}" font-size="9.5" fill="${col}" font-family="JetBrains Mono">${v > 0 ? "+" : "−"}${Math.abs(v).toFixed(1)}%</text>`; }).join("")}
+    <circle cx="318" cy="${H2 / 2}" r="26" fill="${shade(d.p)}" stroke="#fff" stroke-width="3"/><text x="318" y="${H2 / 2 + 4}" text-anchor="middle" font-size="12" font-weight="800" fill="${d.p > 45 ? "#fff" : "#111827"}">${Math.round(d.p)}%</text></svg>`;
+  side.innerHTML = `<div class="muted">Account · held-out, never seen in training</div><div class="mono" style="font-size:14px;font-weight:600">${d.id}</div>
+  <div style="margin-top:14px"><span class="big" style="color:${shade(Math.max(d.p, 58))}">${d.p.toFixed(1)}%</span><span class="pill" style="background:${bot ? "#fee2e2" : "#d1fae5"};color:${bot ? "#991b1b" : "#065f46"}">${bot ? "BOT" : "NOT BOT"}</span></div>
+  <div class="muted" style="margin-top:6px">BOT probability${d.t != null ? ` · true label <b style="color:#111827">${d.t ? "bot" : "human"}</b> · ${wrong ? '<b style="color:#b45309">model wrong</b>' : '<b style="color:#047857">correct</b>'}` : ""}${c ? ` · clade <b style="color:#111827">${c.name}</b>` : ""}</div>
+  <h3>The decision</h3>${pipeline(d)}
+  <h3>Why · each indicator's share (learned)</h3>${net}
+  <div class="muted">Red pushes towards bot, green towards human; line width = share of the decision. ${d.nb ? `Graph: ${d.nb} coordination neighbours, average neighbour BOT ${d.nbp.toFixed(0)}%.` : "No coordination neighbours."}</div>
+  <p style="margin-top:16px"><a href="#" id="back" style="color:#111827;font-weight:600">← overview</a></p>`;
+  document.getElementById("back").onclick = (e) => { e.preventDefault(); overview(); };
+}
+function cladeView(c) {
+  node.attr("opacity", (n) => n.c === c.id ? 1 : 0.15); link.attr("stroke-opacity", (l) => l.source.c === c.id && l.target.c === c.id ? 0.6 : 0.04);
+  side.innerHTML = `<div class="muted">Motive clade</div><h2 style="font-size:18px">${c.name}</h2>
+  <div style="display:flex;gap:26px;margin:14px 0"><div><div class="big" style="font-size:32px">${c.n}</div><div class="muted">accounts</div></div>
+  <div><div class="big" style="font-size:32px;color:${shade(100 * (c.bot ?? 0))}">${Math.round(100 * (c.bot ?? 0))}%</div><div class="muted">flagged BOT</div></div>
+  ${c.true != null ? `<div><div class="big" style="font-size:32px">${Math.round(100 * c.true)}%</div><div class="muted">truly bots</div></div>` : ""}</div>
+  <h3>Typical copied post</h3><div style="font-size:13px;background:#f9fafb;border:1px solid var(--line);border-radius:9px;padding:10px 12px">${(c.ex || "").replace(/</g, "&lt;")}</div>
+  <h3>Aimed at</h3>${c.targets.map((t) => `<div style="font-size:12.5px;margin:4px 0" class="mono">${t.replace(/</g, "&lt;")}</div>`).join("")}
+  <p class="muted" style="margin-top:14px">The motive only groups accounts. The verdict on each account is its own BOT %.</p>
+  <p><a href="#" id="back" style="color:#111827;font-weight:600">← overview</a></p>`;
+  document.getElementById("back").onclick = (e) => { e.preventDefault(); overview(); };
+}
+svg.on("click", () => overview());
+overview(); setTimeout(run, 900);
 </script></body></html>
 """
 
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--scores", default=str(HERE / "data" / "scores_cresci2017_test"))
-    ap.add_argument("--out", default=str(HERE / "data" / "graph.html"))
-    ap.add_argument("--max-nodes", type=int, default=450)
+    ap.add_argument("--out", default=str(HERE.parent / "frontend" / "graph.html"))
+    ap.add_argument("--data", default="cresci2017")
     a = ap.parse_args()
-    print(build(Path(a.scores), Path(a.out), a.max_nodes))
+    print(build(Path(a.out), a.data))
 
 
 if __name__ == "__main__":
