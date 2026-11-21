@@ -188,3 +188,10 @@ details.full > summary { cursor: pointer; font-weight: 600; font-size: 16px; pad
 details.full > summary::before { content: "▸ "; } details.full[open] > summary::before { content: "▾ "; }
 details.full > .kpis { margin-top: 18px; }
 details.full section.wrap { padding-inline: 0; }
+.found { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px; }
+.fcard { background: var(--white); border: 1px solid var(--line); border-radius: 12px; padding: 16px; display: grid; gap: 4px; align-content: start; }
+.fhead { display: flex; justify-content: space-between; align-items: center; }
+.fcard .ti { font-size: 24px; } .fcard b { font-size: 34px; line-height: 1.1; font-variant-numeric: tabular-nums; }
+.cert { color: #fff; font-size: 11px; font-weight: 700; border-radius: 10px; padding: 2px 8px; text-transform: uppercase; letter-spacing: .04em; }
+.ft { font-weight: 600; } .fd { color: var(--muted); font-size: 13px; }
+.fnote { grid-column: 1 / -1; color: var(--muted); font-size: 14px; margin: 4px 0 0; }

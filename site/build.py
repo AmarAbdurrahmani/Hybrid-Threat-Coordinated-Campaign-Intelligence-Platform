@@ -361,6 +361,14 @@ def main() -> None:
                         "accounts are ranked by the coordination engine, and a Kosovo-labelled sample is the next step.",
         },
         "counts": {"comments": len(comments), "videos": len(threads), "accounts": len(users), "nodes": len(nodes), "rels": len(rels)},
+        "findings": {
+            "groups_3": len(groups), "groups_5": sum(1 for g in groups if len(g["members"]) >= 5),
+            "groups_10": sum(1 for g in groups if len(g["members"]) >= 10), "largest_group": len(ranked[0]) if ranked else 0,
+            "accounts_in_groups_5": sum(len(g["members"]) for g in groups if len(g["members"]) >= 5),
+            "strong": sum(1 for s in risk.values() if s >= 60), "moderate": sum(1 for s in risk.values() if 35 <= s < 60),
+            "weak": sum(1 for s in risk.values() if 15 <= s < 35), "none": sum(1 for s in risk.values() if s < 15),
+            "accounts": len(risk),
+        },
         "showcase": showcase(best, risk, cluster_of, group_name, user_themes, threads, per_user_n),
         "stats": stage_stats(col, threads, tmeta, per_thread_n, per_user_n, best, risk, relc, levels, weights, meta),
     }

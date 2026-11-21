@@ -47,6 +47,19 @@
   }
   if (bnodes.length) pick([...bnodes].sort((a, b) => b.risk - a.risk)[0]);
 
+  /* ---------- what we found, by certainty ---------- */
+  const F = S.findings || {}, CFf = S.model.confidence || {};
+  const top99 = (CFf.rows || []).find(r => r.band === "99–100%") || {};
+  $("foundrow").innerHTML = [
+    ["🏭", F.groups_5, "possible bot farms", `groups of 5+ accounts posting the same text or showing up together (${fmt(F.accounts_in_groups_5)} accounts; largest ${fmt(F.largest_group)})`, "Moderate", "#e8a33b"],
+    ["🔴", F.strong, "accounts with strong evidence", "coordination score 60+", "High", "#d43f3a"],
+    ["🟠", F.moderate, "accounts with moderate evidence", "score 35–59: bursts plus copied text", "Moderate", "#e8a33b"],
+    ["🟡", F.weak, "accounts with weak evidence", "score 15–34: one signal only", "Low", "#4C8EDA"],
+    ["✅", top99.bots != null ? `${fmt(top99.bots)}/${fmt(top99.accounts)}` : "–", "confident calls were real bots", "on labelled test accounts (Twitter benchmark), where the true answer is known", "Proven", "#2e9e5b"],
+  ].map(([i, v, t, d, c, col]) => `<div class="fcard"><div class="fhead"><span class="ti">${i}</span><span class="cert" style="background:${col}">${c} certainty</span></div>
+    <b>${typeof v === "number" ? fmt(v) : v}</b><span class="ft">${t}</span><span class="fd">${d}</span></div>`).join("") +
+    `<p class="fnote">Out of ${fmt(F.accounts)} accounts, ${fmt(F.none)} look like ordinary conversation. "Certain" on YouTube needs a sample checked by two people; that is our next step.</p>`;
+
   /* ---------- trust row ---------- */
   const allChecks = (S.checks?.groups || []).flatMap(g => g.items);
   const CFt = S.model.confidence || {};

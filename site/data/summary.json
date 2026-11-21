@@ -1,5 +1,5 @@
 {
- "built": "2026-11-21 20:42 UTC",
+ "built": "2026-11-21 20:45 UTC",
  "kpis": [
   {
    "value": 10275,
@@ -334,6 +334,18 @@
   "accounts": 7188,
   "nodes": 2571,
   "rels": 11672
+ },
+ "findings": {
+  "groups_3": 176,
+  "groups_5": 51,
+  "groups_10": 12,
+  "largest_group": 542,
+  "accounts_in_groups_5": 1021,
+  "strong": 0,
+  "moderate": 616,
+  "weak": 2719,
+  "none": 3853,
+  "accounts": 7188
  },
  "showcase": [
   {
@@ -736,7 +748,7 @@
   }
  },
  "checks": {
-  "generated": "2026-11-21 20:45 UTC",
+  "generated": "2026-11-21 20:46 UTC",
   "groups": [
    {
     "name": "Security",
@@ -874,12 +886,12 @@
      {
       "name": "Detector test suite",
       "status": "PASS",
-      "detail": "43 passed, 1 warning in 8.62s"
+      "detail": "43 passed, 1 warning in 8.34s"
      },
      {
       "name": "Backend test suite",
       "status": "PASS",
-      "detail": "32 passed, 1 warning in 4.99s"
+      "detail": "32 passed, 1 warning in 5.14s"
      }
     ]
    }
