@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HTCCIP · Coordinated Account Intelligence</title>
+<meta name="description" content="Real Kosovo–Serbia YouTube comments, pseudonymised, scored for coordination and explored as a graph.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Open+Sans:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<nav class="top">
+  <a class="brand" href="#top">HTCCIP</a>
+  <div class="links">
+    <a href="#pipeline">Pipeline</a><a href="#graph">Graph</a><a href="#model">Model</a><a href="#checks">Checks</a>
+  </div>
+</nav>
+
+<header id="top" class="hero wrap">
+  <p class="eyebrow">Challenge 01 · AI-powered OSINT &amp; hybrid threat intelligence</p>
+  <h1>Which voices in Kosovo's comment sections are acting together?</h1>
+  <p class="lede">Real public YouTube comments on Kosovo–Serbia videos, collected through the official API, pseudonymised on arrival, scored by our coordination engine and explored as a graph. Every number on this page comes from that data.</p>
+  <div class="kpis" id="kpis"></div>
+</header>
+
+<section id="pipeline" class="wrap">
+  <h2>The pipeline, with real counts</h2>
+  <p class="sub">One run, end to end. Each stage hands the next a concrete artefact.</p>
+  <ol class="pipe" id="pipe"></ol>
+</section>
+
+<section id="graph" class="wrap">
+  <h2>Graph browser</h2>
+  <p class="sub">Run a query to load a slice of the graph. Drag nodes, scroll to zoom, click a node or relationship for its properties, click a label to hide it.</p>
+  <div class="browser">
+    <aside class="queries">
+      <div class="qhead">Saved queries</div>
+      <div id="qlist"></div>
+    </aside>
+    <div class="frame">
+      <div class="frame-bar">
+        <span class="prompt">neo4j$</span>
+        <code id="cypher"></code>
+        <span class="took" id="took"></span>
+      </div>
+      <div class="frame-body">
+        <div class="viewtabs" role="tablist">
+          <button class="vt on" data-view="graph" role="tab">Graph</button>
+          <button class="vt" data-view="table" role="tab">Table</button>
+          <button class="vt" data-view="json" role="tab">Text</button>
+        </div>
+        <div class="canvas-wrap">
+          <div class="overview" id="overview"></div>
+          <svg id="svg" aria-label="Graph result"></svg>
+          <div class="tableview" id="tableview" hidden></div>
+          <pre class="jsonview" id="jsonview" hidden></pre>
+          <aside class="props" id="props"></aside>
+        </div>
+        <div class="frame-foot" id="foot"></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="model" class="wrap">
+  <h2>What the bot model learned</h2>
+  <p class="sub" id="modelsub"></p>
+  <div class="two">
+    <div class="card">
+      <h3>Indicator weights</h3>
+      <p class="note">Share of the evidence the model uses, learned from human-labelled accounts. Nobody typed these numbers.</p>
+      <div id="weights" class="bars"></div>
+    </div>
+    <div class="card">
+      <h3>Benchmark results</h3>
+      <table class="kv" id="bench"></table>
+      <h3 class="mt">Learned link weights</h3>
+      <p class="note">How much a link to another account counts, per link type (graph neural network gates).</p>
+      <div id="gates" class="bars"></div>
+      <p class="warn" id="transfer"></p>
+    </div>
+  </div>
+</section>
+
+<section id="checks" class="wrap">
+  <h2>Security and sanity checks</h2>
+  <p class="sub" id="checksub"></p>
+  <div class="checks" id="checklist"></div>
+</section>
+
+<footer class="wrap foot">
+  <p>Scores are indicators of coordination for a human analyst. They are never attribution: the platform measures behaviour, not identity or sponsor. Account IDs are keyed hashes; comment text, names and channel IDs are not published on this site.</p>
+</footer>
+
+<script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,328 @@
+{
+ "built": "2026-11-21 19:45 UTC",
+ "kpis": [
+  {
+   "value": 10275,
+   "label": "real comments · 23 Sep 2026 – 21 Nov 2026"
+  },
+  {
+   "value": 69,
+   "label": "Kosovo–Serbia videos"
+  },
+  {
+   "value": 7188,
+   "label": "accounts, pseudonymised"
+  },
+  {
+   "value": 2324,
+   "label": "accounts linked to others"
+  },
+  {
+   "value": 616,
+   "label": "medium/high-risk accounts"
+  },
+  {
+   "value": 45,
+   "label": "videos raised for review"
+  }
+ ],
+ "pipeline": [
+  {
+   "stage": "collect",
+   "title": "YouTube Data API",
+   "value": 69,
+   "unit": "videos with comments",
+   "detail": "16 Albanian, Serbian and English queries · <code>search.list</code>, <code>commentThreads.list</code>, <code>channels.list</code> · 3445 quota units"
+  },
+  {
+   "stage": "protect",
+   "title": "Pseudonymise",
+   "value": 7188,
+   "unit": "accounts as keyed hashes",
+   "detail": "HMAC-SHA256 with a server secret. Channel IDs and names are dropped before storage."
+  },
+  {
+   "stage": "store",
+   "title": "SQLite store",
+   "value": 10275,
+   "unit": "comments, deduplicated",
+   "detail": "Scoped comment IDs; re-fetching a video adds nothing twice."
+  },
+  {
+   "stage": "score",
+   "title": "Coordination engine",
+   "value": 69,
+   "unit": "threads analysed",
+   "detail": "Timing bursts, language (Geg/standard doublets, calques), shared talking points, network signals."
+  },
+  {
+   "stage": "link",
+   "title": "Account graph",
+   "value": 6173,
+   "unit": "links between accounts",
+   "detail": "COPY 4218 · CO_THREAD 1945 · SYNC 10"
+  },
+  {
+   "stage": "learn",
+   "title": "Bot model",
+   "value": "F1 0.996",
+   "unit": "on 10,197 labelled accounts",
+   "detail": "LightGBM + relational GNN, calibrated. Learned weights, no hand-set rules."
+  },
+  {
+   "stage": "decide",
+   "title": "Analyst",
+   "value": 616,
+   "unit": "accounts to review",
+   "detail": "30 videos at Level 2, 15 at Level 3, 22 quiet. A human decides."
+  }
+ ],
+ "model": {
+  "dataset": "Cresci-2017, Twitter",
+  "n_accounts": 10197,
+  "n_features": 33,
+  "weights": [
+   {
+    "name": "Account age (days, log)",
+    "pct": 22.2
+   },
+   {
+    "name": "Near-duplicate posts shared with other accounts",
+    "pct": 21.3
+   },
+   {
+    "name": "Lifetime post count (log)",
+    "pct": 9.4
+   },
+   {
+    "name": "Followers vs. following balance",
+    "pct": 9.3
+   },
+   {
+    "name": "Share of posts with @mentions",
+    "pct": 7.2
+   },
+   {
+    "name": "Share of posts that are replies",
+    "pct": 6.0
+   },
+   {
+    "name": "Accounts followed (log)",
+    "pct": 3.7
+   },
+   {
+    "name": "Digits",
+    "pct": 2.3
+   },
+   {
+    "name": "Share of posts with hashtags",
+    "pct": 2.0
+   },
+   {
+    "name": "Typical post length (log)",
+    "pct": 2.0
+   },
+   {
+    "name": "Spread of activity over the day",
+    "pct": 1.9
+   },
+   {
+    "name": "Exclamation marks",
+    "pct": 1.8
+   },
+   {
+    "name": "Followers / subscribers (log)",
+    "pct": 1.4
+   },
+   {
+    "name": "Typical gap between posts (log s)",
+    "pct": 1.4
+   }
+  ],
+  "bench": [
+   [
+    "Held-out F1 (seen bot types)",
+    "0.996"
+   ],
+   [
+    "95% interval",
+    "0.993 – 0.998"
+   ],
+   [
+    "Precision / recall",
+    "0.995 / 0.996"
+   ],
+   [
+    "PR-AUC",
+    "0.999"
+   ],
+   [
+    "Calibration error (ECE)",
+    "0.006"
+   ],
+   [
+    "F1 on bot types never seen in training",
+    "0.972 – 0.997 (5 tests)"
+   ],
+   [
+    "Weakest unseen type",
+    "fake followers · 0.972"
+   ]
+  ],
+  "gates": [
+   {
+    "relation": "COPY",
+    "weight": 0.8395826816558838,
+    "trained": true
+   },
+   {
+    "relation": "SYNC",
+    "weight": 0.82874995470047,
+    "trained": true
+   },
+   {
+    "relation": "LINK",
+    "weight": 0.6931471824645996,
+    "trained": false
+   },
+   {
+    "relation": "REPLY",
+    "weight": 0.6978939771652222,
+    "trained": true
+   },
+   {
+    "relation": "CO_THREAD",
+    "weight": 0.6931471824645996,
+    "trained": false
+   }
+  ],
+  "transfer": "Transfer check: applied to these 7,188 YouTube accounts, the Twitter-trained model flags 100% of them as bots. Most YouTube commenters post once and have no follower data, which the Twitter model never saw. So this page does not label anyone a bot: accounts are ranked by the coordination engine, and a Kosovo-labelled sample is the next step."
+ },
+ "counts": {
+  "comments": 10275,
+  "videos": 69,
+  "accounts": 7188,
+  "nodes": 2464,
+  "rels": 8973
+ },
+ "checks": {
+  "generated": "2026-11-21 19:45 UTC",
+  "groups": [
+   {
+    "name": "Security",
+    "items": [
+     {
+      "name": "Every stored account ID is a keyed hash",
+      "status": "PASS",
+      "detail": "7,188 IDs match yt_ + 12 hex"
+     },
+     {
+      "name": "Every published account ID is a keyed hash",
+      "status": "PASS",
+      "detail": "2,380 account nodes checked"
+     },
+     {
+      "name": "No YouTube channel IDs published",
+      "status": "PASS",
+      "detail": "searched all site files for UC… channel IDs"
+     },
+     {
+      "name": "No Google API keys published",
+      "status": "PASS",
+      "detail": "searched all site files for AIza… keys"
+     },
+     {
+      "name": "No server secrets published",
+      "status": "PASS",
+      "detail": "2 secret values from .env compared against all site files"
+     },
+     {
+      "name": "No comment text published",
+      "status": "PASS",
+      "detail": "6,380 comments of 30+ characters checked; 0 found in site files"
+     },
+     {
+      "name": "No author names stored",
+      "status": "PASS",
+      "detail": "comments table has no name column; display names are dropped on ingest"
+     },
+     {
+      "name": "No channel IDs in stored account metadata",
+      "status": "PASS",
+      "detail": "account metadata holds only creation date and follower count"
+     },
+     {
+      "name": "Security headers configured",
+      "status": "PASS",
+      "detail": "content-security-policy, referrer-policy, x-content-type-options, x-frame-options"
+     },
+     {
+      "name": "Third-party scripts pinned to exact versions",
+      "status": "PASS",
+      "detail": "https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"
+     }
+    ]
+   },
+   {
+    "name": "Sanity",
+    "items": [
+     {
+      "name": "Comments collected",
+      "status": "PASS",
+      "detail": "10,275 comments"
+     },
+     {
+      "name": "No simulated data",
+      "status": "PASS",
+      "detail": "0 simulated rows"
+     },
+     {
+      "name": "No duplicate comments",
+      "status": "PASS",
+      "detail": "0 duplicates"
+     },
+     {
+      "name": "Timestamps valid",
+      "status": "PASS",
+      "detail": "0 missing, future or pre-2005 timestamps"
+     },
+     {
+      "name": "Every comment belongs to a stored video",
+      "status": "PASS",
+      "detail": "0 orphans"
+     },
+     {
+      "name": "Every video analysed",
+      "status": "PASS",
+      "detail": "69 of 69 videos have a current analysis"
+     },
+     {
+      "name": "Risk scores within 0–100",
+      "status": "PASS",
+      "detail": "2,380 scores, max 58"
+     },
+     {
+      "name": "Graph is consistent",
+      "status": "PASS",
+      "detail": "8,973 relationships; 0 dangling, 0 self-loops"
+     },
+     {
+      "name": "Page counts match the database",
+      "status": "PASS",
+      "detail": "page 10,275 comments / 69 videos; DB 10,275 / 69"
+     },
+     {
+      "name": "Model trained on real labelled data",
+      "status": "PASS",
+      "detail": "trained_on=cresci2017, 10,197 accounts"
+     },
+     {
+      "name": "Model metrics present and plausible",
+      "status": "PASS",
+      "detail": "F1 0.9956 (a perfect 1.000 would signal a broken evaluation)"
+     }
+    ]
+   }
+  ]
+ }
+}
