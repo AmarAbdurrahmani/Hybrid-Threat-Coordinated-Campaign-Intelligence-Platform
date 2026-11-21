@@ -46,14 +46,12 @@ MOTIVES = {
                                          r"slovens\w*|majka\s+rusija)\b", "#1e3a8a"),
     "Anti-NATO / anti-West": (r"\bnato\b.*(?:agres|bomb|aggress|zlo[čc]in|crime|occup|okup)|agresij|double\s+standard|dvostruk|"
                               r"(?:usa|america|amerika|zapad|west)\w*\s+(?:is|je|su)?\s*(?:evil|zlo|imperij|kriv|guilty)", "#7c2d12"),
-    "Ethnic hostility / slurs": (r"[šs]iptar|teroris|terroris|okupator|occupier|albanian\s+(?:mafia|terror)|serb\s+(?:dogs|chetnik)|[čc]etni|shkije|shkija", "#111827"),
+    "Anti-Albanian hostility / slurs": (r"[šs]iptar|teroris|terroris|okupator|occupier|albanian\s+(?:mafia|terror)", "#111827"),
     "Orthodox “holy land” claim": (r"svet[ae]?\s+zemlj|holy\s+land|kolevk|cradle\s+of\s+serb|manastir|monaster|\bzavet|pe[ćc]k\w*\s+patrijar", "#6b21a8"),
     "Kosovo statehood denied": (r"(?:not|isn'?t)\s+a\s+(?:real\s+)?country|fake\s+(?:country|state)|la[žz]na\s+dr[žz]ava|nije\s+dr[žz]ava|"
                                 r"nije\s+zemlja|not\s+recogni[sz]", "#b45309"),
     "Islamist / Sharia advocacy": (r"\b(?:sharia\w*|sheriat\w*|[šs]erijat\w*|khilaf\w*|hilafet\w*|caliphat\w*|kalifat\w*|halifat\w*|"
                                    r"jihad\w*|d[žz]ihad\w*|xhihad\w*|ummah)\b", "#065f46"),
-    "Pro-Kosovo independence": (r"kosov[oa]\s+(?:is|është|eshte)\s+(?:a\s+)?(?:country|independent|shtet|e\s+pavarur)|independent\s+kosov|"
-                                r"kosova\s+e\s+lir|republi\w+\s+e\s+kosov|i'?m\s+from\s+kosov|unë\s+jam\s+nga\s+kosov", "#0f766e"),
 }
 
 
