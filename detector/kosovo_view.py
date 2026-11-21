@@ -118,7 +118,7 @@ def bench_stats() -> dict:
     return out
 
 
-def build(db: Path, out: Path, max_nodes: int = 520) -> Path:
+def build(db: Path, out: Path, max_nodes: int = 2400) -> Path:
     con = sqlite3.connect(f"file:{db}?mode=ro", uri=True)
     p = pd.read_sql("select c.user, c.text, c.ts, c.thread_id, c.account, t.title from comments c "
                     "left join threads t on t.id = c.thread_id where coalesce(c.simulated, 0) = 0", con)
@@ -163,7 +163,7 @@ def build(db: Path, out: Path, max_nodes: int = 520) -> Path:
     pushes = pushes[:10]
     # graph: accounts per push (copy-paste accounts first), edges = posted the identical text
     nodes, idx = [], {}
-    budget = max(18, max_nodes // max(1, len(pushes)))
+    budget = max_nodes  # all accounts of every push
     for k, pu in enumerate(pushes):
         acc = members[pu["name"]].copy()
         acc["score"] = 100 * (0.55 * acc.copied + 0.30 * acc.burst + 0.15 * (acc.age < 180))
@@ -318,6 +318,8 @@ aside{background:#ffffff;border-left:1px solid #e3e8f1;overflow:auto;padding:18p
 .card:hover,.card.on{border-color:#111827;box-shadow:0 4px 14px #0b0f1914}
 .rank{font:800 20px Inter;color:#d2ab67;margin-right:10px;vertical-align:-2px}.nm{font-weight:700;font-size:14px}
 .facts{display:flex;flex-wrap:wrap;gap:6px 14px;margin:8px 0 6px;font-size:12px;color:#374151}.facts b{font-variant-numeric:tabular-nums}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin:12px 0 4px}.stats div{background:#f6f8fc;border:1px solid #e3e8f1;border-radius:9px;padding:7px 9px}
+.stats b{display:block;font:800 24px/1.05 Inter;letter-spacing:-.02em;font-variant-numeric:tabular-nums}.stats span{font-size:10.5px;color:#6b7280;text-transform:uppercase;letter-spacing:.04em}
 .q{font-size:12.5px;background:#f9fafb;border-left:3px solid #dc2626;padding:5px 9px;margin:5px 0;border-radius:0 6px 6px 0}
 .q span{color:var(--mut);font-size:11px;margin-left:6px}.tg{font-size:11.5px;color:var(--mut);margin-top:4px}
 .legend{position:absolute;right:14px;bottom:12px;display:flex;align-items:center;gap:7px;background:#ffffffaa;border-radius:999px;padding:4px 10px;font:500 10.5px Inter;color:#6b7280;opacity:.8}
@@ -378,16 +380,41 @@ const nodes = D.nodes.map((d) => ({ ...d })), links = D.links.map((l) => ({ sour
 const link = gL.selectAll("line").data(links).join("line").attr("stroke", "#dc2626").attr("stroke-opacity", 0.18).attr("stroke-width", 1);
 const node = gN.selectAll("circle").data(nodes).join("circle").attr("r", (d) => 4.5 + d.s / 14).attr("fill", (d) => shade(d.s)).attr("stroke", "#fff").attr("stroke-width", 1.2)
   .style("cursor", "pointer").on("click", (e, d) => { e.stopPropagation(); showAccount(d); });
+const nlab = gN.selectAll("text.nl").data(nodes.filter((d) => d.s >= 60)).join("text").attr("class", "nl").attr("text-anchor", "middle")
+  .attr("font-size", 9).attr("font-weight", 800).attr("font-family", "Inter").attr("fill", "#7f1d1d").attr("paint-order", "stroke").attr("stroke", "#f3f6fb").attr("stroke-width", 3)
+  .style("pointer-events", "none").text((d) => Math.round(d.s) + "%");
 d3.forceSimulation(nodes).force("link", d3.forceLink(links).distance(14).strength((l) => l.source.k === l.target.k ? 0.15 : 0))
   .force("charge", d3.forceManyBody().strength(-10)).force("x", d3.forceX((d) => cx(d.k)).strength(0.2)).force("y", d3.forceY((d) => cy(d.k)).strength(0.2))
   .force("collide", d3.forceCollide((d) => 5.5 + d.s / 14)).on("tick", tick).on("end", fit);
+
+const ICO = {
+  cross: '<svg viewBox="0 0 24 24" width="100%" height="100%"><rect x="10.5" y="3" width="3" height="18" rx="1" fill="#04408b"/><rect x="6" y="7" width="12" height="2.6" rx="1" fill="#04408b"/><rect x="7.5" y="13.5" width="9" height="2.2" rx="1" transform="rotate(-14 12 14.6)" fill="#04408b"/></svg>',
+  warn: '<svg viewBox="0 0 24 24" width="100%" height="100%"><path d="M12 3 22 20H2Z" fill="#dc2626"/><rect x="11" y="9" width="2" height="6" fill="#fff"/><rect x="11" y="16.5" width="2" height="2" fill="#fff"/></svg>',
+  target: '<svg viewBox="0 0 24 24" width="100%" height="100%"><circle cx="12" cy="12" r="9" fill="none" stroke="#7c2d12" stroke-width="2.4"/><circle cx="12" cy="12" r="4.5" fill="none" stroke="#7c2d12" stroke-width="2.4"/><circle cx="12" cy="12" r="1.6" fill="#7c2d12"/></svg>',
+  nostate: '<svg viewBox="0 0 24 24" width="100%" height="100%"><rect x="4" y="5" width="16" height="13" rx="2" fill="#04408b"/><path d="M9 9h6v5H9z" fill="#d2ab67"/><path d="M3 21 21 3" stroke="#dc2626" stroke-width="2.6" stroke-linecap="round"/></svg>',
+  scale: '<svg viewBox="0 0 24 24" width="100%" height="100%"><rect x="11" y="4" width="2" height="15" fill="#374151"/><rect x="7" y="19" width="10" height="2" rx="1" fill="#374151"/><path d="M4 7h16" stroke="#374151" stroke-width="2"/><path d="M4 7 1.5 13h5Z M20 7l-2.5 6h5Z" fill="#9ca3af"/></svg>'};
+const FLAG = (cc) => `<img src="https://flagcdn.com/h40/${cc}.png" style="width:100%;height:100%;object-fit:cover;display:block">`;
+function pushIcon(name) {
+  const n = name.toLowerCase();
+  if (n.includes("russia") || n.includes("putin")) return FLAG("ru");
+  if (n.includes("orthodox") || n.includes("holy")) return ICO.cross;
+  if (n.includes("albanians as enemies") || n.includes("hostility")) return ICO.warn;
+  if (n.includes("nato")) return ICO.target;
+  if (n.includes("not a country") || n.includes("fake state") || n.includes("statehood")) return ICO.nostate;
+  if (n.includes("double standard") || n.includes("crimea")) return ICO.scale;
+  return FLAG("rs");
+}
+const badge = (name, size = 30) => `<span style="width:${size}px;height:${size}px;border-radius:50%;overflow:hidden;display:inline-grid;place-items:center;background:#fff;box-shadow:0 0 0 2px #fff,0 0 0 3px #d2ab67;flex:none">${pushIcon(name)}</span>`;
 function tick() {
   link.attr("x1", (l) => l.source.x).attr("y1", (l) => l.source.y).attr("x2", (l) => l.target.x).attr("y2", (l) => l.target.y);
   node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
+  nlab.attr("x", (d) => d.x).attr("y", (d) => d.y - (4.5 + d.s / 14) - 3);
   const g = d3.group(nodes, (d) => d.k);
   gH.selectAll("path").data(D.pushes).join("path").attr("fill", "#dc262606").attr("stroke", "#dc262633").attr("stroke-width", 1.2)
     .attr("d", (p, k) => { const ps = (g.get(k) || []).flatMap((d) => [[d.x - 12, d.y - 12], [d.x + 12, d.y - 12], [d.x - 12, d.y + 12], [d.x + 12, d.y + 12]]); const h = ps.length > 2 && d3.polygonHull(ps); return h ? "M" + h.join("L") + "Z" : null; });
-  gT.selectAll("g").data(D.pushes).join((en) => { const t = en.append("g"); t.append("text").attr("class", "hlabel"); t.append("text").attr("class", "hsub").attr("dy", 15); return t; })
+  gT.selectAll("g").data(D.pushes).join((en) => { const t = en.append("g");
+      t.append("foreignObject").attr("x", -17).attr("y", -52).attr("width", 34).attr("height", 34).html((p) => `<div xmlns="http://www.w3.org/1999/xhtml" style="width:34px;height:34px;display:grid;place-items:center">${badge(p.name, 30)}</div>`);
+      t.append("text").attr("class", "hlabel"); t.append("text").attr("class", "hsub").attr("dy", 15); return t; })
     .attr("transform", (p, k) => { const ps = g.get(k) || []; return ps.length ? `translate(${d3.mean(ps, (d) => d.x)},${d3.min(ps, (d) => d.y) - 24})` : "translate(-999,-999)"; })
     .call((t) => { t.select(".hlabel").attr("text-anchor", "middle").text((p, k) => `#${k + 1} ${p.name}`);
       t.select(".hsub").attr("text-anchor", "middle").text((p) => `${p.accounts} accounts · ${p.copy_accounts} copy-paste`); });
@@ -396,8 +423,9 @@ function fit() { const b = root.node().getBBox(); const k = Math.min(W() / (b.wi
   svg.transition().duration(700).call(zoom.transform, d3.zoomIdentity.translate(W() / 2 - k * (b.x + b.width / 2), H() / 2 - k * (b.y + b.height / 2)).scale(k)); }
 const pct = (x) => Math.round(100 * x) + "%";
 document.getElementById("side").innerHTML = `<div class="note"><b style="color:#111827">How to read this.</b> Each card is a narrative pushed in comments under Kosovo/Serbia videos, ranked by how many accounts push it. <b>Copy-paste</b> = accounts that posted the identical text as other accounts. <b>Bursts</b> = same text from different accounts within 10 minutes. These are coordination signals for an analyst; the page does not attribute them to any state, and it does not show a bot % because the bot model is validated on the benchmark, not yet on YouTube.</div>` +
-  D.pushes.map((p, k) => `<div class="card" data-k="${k}"><div><span class="rank">${k + 1}</span><span class="nm">${p.name}</span></div>
-  <div class="facts"><span><b>${p.accounts}</b> accounts</span><span><b>${p.comments}</b> comments</span><span><b>${p.copy_accounts}</b> copy-paste</span><span><b>${p.burst_accounts}</b> in bursts</span><span><b>${pct(p.new_share)}</b> brand-new channels</span><span><b>${p.videos}</b> videos</span></div>
+  D.pushes.map((p, k) => `<div class="card" data-k="${k}"><div style="display:flex;align-items:center;gap:10px">${badge(p.name, 34)}<span class="rank">${k + 1}</span><span class="nm" style="font-size:15px">${p.name}</span></div>
+  <div class="stats">${[[p.accounts, "accounts", 0], [p.comments, "comments", 0], [p.copy_accounts, "copy-paste", 1], [p.burst_accounts, "in bursts", 1], [pct(p.new_share), "brand-new channels", 0], [p.videos, "videos", 0]]
+    .map(([v, l, hot]) => `<div><b style="color:${hot && +String(v).replace(/\D/g, "") > 0 ? "#b91c1c" : "#04408b"}">${typeof v === "number" ? v.toLocaleString() : v}</b><span>${l}</span></div>`).join("")}</div>
   ${p.examples.map(([t, c]) => `<div class="q">${t.replace(/</g, "&lt;")}<span>${c} account${c > 1 ? "s" : ""}</span></div>`).join("")}
   <div class="tg">Aimed at: ${p.targets.map(([t, c]) => `${t.replace(/</g, "&lt;")} (${c})`).join(" · ")}</div>
   <div class="tg">Languages: ${Object.entries(p.langs).map(([l, c]) => `${l} ${c}`).join(" · ")}</div><div class="more">Click for examples and targeted videos</div></div>`).join("");
