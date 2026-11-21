@@ -1799,20 +1799,27 @@ if (typeof module !== "undefined") module.exports = Engine;
   // Same-origin when this page is served by the backend itself (Render URL or local uvicorn).
   // Override: ?api=https://other-host  ·  ?api=same (same-origin)  ·  ?api= (clear override).
   const RENDER_API = 'https://hybrid-threat-coordinated-campaign.onrender.com';
-  const API_BASE = (() => {
+  const IS_LOOPBACK = /^(localhost|127\.0\.0\.1|\[::1\])$/.test(location.hostname);
+  let apiPinned = false;
+  let API_BASE = (() => {
     let o = null;
     try {
       const q = new URLSearchParams(location.search).get('api');
       if (q === '') localStorage.removeItem('htccip_api'); else if (q) localStorage.setItem('htccip_api', q);
       o = localStorage.getItem('htccip_api');
     } catch (e) {}
-    if (o) return o === 'same' ? '' : o.replace(/\/+$/, '');
-    if (location.origin === RENDER_API || /^(localhost|127\.0\.0\.1)$/.test(location.hostname)) return '';
+    if (o) { apiPinned = true; return o === 'same' ? '' : o.replace(/\/+$/, ''); }
+    if (location.origin === RENDER_API || IS_LOOPBACK) return '';
     return RENDER_API;
   })();
-  const API_HOST = API_BASE ? API_BASE.replace(/^https?:\/\//, '') : location.host;
-  const API_ORIGIN = new URL(API_BASE || location.origin, location.href).origin;
-  const KEY_NAME = 'htccip_key:' + API_ORIGIN;
+  let API_HOST, API_ORIGIN, KEY_NAME;
+  function setApiBase(base) {
+    API_BASE = base;
+    API_HOST = API_BASE ? API_BASE.replace(/^https?:\/\//, '') : location.host;
+    API_ORIGIN = new URL(API_BASE || location.origin, location.href).origin;
+    KEY_NAME = 'htccip_key:' + API_ORIGIN;
+  }
+  setApiBase(API_BASE);
   let ws = null, reconnectTimer = null, liveTimer = null, apiKey = '', connection = 0, threadRequest = 0;
   let threadList = [], selectedUpdates = new Set();
   // Analyst key resolution (first hit wins), so nobody retypes it on every load:
@@ -1980,10 +1987,28 @@ if (typeof module !== "undefined") module.exports = Engine;
     }
     return null;
   }
+  // Page on localhost but not served by the backend (Live Server :5500, Vite, http.server, …): its own
+  // origin has no /api, so try the local uvicorn on :8000, then the Render deployment. ?api= pins a base.
+  async function discoverApi() {
+    if (apiPinned || API_BASE || !IS_LOOPBACK) return probeHealth(4);
+    const own = await probeHealth(1, 8000);
+    if (own) return own;
+    for (const alt of [location.port !== '8000' ? 'http://localhost:8000' : null, RENDER_API].filter(Boolean)) {
+      setApiBase(alt);
+      const h = await probeHealth(alt === RENDER_API ? 3 : 1, alt === RENDER_API ? 65000 : 5000);
+      if (h) {
+        if (keySource === 'link') saveKey(apiKey);
+        else { apiKey = ''; keySource = ''; try { if ((apiKey = localStorage.getItem(KEY_NAME) || '')) keySource = 'saved'; } catch (e) {} }
+        return h;
+      }
+    }
+    setApiBase('');
+    return null;
+  }
   let healthProbe = null;
   async function initLive() {
     if (!/^https?:$/.test(location.protocol)) return;
-    healthProbe = probeHealth(4);
+    healthProbe = discoverApi();
     const health = await healthProbe;
     if (!health) return;
     renderLabStatus(); renderLabSummary();
@@ -3143,7 +3168,14 @@ if (typeof module !== "undefined") module.exports = Engine;
   const YT_MSG = { keyInvalid: 'The YouTube API key is invalid', badRequest: 'The YouTube API key is invalid or the request was rejected',
     accessNotConfigured: 'YouTube Data API v3 is not enabled for this key’s project', quotaExceeded: 'YouTube API quota exceeded for this key, try again tomorrow or use another key',
     dailyLimitExceeded: 'YouTube API daily limit exceeded for this key', rateLimitExceeded: 'YouTube API rate limit hit, try again shortly',
-    commentsDisabled: 'Comments are disabled on this video', videoNotFound: 'Video not found, private or removed', forbidden: 'YouTube refused access to this video’s comments' };
+    commentsDisabled: 'Comments are disabled on this video', videoNotFound: 'Video not found, private or removed', forbidden: 'YouTube refused access to this video’s comments',
+    API_KEY_INVALID: 'The YouTube API key is invalid', SERVICE_DISABLED: 'YouTube Data API v3 is not enabled for this key’s project',
+    API_KEY_HTTP_REFERRER_BLOCKED: `This YouTube key is restricted to other websites: add ${location.origin}/* to its HTTP referrers in Google Cloud Console → Credentials, or remove the restriction`,
+    API_KEY_IP_ADDRESS_BLOCKED: 'This YouTube key is IP-restricted, so a browser cannot use it: use a key with no or website (HTTP referrer) restrictions',
+    API_KEY_SERVICE_BLOCKED: 'This API key is not allowed to call YouTube Data API v3 (check its API restrictions in Google Cloud Console)',
+    API_KEY_ANDROID_APP_BLOCKED: 'This YouTube key is restricted to an Android app', API_KEY_IOS_APP_BLOCKED: 'This YouTube key is restricted to an iOS app' };
+  // Errors that make every further call with this key fail too: stop instead of retrying per video/query.
+  const YT_FATAL = /^(keyInvalid|badRequest|accessNotConfigured|quotaExceeded|dailyLimitExceeded|rateLimitExceeded|unreachable|API_KEY_|SERVICE_DISABLED)/;
   function ytVideoId(v) {
     v = String(v || '').trim(); if (/^[A-Za-z0-9_-]{11}$/.test(v)) return v;
     const m = v.match(/(?:youtube(?:-nocookie)?\.com\/(?:watch\?(?:.*&)?v=|shorts\/|live\/|embed\/|v\/)|youtu\.be\/)([A-Za-z0-9_-]{11})(?![A-Za-z0-9_-])/);
@@ -3152,9 +3184,15 @@ if (typeof module !== "undefined") module.exports = Engine;
   const ytPseud = (raw) => { let h = 0x811c9dc5; for (let i = 0; i < raw.length; i++) { h ^= raw.charCodeAt(i); h = Math.imul(h, 0x01000193) >>> 0; } return 'yt_' + h.toString(36).padStart(7, '0'); };
   const ytPlain = (t) => new DOMParser().parseFromString(String(t).replace(/<br\s*\/?>/gi, '\n'), 'text/html').body.textContent.trim(); // inert document: no scripts or image loads
   async function ytGet(ep, params, key) {
-    let r; try { r = await fetch(YT_API + ep + '?' + new URLSearchParams({ ...params, key }), { headers: { Accept: 'application/json' } }); } catch (e) { throw new Error('Could not reach the YouTube API'); }
+    let r; try { r = await fetch(YT_API + ep + '?' + new URLSearchParams({ ...params, key }), { headers: { Accept: 'application/json' } }); }
+    catch (e) { throw Object.assign(new Error('Could not reach the YouTube API (network or browser extension blocking googleapis.com)'), { reason: 'unreachable', fatal: true }); }
     const j = await r.json().catch(() => ({}));
-    if (!r.ok) { const reason = j?.error?.errors?.[0]?.reason || ''; throw new Error(YT_MSG[reason] || `YouTube API error (${reason || r.status})`); }
+    if (!r.ok) {
+      const err = j?.error || {};
+      const detail = (err.details || []).map((d) => d.reason || '').find((x) => /^(API_KEY_|SERVICE_)/.test(x)) || '';
+      const reason = detail || err.errors?.[0]?.reason || '';
+      throw Object.assign(new Error(YT_MSG[reason] || (err.message ? 'YouTube API: ' + ytPlain(err.message) : `YouTube API error (${reason || r.status})`)), { reason, fatal: YT_FATAL.test(reason) });
+    }
     return j;
   }
   async function ytBrowserFetch(vid, key, pages = 3) {
@@ -3174,14 +3212,16 @@ if (typeof module !== "undefined") module.exports = Engine;
   }
   // Decide per click whether the backend can do the YouTube work, and say exactly why not.
   // Only HTTP + the analyst key are needed (not the WebSocket), so a slow WS never forces fallback.
-  async function ytBackend() {
+  async function ytBackend(key) {
     if (!/^https?:$/.test(location.protocol)) return { ok: false, code: 'offline', why: 'the page was opened from a file, so there is no backend' };
     let h = state.health;
     if (!h) {
-      ytStatus(`Contacting backend ${API_HOST}… (a sleeping Render instance can take up to a minute to wake)`);
-      h = (healthProbe && await healthProbe) || await probeHealth(2);
+      // With a browser key in hand, wait at most 20 s for a sleeping Render instance, then run in the browser.
+      ytStatus(`Contacting backend ${API_HOST}… ${key ? '(up to 20 s, then this runs in your browser)' : '(a sleeping Render instance can take up to a minute to wake)'}`);
+      const probe = (async () => (healthProbe && await healthProbe) || await probeHealth(2))();
+      h = await Promise.race([probe, new Promise((res) => setTimeout(() => res(null), key ? 20000 : 150000))]);
     }
-    if (!h) return { ok: false, code: 'offline', why: `backend ${API_HOST} is unreachable` };
+    if (!h) return { ok: false, code: 'offline', why: `backend ${API_HOST} is unreachable${IS_LOOPBACK && !apiPinned ? ' (start it with “uvicorn main:app --port 8000” in backend/, or open http://localhost:8000)' : ''}` };
     if (h.auth_required && !h.analyst_key_configured) return { ok: false, code: 'noServerKey', why: `backend ${API_HOST} is online but has no API_KEY configured (set API_KEY in backend/.env or on Render)` };
     if (h.auth_required && !apiKey) return { ok: false, code: 'noAnalystKey', why: `backend ${API_HOST} is online but no analyst API key is entered in the LIVE bar` };
     return { ok: true, h };
@@ -3194,19 +3234,21 @@ if (typeof module !== "undefined") module.exports = Engine;
     if (!r.ok) {
       const msg = r.status === 401 ? 'the analyst API key in the LIVE bar was rejected'
         : typeof j.detail === 'string' ? j.detail : r.status === 404 ? `${API_HOST} runs an older version without this endpoint` : 'HTTP ' + r.status;
-      throw Object.assign(new Error(msg), { fallback: [401, 404, 502, 503, 504].includes(r.status) });
+      throw Object.assign(new Error(msg), { backend: true, status: r.status, fallback: [401, 404, 502, 503, 504].includes(r.status) });
     }
     return j;
   }
   // Runs `viaBackend()` when possible, otherwise `viaBrowser(note)` with the analyst's own key.
   async function ytRun(key, viaBackend, viaBrowser) {
-    const be = await ytBackend();
+    const be = await ytBackend(key);
     if (be.ok) {
       if (!be.h.youtube && !key) throw new Error('Missing YouTube API key: the backend has no YOUTUBE_API_KEY. Enter a YouTube Data API v3 key in the form, or set YOUTUBE_API_KEY in backend/.env or on Render.');
       try { return await viaBackend(key ? 'your YouTube key' : 'server YOUTUBE_API_KEY'); }
       catch (err) {
-        if (!err.fallback) throw err;
+        // Any backend failure (auth, 4xx/5xx, network) with a browser key in hand -> do the same work in the browser.
+        if (!err.backend && !err.fallback) throw err;
         if (!key) throw new Error(`Backend error: ${err.message}. Enter a YouTube API key in the form to run this in the browser instead.`);
+        ytStatus(`Backend error (${err.message}); retrying in this browser with your YouTube key…`);
         return viaBrowser(`Backend error (${err.message}), so this used your browser key.`);
       }
     }
@@ -3231,6 +3273,7 @@ if (typeof module !== "undefined") module.exports = Engine;
         const { meta, comments } = await ytBrowserFetch(vid, key);
         if (!comments.length) throw new Error('This video has no public comments yet.');
         state.external = { ...meta, vid }; state.sel = null; state.filter = 'all'; state.q = ''; $('#search').value = '';
+        $('#liveThreads').dataset.demo = 'true'; // browser data stays on screen across live reconnects
         load(comments, meta.published, false);
         ytStatus(`${note} ${comments.length} real comments from “${meta.title}” analysed in this browser (channel ages unavailable, so the network signal is skipped).`, 'ok');
         toast(`YouTube: ${comments.length} comments analysed in the browser`);
@@ -3267,7 +3310,7 @@ if (typeof module !== "undefined") module.exports = Engine;
     const id = b.dataset.ytOpen;
     try {
       if ($('#ytScan').dataset.mode === 'backend') { delete $('#liveThreads').dataset.demo; await refreshThreadList(id); await loadLiveThread(id); }
-      else { const v = ytScanVideos.get(id); if (!v) return; state.external = { ...v.meta, vid: id }; state.sel = null; state.filter = 'all'; load(v.comments, v.meta.published, false); }
+      else { const v = ytScanVideos.get(id); if (!v) return; $('#liveThreads').dataset.demo = 'true'; state.external = { ...v.meta, vid: id }; state.sel = null; state.filter = 'all'; load(v.comments, v.meta.published, false); }
       go('#sec-overview');
     } catch (err) { toast('YouTube: ' + err.message); }
   });
@@ -3275,13 +3318,16 @@ if (typeof module !== "undefined") module.exports = Engine;
     const ck = 'htccip_ytscan:' + JSON.stringify([queries, order, Math.floor(Date.now() / 900000)]);
     try { const hit = sessionStorage.getItem(ck); if (hit) return { ...JSON.parse(hit), cached: true }; } catch (e) {}
     const after = new Date(Date.now() - 168 * 3600000); after.setUTCMinutes(0, 0, 0);
-    const found = new Map(); let units = 0;
+    const found = new Map(), warnings = []; let units = 0;
     for (const q of queries) {
-      const d = await ytGet('search', { part: 'snippet', type: 'video', q, order, maxResults: 10, publishedAfter: after.toISOString().replace(/\.\d+Z$/, 'Z') }, key); units += 100;
+      let d;
+      try { d = await ytGet('search', { part: 'snippet', type: 'video', q, order, maxResults: 10, publishedAfter: after.toISOString().replace(/\.\d+Z$/, 'Z') }, key); }
+      catch (err) { units += 100; if (err.fatal && !found.size) throw err; warnings.push(`“${q}”: ${err.message}`); if (err.fatal) break; continue; }
+      units += 100;
       (d.items || []).forEach((it) => { const vid = it.id && it.id.videoId, sn = it.snippet || {};
         if (vid && sn.liveBroadcastContent !== 'upcoming' && !found.has(vid)) found.set(vid, { video_id: vid, title: ytPlain(sn.title || ''), channel: ytPlain(sn.channelTitle || ''), published: sn.publishedAt, url: 'https://www.youtube.com/watch?v=' + vid }); });
     }
-    if (!found.size) return { videos: [], comments: [], units, found: 0 };
+    if (!found.size) return { videos: [], comments: [], units, found: 0, warnings };
     const st = await ytGet('videos', { part: 'statistics', id: [...found.keys()].join(',') }, key); units += 1;
     const cc = new Map((st.items || []).map((it) => [it.id, it.statistics && it.statistics.commentCount != null ? Number(it.statistics.commentCount) : null]));
     found.forEach((v) => { const n = cc.get(v.video_id); v.comment_count = n; if (!cc.has(v.video_id)) { v.status = 'videoNotFound'; v.message = YT_MSG.videoNotFound; } else if (n == null) { v.status = 'commentsDisabled'; v.message = YT_MSG.commentsDisabled; } else if (!n) v.status = 'no_comments'; });
@@ -3294,9 +3340,9 @@ if (typeof module !== "undefined") module.exports = Engine;
           return { id: 'yt:' + c.id, user: ytPseud(raw), ts: sn.publishedAt, text: sn.textOriginal || ytPlain(sn.textDisplay || ''), likes: sn.likeCount ?? null,
             url: `https://www.youtube.com/watch?v=${v.video_id}&lc=${c.id}`, platform: 'youtube', source: 'youtube', thread: v.title }; });
         v.status = v.items.length ? 'ok' : 'no_comments'; all.push(...v.items);
-      } catch (err) { units += 1; v.status = 'error'; v.message = err.message; v.items = []; if (/quota|invalid|not enabled|rate limit/i.test(err.message)) { if (!all.length) throw err; break; } }
+      } catch (err) { units += 1; v.status = err.reason || 'error'; v.message = err.message; v.items = []; if (err.fatal) { if (!all.length) throw err; warnings.push(err.message); break; } }
     }
-    const out = { videos: [...picked, ...[...found.values()].filter((v) => !picked.includes(v))], comments: all, units, found: found.size };
+    const out = { videos: [...picked, ...[...found.values()].filter((v) => !picked.includes(v))], comments: all, units, found: found.size, warnings };
     try { sessionStorage.setItem(ck, JSON.stringify(out)); } catch (e) {}
     return out;
   }
@@ -3320,14 +3366,15 @@ if (typeof module !== "undefined") module.exports = Engine;
         const res = await ytBrowserAutoScan(shown, order, key);
         ytScanVideos.clear();
         res.videos.forEach((v) => { if (v.items && v.items.length) ytScanVideos.set(v.video_id, { meta: { title: v.title, channel: v.channel, published: v.published }, comments: v.items }); });
-        if (!res.comments.length) { renderYtScan(res.videos, false); throw new Error(`Found ${res.found} videos but none had public comments yet; try “Most relevant” or other topics.`); }
+        if (!res.comments.length) { renderYtScan(res.videos, false); throw new Error(res.found ? `Found ${res.found} videos but none had public comments yet; try “Most relevant” or other topics.` : `No videos found in the last 7 days${res.warnings && res.warnings.length ? ' (' + res.warnings.join('; ') + ')' : ''}; try “Most relevant” or other topics.`); }
         const top = res.videos.find((v) => v.items && v.items.length);
         state.external = { title: `Auto-scan · ${ytScanVideos.size} videos`, channel: 'multiple channels', published: top.published, vid: top.video_id };
         state.sel = null; state.filter = 'all'; state.q = ''; $('#search').value = '';
+        $('#liveThreads').dataset.demo = 'true';
         load(res.comments, new Date(Math.min(...res.videos.filter((v) => v.items && v.items.length).map((v) => Date.parse(v.published)))).toISOString(), false);
         const users = new Set(state.res.items.filter((i) => i.tier !== 'organic').map((i) => i.c.user));
         renderYtScan(res.videos, false);
-        ytStatus(`${note} Auto-scan: ${ytScanVideos.size} videos · ${res.comments.length} comments analysed together · ${users.size} flagged accounts · ${state.res.clusters.length} clusters · quota ${res.cached ? '0 units (cached)' : res.units + ' units'}. Click a video to analyse it alone. Channel ages unavailable in the browser.`, 'ok');
+        ytStatus(`${note} Auto-scan: ${ytScanVideos.size} videos · ${res.comments.length} comments analysed together · ${users.size} flagged accounts · ${state.res.clusters.length} clusters · quota ${res.cached ? '0 units (cached)' : res.units + ' units'}${res.warnings && res.warnings.length ? ' · ⚠ ' + res.warnings.join('; ') : ''}. Click a video to analyse it alone. Channel ages unavailable in the browser.`, 'ok');
         toast(`Auto-scan: ${res.comments.length} comments from ${ytScanVideos.size} videos (browser)`);
       });
       go('#sec-overview');

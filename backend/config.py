@@ -11,6 +11,7 @@ try:
     # backend/.env wins regardless of the working directory uvicorn was started from;
     # real environment variables (Render) still take precedence over both.
     load_dotenv(Path(__file__).resolve().with_name(".env"))
+    load_dotenv(Path(__file__).resolve().parent.parent / ".env")  # repo-root .env, if you keep one there
     load_dotenv()
 except Exception:  # pragma: no cover
     pass
@@ -28,7 +29,7 @@ def _list(name: str) -> list[str]:
 @dataclass
 class Settings:
     # --- security ---
-    api_key: str = os.getenv("API_KEY", "").strip()
+    api_key: str = (os.getenv("API_KEY") or os.getenv("ANALYST_API_KEY") or "").strip()  # ANALYST_API_KEY = alias
     ingest_api_key: str = os.getenv("INGEST_API_KEY", "")
     allow_unauthenticated: bool = _bool("ALLOW_UNAUTHENTICATED", False)
     # Local development only: lets the dashboard served by THIS backend on localhost fetch API_KEY
@@ -39,6 +40,9 @@ class Settings:
     # No cookies are used and writes still need X-API-Key. Set CORS_ORIGIN_REGEX="" to disable,
     # or pin it to your own project, e.g. https://my-dashboard(-[\w-]+)?\.vercel\.app
     cors_origin_regex: str = os.getenv("CORS_ORIGIN_REGEX", r"https://[\w-]+\.vercel\.app")
+    # Dashboards opened from any local dev server port (Live Server :5500, Vite :5173, http.server …)
+    # may call this API. Writes still need X-API-Key; set CORS_ALLOW_LOCALHOST=false to disable.
+    cors_allow_localhost: bool = _bool("CORS_ALLOW_LOCALHOST", True)
     pseudonym_secret: str = os.getenv("PSEUDONYM_SECRET", "change-me-before-the-demo")
     keep_display_names: bool = _bool("KEEP_DISPLAY_NAMES", False)
 
@@ -46,7 +50,7 @@ class Settings:
     db_path: str = os.getenv("DB_PATH", "htccip.db")
 
     # --- YouTube Data API v3 ---
-    youtube_api_key: str = os.getenv("YOUTUBE_API_KEY", "").strip()
+    youtube_api_key: str = (os.getenv("YOUTUBE_API_KEY") or os.getenv("YT_API_KEY") or "").strip()
     youtube_video_ids: list[str] = field(default_factory=lambda: _list("YOUTUBE_VIDEO_IDS"))
     youtube_search_query: str = os.getenv("YOUTUBE_SEARCH_QUERY", "")  # e.g. "Kosovo Serbia dialogue KFOR"
     youtube_search_lang: str = os.getenv("YOUTUBE_SEARCH_LANG", "sq")

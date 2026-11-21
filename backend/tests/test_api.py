@@ -315,3 +315,30 @@ def test_dev_analyst_key_only_for_local_same_origin(api, monkeypatch):
     assert rebind.get("/api/dev/analyst-key").status_code == 404           # DNS rebinding
     monkeypatch.setattr(settings, "api_key", "")
     assert local.get("/api/dev/analyst-key").status_code == 404
+
+
+def test_cors_allows_local_dev_server_ports(api):
+    client, _ = api
+    for origin, allowed in (("http://localhost:5500", True), ("http://127.0.0.1:5173", True),
+                            ("https://x.vercel.app", True), ("https://evil.example", False), ("http://localhost.evil.example", False)):
+        r = client.options("/api/health", headers={"Origin": origin, "Access-Control-Request-Method": "GET"})
+        assert (r.headers.get("access-control-allow-origin") == origin) is allowed, origin
+
+
+def test_youtube_key_restriction_reason_is_parsed_and_explained(api, monkeypatch):
+    import io
+    import json as _json
+    import urllib.error
+    body = _json.dumps({"error": {"code": 403, "errors": [{"reason": "forbidden"}],
+                                  "details": [{"@type": "type.googleapis.com/google.rpc.ErrorInfo", "reason": "API_KEY_HTTP_REFERRER_BLOCKED"}]}}).encode()
+
+    def refuse(req, timeout=20):
+        raise urllib.error.HTTPError(req.full_url, 403, "Forbidden", {}, io.BytesIO(body))
+    monkeypatch.setattr(ingest.urllib.request, "urlopen", refuse)
+    with pytest.raises(ingest.YouTubeError) as exc:
+        ingest._yt_get("search", {"q": "x"}, api_key="k" * 39)
+    assert exc.value.reason == "API_KEY_HTTP_REFERRER_BLOCKED" and "k" * 39 not in str(exc.value)
+    ingest._YT_CACHE.clear()
+    client, _ = api
+    r = client.post("/api/osint/youtube/auto-scan", json={"queries": ["Kosovo"], "api_key": "A" * 39}, headers=ANALYST)
+    assert r.status_code == 403 and "HTTP referrers" in r.json()["detail"]

@@ -113,7 +113,11 @@ def _yt_get(endpoint: str, params: dict, api_key: str | None = None) -> dict:
         body = e.read().decode(errors="ignore")
         reason = ""
         try:
-            reason = json.loads(body)["error"]["errors"][0]["reason"]
+            err = json.loads(body)["error"]
+            # Key restrictions (API_KEY_HTTP_REFERRER_BLOCKED, API_KEY_IP_ADDRESS_BLOCKED, ...) only show up in
+            # error.details[].reason; errors[0].reason is a generic "forbidden" for them.
+            detail = next((d.get("reason") for d in err.get("details") or [] if str(d.get("reason", "")).startswith(("API_KEY_", "SERVICE_"))), "")
+            reason = detail or err["errors"][0]["reason"]
         except Exception:
             pass
         raise YouTubeError(f"{endpoint} HTTP {e.code} {reason}".strip(), status=e.code, reason=reason) from None

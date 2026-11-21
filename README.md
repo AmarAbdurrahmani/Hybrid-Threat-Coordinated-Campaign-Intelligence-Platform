@@ -139,6 +139,15 @@ The backend needs **`API_KEY`** (the analyst key you paste in the LIVE bar) and 
 service's Environment tab. Without `API_KEY`, analyst endpoints return 503 with an explicit message, and
 `/api/health` shows `analyst_key_configured: false`.
 
+**Fallback rules.** With a YouTube key in the form, any backend failure falls back to the same scan in the browser, and the status line names the reason:
+- the backend is offline, or a sleeping Render instance doesn't answer within 20 s;
+- the backend has no `API_KEY`, or there is no or a wrong analyst key;
+- the backend returns an error (4xx/5xx).
+
+The browser scan stays on screen across live reconnects. A key-level YouTube error stops the scan with a precise message: invalid key, quota, API not enabled, or a key restricted to other websites or IPs (`API_KEY_HTTP_REFERRER_BLOCKED` / `API_KEY_IP_ADDRESS_BLOCKED`).
+
+**Local dev servers.** A dashboard opened on another localhost port (Live Server `:5500`, Vite, `python -m http.server`) has no `/api` of its own. It finds the backend by itself, trying the same origin, then `http://localhost:8000`, then Render. `?api=` pins one. CORS allows any `localhost` / `127.0.0.1` port by default (`CORS_ALLOW_LOCALHOST=false` disables this). `ANALYST_API_KEY` is accepted as an alias of `API_KEY`. A repo-root `.env` is loaded too, after `backend/.env`.
+
 **Analyst key without retyping.** The dashboard (and the workspace) resolve the analyst key in this order; the first hit wins:
 1. A one-time link `https://<dashboard>/#key=<API_KEY>`. The URL fragment is never sent to any server, and the page removes it
    from the address bar immediately.

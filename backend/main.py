@@ -111,7 +111,9 @@ async def source_loop(kind: str) -> None:
 
 # YouTube auto-scan: search.list -> commentThreads.list -> pipeline (detection runs per video thread).
 YT_FATAL = {"missingKey", "keyInvalid", "badRequest", "accessNotConfigured", "quotaExceeded", "dailyLimitExceeded",
-            "rateLimitExceeded", "unreachable"}
+            "rateLimitExceeded", "unreachable", "API_KEY_INVALID", "API_KEY_HTTP_REFERRER_BLOCKED",
+            "API_KEY_IP_ADDRESS_BLOCKED", "API_KEY_SERVICE_BLOCKED", "API_KEY_ANDROID_APP_BLOCKED",
+            "API_KEY_IOS_APP_BLOCKED", "SERVICE_DISABLED"}
 
 
 def _yt_message(exc: "ingest.YouTubeError") -> str:
@@ -288,7 +290,9 @@ async def lifespan(_app: FastAPI):
 
 
 app = FastAPI(title="Hybrid Threat & Coordinated Campaign Intelligence Platform API", version="1.1", lifespan=lifespan)
-app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_origin_regex=settings.cors_origin_regex or None,
+_cors_regex = "|".join(f"(?:{r})" for r in (settings.cors_origin_regex,
+                        r"https?://(?:localhost|127\.0\.0\.1|\[::1\])(?::\d+)?" if settings.cors_allow_localhost else "") if r)
+app.add_middleware(CORSMiddleware, allow_origins=settings.cors_origins, allow_origin_regex=_cors_regex or None,
                    allow_methods=["GET", "POST", "PATCH"], allow_headers=["Content-Type", "X-API-Key"])
 
 
@@ -427,6 +431,13 @@ YT_ERRORS = {  # YouTube error reason -> (HTTP status, analyst-facing message)
     "videoNotFound": (404, "Video not found, private or removed"),
     "forbidden": (403, "YouTube refused access to this video's comments"),
     "unreachable": (502, "Could not reach the YouTube API"),
+    "API_KEY_INVALID": (400, "The YouTube API key is invalid"),
+    "SERVICE_DISABLED": (403, "YouTube Data API v3 is not enabled for this API key's project"),
+    "API_KEY_SERVICE_BLOCKED": (403, "This API key is not allowed to call YouTube Data API v3 (check its API restrictions in Google Cloud Console)"),
+    "API_KEY_HTTP_REFERRER_BLOCKED": (403, "This YouTube API key is restricted to websites (HTTP referrers), so the server cannot use it: use an unrestricted or IP-restricted key on the backend"),
+    "API_KEY_IP_ADDRESS_BLOCKED": (403, "This YouTube API key is restricted to other IP addresses (check its application restrictions in Google Cloud Console)"),
+    "API_KEY_ANDROID_APP_BLOCKED": (403, "This YouTube API key is restricted to an Android app"),
+    "API_KEY_IOS_APP_BLOCKED": (403, "This YouTube API key is restricted to an iOS app"),
 }
 
 
