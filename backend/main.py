@@ -269,6 +269,10 @@ async def alert_loop() -> None:
 @contextlib.asynccontextmanager
 async def lifespan(_app: FastAPI):
     global telegram_fetcher
+    if not settings.api_key and not settings.allow_unauthenticated:
+        log.warning("API_KEY is not set: every analyst endpoint (threads, YouTube fetch/auto-scan) will return 503")
+    if not settings.youtube_api_key:
+        log.warning("YOUTUBE_API_KEY is not set: YouTube fetch/auto-scan need a per-request api_key from the dashboard")
     tasks = [asyncio.create_task(task) for task in (source_loop("youtube"), source_loop("telegram"),
                                                    recovery_loop(), alert_loop(), autoscan_loop())]
     try:
@@ -303,6 +307,8 @@ def authorized(value: str | None, expected: str) -> bool:
 
 
 def require_key(x_api_key: str | None = Header(default=None)):
+    if not settings.api_key and not settings.allow_unauthenticated:
+        raise HTTPException(503, "Backend has no analyst API_KEY configured: set API_KEY in backend/.env or the Render environment")
     if not authorized(x_api_key, settings.api_key):
         raise HTTPException(401, "Missing or invalid analyst API key")
 
@@ -493,7 +499,7 @@ async def health():
             "embedder": pipeline.embedder.kind, "alerts": "dry-run" if settings.alert_dry_run else "live",
             "auth_required": bool(settings.api_key or not settings.allow_unauthenticated),
             "analyst_key_configured": bool(settings.api_key),
-            "youtube": bool(settings.youtube_api_key), "telegram": bool(settings.tg_api_id and settings.tg_api_hash),
+            "youtube": bool(settings.youtube_api_key), "features": ["youtube_osint", "youtube_autoscan"], "telegram": bool(settings.tg_api_id and settings.tg_api_hash),
             "llm": settings.llm_enabled and bool(settings.anthropic_api_key),
             "llm_model": settings.llm_model if evaluator.available() else None}
 

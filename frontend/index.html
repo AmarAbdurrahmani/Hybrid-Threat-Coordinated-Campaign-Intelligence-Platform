@@ -1874,6 +1874,10 @@ if (typeof module !== "undefined") module.exports = Engine;
   }
   async function connectWS(attempt, authRequired) {
     if (attempt !== connection) return;
+    if (authRequired && state.health && !state.health.analyst_key_configured) {
+      setLive(false, 'Server has no API_KEY configured');
+      return;
+    }
     if (authRequired && !apiKey) {
       setLive(false, 'Enter analyst API key');
       return;
@@ -1929,16 +1933,25 @@ if (typeof module !== "undefined") module.exports = Engine;
       reconnectTimer = setTimeout(() => connectWS(attempt, authRequired), 3000);
     }
   }
+  // A sleeping Render instance answers the first request only after ~30-60 s (or with a 502/503
+  // while it boots), so probe a few times before declaring the backend offline.
+  async function probeHealth(tries = 1, timeoutMs = 65000) {
+    for (let i = 0; i < tries; i++) {
+      try {
+        const r = await fetch(API_BASE + '/api/health', { cache: 'no-store', signal: AbortSignal.timeout(timeoutMs) });
+        if (r.ok) { const h = await r.json(); if (h && h.contract === '1') { state.health = h; return h; } return null; }
+      } catch (e) {}
+      if (i < tries - 1) await new Promise((res) => setTimeout(res, 4000));
+    }
+    return null;
+  }
+  let healthProbe = null;
   async function initLive() {
     if (!/^https?:$/.test(location.protocol)) return;
-    let health;
-    try {
-      const response = await fetch(API_BASE + '/api/health', { cache: 'no-store' });
-      if (!response.ok) return;
-      health = await response.json();
-      state.health = health; renderLabStatus(); renderLabSummary();
-      if (health.contract !== '1') return;
-    } catch { return; }
+    healthProbe = probeHealth(4);
+    const health = await healthProbe;
+    if (!health) return;
+    renderLabStatus(); renderLabSummary();
     $('#livePanel').classList.remove('hidden');
     const input = $('#liveKey');
     input.classList.remove('hidden');
@@ -3115,6 +3128,47 @@ if (typeof module !== "undefined") module.exports = Engine;
     }
     return { meta: { title: it.snippet.title, channel: it.snippet.channelTitle, published: it.snippet.publishedAt }, comments: out };
   }
+  // Decide per click whether the backend can do the YouTube work, and say exactly why not.
+  // Only HTTP + the analyst key are needed (not the WebSocket), so a slow WS never forces fallback.
+  async function ytBackend() {
+    if (!/^https?:$/.test(location.protocol)) return { ok: false, code: 'offline', why: 'the page was opened from a file, so there is no backend' };
+    let h = state.health;
+    if (!h) {
+      ytStatus(`Contacting backend ${API_HOST}… (a sleeping Render instance can take up to a minute to wake)`);
+      h = (healthProbe && await healthProbe) || await probeHealth(2);
+    }
+    if (!h) return { ok: false, code: 'offline', why: `backend ${API_HOST} is unreachable` };
+    if (h.auth_required && !h.analyst_key_configured) return { ok: false, code: 'noServerKey', why: `backend ${API_HOST} is online but has no API_KEY configured (set API_KEY in backend/.env or on Render)` };
+    if (h.auth_required && !apiKey) return { ok: false, code: 'noAnalystKey', why: `backend ${API_HOST} is online but no analyst API key is entered in the LIVE bar` };
+    return { ok: true, h };
+  }
+  async function ytPost(path, body) {
+    let r;
+    try { r = await apiFetch(path, { method: 'POST', body: JSON.stringify(body) }); }
+    catch (e) { throw Object.assign(new Error(`could not reach ${API_HOST}`), { fallback: true }); }
+    const j = await r.json().catch(() => ({}));
+    if (!r.ok) {
+      const msg = r.status === 401 ? 'the analyst API key in the LIVE bar was rejected'
+        : typeof j.detail === 'string' ? j.detail : r.status === 404 ? `${API_HOST} runs an older version without this endpoint` : 'HTTP ' + r.status;
+      throw Object.assign(new Error(msg), { fallback: [401, 404, 502, 503, 504].includes(r.status) });
+    }
+    return j;
+  }
+  // Runs `viaBackend()` when possible, otherwise `viaBrowser(note)` with the analyst's own key.
+  async function ytRun(key, viaBackend, viaBrowser) {
+    const be = await ytBackend();
+    if (be.ok) {
+      if (!be.h.youtube && !key) throw new Error('Missing YouTube API key: the backend has no YOUTUBE_API_KEY. Enter a YouTube Data API v3 key in the form, or set YOUTUBE_API_KEY in backend/.env or on Render.');
+      try { return await viaBackend(key ? 'your YouTube key' : 'server YOUTUBE_API_KEY'); }
+      catch (err) {
+        if (!err.fallback) throw err;
+        if (!key) throw new Error(`Backend error: ${err.message}. Enter a YouTube API key in the form to run this in the browser instead.`);
+        return viaBrowser(`Backend error (${err.message}), so this used your browser key.`);
+      }
+    }
+    if (!key) throw new Error(`Missing YouTube API key: ${be.why}. Enter a YouTube Data API v3 key in the form to run this in the browser${be.code === 'noAnalystKey' ? ', or paste the analyst key in the LIVE bar' : ''}.`);
+    return viaBrowser(`${be.code === 'offline' ? 'Backend offline' : 'Backend not usable'}, so this used your browser key (${be.why}).`);
+  }
   function ytStatus(msg, tone) { const el = $('#ytStatus'); el.textContent = msg; el.className = 'text-[11px] px-1 ' + (tone === 'err' ? 'text-rose-300' : tone === 'ok' ? 'text-emerald-300' : 'text-slate-400'); }
   try { $('#ytKey').value = sessionStorage.getItem('htccip_ytkey') || ''; } catch (e) {}
   $('#ytForm').addEventListener('submit', async (e) => {
@@ -3124,22 +3178,19 @@ if (typeof module !== "undefined") module.exports = Engine;
     try { key ? sessionStorage.setItem('htccip_ytkey', key) : sessionStorage.removeItem('htccip_ytkey'); } catch (err) {}
     btn.disabled = true; btn.textContent = 'Fetching…'; ytStatus(`Fetching comments for ${vid}…`);
     try {
-      if (liveReady) {
-        const r = await apiFetch('/api/osint/youtube', { method: 'POST', body: JSON.stringify({ youtube_url_or_id: raw, ...(key ? { api_key: key } : {}) }) });
-        const j = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(typeof j.detail === 'string' ? j.detail : r.status === 401 ? 'Enter the analyst API key in the LIVE bar' : 'HTTP ' + r.status);
+      await ytRun(key, async (via) => {
+        const j = await ytPost('/api/osint/youtube', { youtube_url_or_id: raw, ...(key ? { api_key: key } : {}) });
         delete $('#liveThreads').dataset.demo; await refreshThreadList(j.thread_id); await loadLiveThread(j.thread_id);
-        ytStatus(`${j.comments} real comments from “${j.title}” stored and analysed on the backend${j.channels_enriched ? ' · channel ages added' : ''}.`, 'ok');
+        ytStatus(`Backend ${API_HOST} · ${via}: ${j.comments} real comments from “${j.title}” stored and analysed${j.channels_enriched ? ' · channel ages added' : ''}.`, 'ok');
         toast(`YouTube: ${j.comments} comments analysed (${j.new} new)`);
-      } else {
-        if (!key) throw new Error('The backend is not connected: enter a YouTube API key to fetch directly from this browser.');
+      }, async (note) => {
         const { meta, comments } = await ytBrowserFetch(vid, key);
         if (!comments.length) throw new Error('This video has no public comments yet.');
         state.external = { ...meta, vid }; state.sel = null; state.filter = 'all'; state.q = ''; $('#search').value = '';
         load(comments, meta.published, false);
-        ytStatus(`${comments.length} real comments from “${meta.title}” analysed in this browser (no backend: channel ages unavailable, so the network signal is skipped).`, 'ok');
+        ytStatus(`${note} ${comments.length} real comments from “${meta.title}” analysed in this browser (channel ages unavailable, so the network signal is skipped).`, 'ok');
         toast(`YouTube: ${comments.length} comments analysed in the browser`);
-      }
+      });
       go('#sec-overview');
     } catch (err) { ytStatus(err.message, 'err'); toast('YouTube: ' + err.message); }
     finally { btn.disabled = false; btn.textContent = 'Fetch YouTube'; }
@@ -3213,17 +3264,15 @@ if (typeof module !== "undefined") module.exports = Engine;
     btn.disabled = true; btn.textContent = 'Scanning…';
     ytStatus(`Auto-scan: searching YouTube for ${shown.map((q) => '“' + q + '”').join(', ')} → fetching comments → running detection…`);
     try {
-      if (liveReady) {
-        const r = await apiFetch('/api/osint/youtube/auto-scan', { method: 'POST', body: JSON.stringify({ queries, order, ...(key ? { api_key: key } : {}) }) });
-        const j = await r.json().catch(() => ({}));
-        if (!r.ok) throw new Error(typeof j.detail === 'string' ? j.detail : r.status === 401 ? 'Enter the analyst API key in the LIVE bar' : 'HTTP ' + r.status);
+      await ytRun(key, async (via) => {
+        const j = await ytPost('/api/osint/youtube/auto-scan', { queries, order, ...(key ? { api_key: key } : {}) });
         renderYtScan(j.videos || [], true);
         if (j.top_thread_id) { delete $('#liveThreads').dataset.demo; await refreshThreadList(j.top_thread_id); await loadLiveThread(j.top_thread_id); }
         const q = j.quota || {};
-        ytStatus(`Auto-scan: ${j.videos_scanned} videos scanned (${j.videos_found} found for ${j.queries.length} queries) · ${j.comments} comments ingested (${j.new} new) · ${j.flagged_accounts} flagged accounts · ${j.clusters} clusters · ${j.alerts} alerts · quota ${q.units || 0} units${q.cached ? ` (${q.cached} responses from cache)` : ''}${j.warnings && j.warnings.length ? ' · ⚠ ' + j.warnings.join('; ') : ''}${j.top_thread_id ? ' · showing the highest-risk video' : ''}`, j.comments ? 'ok' : '');
+        ytStatus(`Backend ${API_HOST} · ${via} · Auto-scan: ${j.videos_scanned} videos scanned (${j.videos_found} found for ${j.queries.length} queries) · ${j.comments} comments ingested (${j.new} new) · ${j.flagged_accounts} flagged accounts · ${j.clusters} clusters · ${j.alerts} alerts · quota ${q.units || 0} units${q.cached ? ` (${q.cached} responses from cache)` : ''}${j.warnings && j.warnings.length ? ' · ⚠ ' + j.warnings.join('; ') : ''}${j.top_thread_id ? ' · showing the highest-risk video' : ''}`, j.comments ? 'ok' : '');
         toast(`Auto-scan: ${j.comments} comments from ${j.videos_with_comments} videos · ${j.flagged_accounts} flagged accounts`);
-      } else {
-        if (!key) throw new Error('The backend is not connected: enter a YouTube API key to auto-scan directly from this browser.');
+      }, async (note) => {
+        ytStatus(`${note} Searching YouTube from this browser…`);
         const res = await ytBrowserAutoScan(shown, order, key);
         ytScanVideos.clear();
         res.videos.forEach((v) => { if (v.items && v.items.length) ytScanVideos.set(v.video_id, { meta: { title: v.title, channel: v.channel, published: v.published }, comments: v.items }); });
@@ -3234,9 +3283,9 @@ if (typeof module !== "undefined") module.exports = Engine;
         load(res.comments, new Date(Math.min(...res.videos.filter((v) => v.items && v.items.length).map((v) => Date.parse(v.published)))).toISOString(), false);
         const users = new Set(state.res.items.filter((i) => i.tier !== 'organic').map((i) => i.c.user));
         renderYtScan(res.videos, false);
-        ytStatus(`Auto-scan (in this browser): ${ytScanVideos.size} videos · ${res.comments.length} comments analysed together · ${users.size} flagged accounts · ${state.res.clusters.length} clusters · quota ${res.cached ? '0 units (cached)' : res.units + ' units'}. Click a video to analyse it alone. No backend: channel ages unavailable.`, 'ok');
-        toast(`Auto-scan: ${res.comments.length} comments from ${ytScanVideos.size} videos`);
-      }
+        ytStatus(`${note} Auto-scan: ${ytScanVideos.size} videos · ${res.comments.length} comments analysed together · ${users.size} flagged accounts · ${state.res.clusters.length} clusters · quota ${res.cached ? '0 units (cached)' : res.units + ' units'}. Click a video to analyse it alone. Channel ages unavailable in the browser.`, 'ok');
+        toast(`Auto-scan: ${res.comments.length} comments from ${ytScanVideos.size} videos (browser)`);
+      });
       go('#sec-overview');
     } catch (err) { ytStatus('Auto-scan: ' + err.message, 'err'); toast('Auto-scan: ' + err.message); }
     finally { btn.disabled = false; btn.textContent = 'Auto-Scan YouTube'; }

@@ -3,10 +3,14 @@ from __future__ import annotations
 
 import os
 from dataclasses import dataclass, field
+from pathlib import Path
 
 try:
     from dotenv import load_dotenv  # type: ignore
 
+    # backend/.env wins regardless of the working directory uvicorn was started from;
+    # real environment variables (Render) still take precedence over both.
+    load_dotenv(Path(__file__).resolve().with_name(".env"))
     load_dotenv()
 except Exception:  # pragma: no cover
     pass
@@ -24,7 +28,7 @@ def _list(name: str) -> list[str]:
 @dataclass
 class Settings:
     # --- security ---
-    api_key: str = os.getenv("API_KEY", "")
+    api_key: str = os.getenv("API_KEY", "").strip()
     ingest_api_key: str = os.getenv("INGEST_API_KEY", "")
     allow_unauthenticated: bool = _bool("ALLOW_UNAUTHENTICATED", False)
     cors_origins: list[str] = field(default_factory=lambda: _list("CORS_ORIGINS") or ["http://localhost:8000", "http://127.0.0.1:8000", "http://localhost:5173"])
@@ -39,7 +43,7 @@ class Settings:
     db_path: str = os.getenv("DB_PATH", "htccip.db")
 
     # --- YouTube Data API v3 ---
-    youtube_api_key: str = os.getenv("YOUTUBE_API_KEY", "")
+    youtube_api_key: str = os.getenv("YOUTUBE_API_KEY", "").strip()
     youtube_video_ids: list[str] = field(default_factory=lambda: _list("YOUTUBE_VIDEO_IDS"))
     youtube_search_query: str = os.getenv("YOUTUBE_SEARCH_QUERY", "")  # e.g. "Kosovo Serbia dialogue KFOR"
     youtube_search_lang: str = os.getenv("YOUTUBE_SEARCH_LANG", "sq")

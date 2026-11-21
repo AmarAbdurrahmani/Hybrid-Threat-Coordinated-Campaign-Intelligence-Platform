@@ -288,3 +288,14 @@ def test_youtube_autoscan_discovers_fetches_detects_and_caches(api, monkeypatch)
     monkeypatch.setattr(ingest, "_yt_get", lambda *a, **k: (_ for _ in ()).throw(ingest.YouTubeError("x", status=403, reason="quotaExceeded")))
     r = client.post("/api/osint/youtube/auto-scan", json={"api_key": key}, headers=ANALYST)
     assert r.status_code == 429 and "quota" in r.json()["detail"] and key not in r.text
+
+
+def test_missing_server_api_key_is_explicit(api, monkeypatch):
+    client, _ = api
+    health = client.get("/api/health").json()
+    assert health["analyst_key_configured"] and "youtube_autoscan" in health["features"]
+    monkeypatch.setattr(settings, "api_key", "")
+    health = client.get("/api/health").json()
+    assert health["auth_required"] and not health["analyst_key_configured"]
+    r = client.post("/api/osint/youtube/auto-scan", json={}, headers=ANALYST)
+    assert r.status_code == 503 and "API_KEY" in r.json()["detail"]

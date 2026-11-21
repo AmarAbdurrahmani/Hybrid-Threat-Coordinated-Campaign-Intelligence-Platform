@@ -128,6 +128,17 @@ In the dashboard, **Auto-Scan YouTube** (under the Fetch YouTube bar) does all o
 loads the highest-risk video and lists the others (click one to open it). With no backend it runs the same flow in the
 browser using the key from the form.
 
+**Which path runs, and why.** On each click the dashboard checks `/api/health`. It retries for up to about a minute,
+so a sleeping Render instance can wake. The status line then tells you which path ran:
+- `Backend <host> · server YOUTUBE_API_KEY` (or `· your YouTube key`): the scan ran on the backend and was stored.
+- `Backend offline, so this used your browser key`: the backend was unreachable.
+- `Backend not usable, so this used your browser key`: the backend is up but has no `API_KEY`, or no analyst key was entered.
+- `Missing YouTube API key: <reason>`: no backend path and nothing in the form.
+The backend needs **`API_KEY`** (the analyst key you paste in the LIVE bar) and **`YOUTUBE_API_KEY`**. Locally both go in
+`backend/.env`, which is loaded from that folder whatever directory uvicorn starts in. On Render, set them in the
+service's Environment tab. Without `API_KEY`, analyst endpoints return 503 with an explicit message, and
+`/api/health` shows `analyst_key_configured: false`.
+
 ## How the engine scores (engine.py)
 
 `risk = 0.30·Temporal + 0.25·Linguistic + 0.25·Narrative + 0.20·Network`, renormalised over
