@@ -212,13 +212,28 @@ def build(db: Path, out: Path, max_nodes: int = 2400) -> Path:
             comps.append(["Several narratives", 5.0, f"part of {len(nd['pk'])} pushes"])
         nd["comps"] = comps
         nd["s"] = round(min(100.0, sum(c[1] for c in comps)), 1)
-    links = []
-    sub = p[p.user.isin(idx) & p.copied]
-    idx = {u: i for i, u in enumerate(idx)} if False else idx
-    for _, g in sub.groupby("norm"):
-        us = list(dict.fromkeys(g.user))[:25]
-        for i in range(len(us) - 1):
-            links.append({"s": idx[us[i]], "t": idx[us[i + 1]]})
+    links, seen = [], set()
+    def add(a, b, t):
+        key = (min(a, b), max(a, b), t)
+        if a != b and key not in seen:
+            seen.add(key); links.append({"s": a, "t": b, "y": t})
+    # identical text: wire each copy group fully (groups capped at 14 accounts for readability)
+    for _, g in p[p.user.isin(idx) & p.copied].groupby("norm"):
+        us = list(dict.fromkeys(g.user))[:14]
+        for x in range(len(us)):
+            for y in range(x + 1, len(us)):
+                add(idx[us[x]], idx[us[y]], "c")
+    # same video within 30 minutes: link each comment to its nearest following comments by other accounts
+    q = p[p.user.isin(idx)].sort_values("ts")
+    for _, g in q.groupby("thread_id"):
+        t, u = g.ts.to_numpy(), g.user.to_numpy()
+        for x in range(len(t)):
+            k = 0
+            for y in range(x + 1, len(t)):
+                if t[y] - t[x] > 1800 or k >= 3:
+                    break
+                if u[y] != u[x]:
+                    add(idx[u[x]], idx[u[y]], "v"); k += 1
     # Kosovo: coordinated groups = same pro-Serbian text posted by >= 3 different accounts
     serb = p[p.t.str.contains("|".join(f"(?:{r})" for r in PUSHES.values()), regex=True)]
     grp = serb[serb.norm.str.len() >= 6].groupby("norm").user.nunique()
@@ -273,7 +288,7 @@ def build(db: Path, out: Path, max_nodes: int = 2400) -> Path:
         mo["pct_motive"] = round(100 * mo["comments"] / tot, 1) if tot else 0.0
     motives.sort(key=lambda m: -m["comments"])
     clade_block = {"motives": motives, "days": days, "with_motive": tot, "total": int(len(p)), "busy_days": int(len(busy))}
-    data = {"pushes": pushes, "nodes": nodes, "links": links[: max_nodes * 4], "kosovo": kosovo, "bench": bench_stats(), "clades": clade_block,
+    data = {"pushes": pushes, "nodes": nodes, "links": links[:12000], "kosovo": kosovo, "bench": bench_stats(), "clades": clade_block,
             "stats": {"comments": int(len(p)), "accounts": int(p.user.nunique()), "videos": int(p.thread_id.nunique()),
                       "in_pushes": int(sum(pu["accounts"] for pu in pushes)),
                       "copy": int(sum(pu["copy_accounts"] for pu in pushes))}}
@@ -299,7 +314,7 @@ h1{font-size:16px;margin:0;font-weight:700;letter-spacing:-.015em;white-space:no
 main{display:grid;grid-template-columns:minmax(0,1fr) 440px;height:calc(100vh - 150px);min-height:520px;border-bottom:1px solid var(--line)}
 .card .q,.card .tg{display:none}.card.on .q,.card.on .tg{display:block}.card .more{font-size:11.5px;color:#6b7280;margin-top:4px}.card.on .more{display:none}
 .scrollcue{position:absolute;left:50%;bottom:14px;transform:translateX(-50%);background:#04408b;color:#fff;font:600 12px Inter;padding:8px 14px;border-radius:999px;text-decoration:none;box-shadow:0 6px 18px #0b0f1930}
-.zoomhint{position:absolute;right:16px;top:12px;font-size:11.5px;color:#6b7280;background:#ffffffd9;border:1px solid var(--line);border-radius:7px;padding:4px 8px}
+.zoomhint{position:absolute;right:16px;top:12px;font-size:11.5px;color:#dbe6f7;background:#ffffff14;border:1px solid #ffffff26;border-radius:7px;padding:4px 8px}
 section.s{max-width:1180px;margin:0 auto;padding:64px 28px 8px;scroll-margin-top:84px;content-visibility:auto;contain-intrinsic-size:auto 1100px}section.s h2{font-size:28px;letter-spacing:-.025em;margin:0 0 6px}
 section.s .lead{color:var(--mut);font-size:15px;max-width:760px;margin:0 0 26px}
 .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:14px}
@@ -316,8 +331,8 @@ section.s .lead{color:var(--mut);font-size:15px;max-width:760px;margin:0 0 26px}
 #totop{position:fixed;right:18px;bottom:18px;z-index:6;background:#04408b;color:#fff;font:600 12px Inter;text-decoration:none;padding:9px 13px;border-radius:999px;opacity:0;pointer-events:none;transition:opacity .2s}
 #totop.show{opacity:.92;pointer-events:auto}
 @media(max-width:1100px){#secnav{display:none}}section.band{padding-bottom:8px}.tile{border-color:#e3e8f1}section.s h2{color:#04408b}section.s h2::after{content:'';display:block;width:46px;height:3px;background:#d2ab67;border-radius:2px;margin-top:10px}section.blue{background:#04408b;max-width:none;width:100%;padding:64px max(28px,calc((100% - 1124px)/2)) 56px;margin-top:40px}section.blue h2{color:#fff}section.blue .lead{color:#c9d7ee}section.blue .tile{border-color:transparent}section.blue .tile.dark{background:#d2ab67;color:#161616}section.blue .tile.dark .d{color:#3b2f12}.chipx{background:#f3f4f6;border-radius:999px;padding:4px 10px;color:#374151}footer{max-width:1180px;margin:0 auto;padding:40px 28px 60px;color:var(--mut);font-size:12.5px}
-#stage{position:relative;overflow:hidden;background:#f3f6fb}svg#g{width:100%;height:100%;display:block}
-.hlabel{font:700 12px Inter;fill:#111827;paint-order:stroke;stroke:#edf2f7;stroke-width:4px}.hsub{font:500 11px Inter;fill:#6b7280;paint-order:stroke;stroke:#edf2f7;stroke-width:4px}
+#stage{position:relative;overflow:hidden;background:radial-gradient(ellipse at 42% 32%,#0b5bb8 0%,#04408b 42%,#022a5c 100%)}svg#g{width:100%;height:100%;display:block}
+.hlabel{font:800 13px Inter;fill:#ffffff;paint-order:stroke;stroke:#03306a;stroke-width:4px}.hsub{font:600 11px Inter;fill:#c9d7ee;paint-order:stroke;stroke:#03306a;stroke-width:4px}
 aside{background:#ffffff;border-left:1px solid #e3e8f1;overflow:auto;padding:18px 22px}
 .card{background:#fff;border:1px solid #e3e8f1;border-radius:12px;padding:12px 14px;margin:0 0 10px;cursor:pointer;transition:border-color .15s}
 .card:hover,.card.on{border-color:#04408b}
@@ -327,8 +342,8 @@ aside{background:#ffffff;border-left:1px solid #e3e8f1;overflow:auto;padding:18p
 .stats b{display:block;font:800 24px/1.05 Inter;letter-spacing:-.02em;font-variant-numeric:tabular-nums}.stats span{font-size:10.5px;color:#6b7280;text-transform:uppercase;letter-spacing:.04em}
 .q{font-size:12.5px;background:#f9fafb;border-left:3px solid #dc2626;padding:5px 9px;margin:5px 0;border-radius:0 6px 6px 0}
 .q span{color:var(--mut);font-size:11px;margin-left:6px}.tg{font-size:11.5px;color:var(--mut);margin-top:4px}
-.legend{position:absolute;right:14px;bottom:12px;display:flex;align-items:center;gap:7px;background:#ffffffaa;border-radius:999px;padding:4px 10px;font:500 10.5px Inter;color:#6b7280;opacity:.8}
-.ramp{width:90px;height:6px;border-radius:4px;margin:0;background:linear-gradient(90deg,#e5e7eb,#fca5a5 35%,#dc2626 62%,#7f1d1d 84%,#120202)}
+.legend{position:absolute;right:14px;bottom:12px;display:flex;align-items:center;gap:7px;background:#ffffff14;border:1px solid #ffffff26;border-radius:999px;padding:5px 11px;font:500 10.5px Inter;color:#dbe6f7}
+.ramp{width:90px;height:6px;border-radius:4px;margin:0;background:linear-gradient(90deg,#6f86b0,#f9a8a8 40%,#ef4444 70%,#ff2d2d)}
 .note{font-size:12px;color:var(--mut);background:#f4f7fc;border:1px solid #dbe4f3;border-radius:10px;padding:10px 12px;margin-bottom:14px}
 </style></head><body>
 <header><div style="display:flex;align-items:center;gap:11px"><svg class="kodlogo" viewBox="0 0 40 44" width="48" height="53" aria-label="Angry Birds logo" role="img"><path d="M20 2 L36 8 V21 C36 31 29 38.5 20 42 C11 38.5 4 31 4 21 V8 Z" fill="#04408b"/><path d="M20 5.5 L33 10.4 V21 C33 29.3 27.4 35.6 20 38.7 C12.6 35.6 7 29.3 7 21 V10.4 Z" fill="none" stroke="#ffffff" stroke-opacity=".16"/><line x1="13" y1="17" x2="27" y2="15" stroke="#cbd5e1" stroke-width="1.6"/><line x1="13" y1="17" x2="20" y2="29" stroke="#cbd5e1" stroke-width="1.6"/><line x1="27" y1="15" x2="20" y2="29" stroke="#ef4444" stroke-width="1.8"/><circle cx="13" cy="17" r="3.6" fill="#e5e7eb"/><circle cx="27" cy="15" r="3.6" fill="#e5e7eb"/><circle cx="20" cy="29" r="4.8" fill="#dc2626"/><circle cx="20" cy="29" r="7.6" fill="none" stroke="#dc2626" stroke-opacity=".45" stroke-width="1.4"/></svg><div><h1 style="font:800 26px/1 Inter;letter-spacing:-.02em;margin:0;color:#04408b;white-space:nowrap">Angry Birds</h1></div></div><div style="margin-left:4px;display:flex;align-items:center;gap:14px"><span style="width:1px;height:36px;background:#dbe2ee"></span><img src="mod-logo.png" alt="Republika e Kosovës · Ministria e Mbrojtjes" style="height:44px;width:auto;display:block"></div>
@@ -337,7 +352,7 @@ aside{background:#ffffff;border-left:1px solid #e3e8f1;overflow:auto;padding:18p
  <a href="#top">Pushes</a><a href="#numbers">Numbers</a><a href="#motives">Motives</a><a href="#farms">Bot farms</a><a href="#accuracy">Accuracy</a><a href="#theatres">Theatres</a></nav>
 </header><a id="totop" href="#top" aria-label="Back to top">↑ top</a>
 <main id="top" style="scroll-margin-top:84px"><div id="stage"><svg id="g"></svg><a class="scrollcue" href="#numbers">Scroll for motives, bot farms &amp; accuracy ↓</a><div class="zoomhint">Ctrl + scroll to zoom · drag to pan</div>
-<div class="legend" title="Coordination likelihood per account: copies, bursts, fresh channel, no audience, repetition across videos and narratives. Lines join accounts that posted the identical text."><span>coordination</span><div class="ramp"></div><span>0–100</span></div></div>
+<div class="legend" style="right:auto;left:14px"><i style="width:18px;height:2px;background:#ff4d4d;display:inline-block"></i>same text<i style="width:18px;height:1px;background:#cfe0ff;display:inline-block;margin-left:6px"></i>same video ≤ 30 min</div><div class="legend" title="Coordination likelihood per account: copies, bursts, fresh channel, no audience, repetition across videos and narratives. Lines join accounts that posted the identical text."><span>coordination</span><div class="ramp"></div><span>0–100</span></div></div>
 <aside id="side"></aside></main>
 <section class="s blue" id="numbers"><h2>By the numbers</h2>
 <p class="lead">A trained model, not a rule list. It learns every weight from labelled accounts and is tested on accounts it has never seen.</p>
@@ -383,14 +398,18 @@ const zoom = d3.zoom().scaleExtent([0.3, 5]).filter((e) => e.type !== "wheel" ||
   .on("zoom", (e) => root.attr("transform", e.transform)); svg.call(zoom);
 const gH = root.append("g"), gL = root.append("g"), gN = root.append("g"), gT = root.append("g");
 const n = D.pushes.length, cx = (k) => W() / 2 + Math.cos(2 * Math.PI * k / n - 1.57) * W() * 0.33, cy = (k) => H() / 2 + Math.sin(2 * Math.PI * k / n - 1.57) * H() * 0.34;
-const nodes = D.nodes.map((d) => ({ ...d })), links = D.links.map((l) => ({ source: l.s, target: l.t }));
-const link = gL.selectAll("line").data(links).join("line").attr("stroke", "#dc2626").attr("stroke-opacity", 0.18).attr("stroke-width", 1);
-const node = gN.selectAll("circle").data(nodes).join("circle").attr("r", (d) => 4.5 + d.s / 14).attr("fill", (d) => shade(d.s)).attr("stroke", "#fff").attr("stroke-width", 1.2)
+const nodes = D.nodes.map((d) => ({ ...d })), links = D.links.map((l) => ({ source: l.s, target: l.t, y: l.y }));
+const nshade = d3.scaleLinear().domain([0, 30, 60, 85, 100]).range(["#6f86b0", "#f9a8a8", "#ef4444", "#ff2d2d", "#ff1a1a"]).clamp(true);
+svg.append("defs").html('<filter id="glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="2.6" result="b"/><feMerge><feMergeNode in="b"/><feMergeNode in="SourceGraphic"/></feMerge></filter>');
+const LOP = (l) => l.y === "c" ? 0.55 : 0.14;
+const link = gL.selectAll("line").data(links).join("line").attr("stroke", (l) => l.y === "c" ? "#ff4d4d" : "#cfe0ff").attr("stroke-opacity", LOP).attr("stroke-width", (l) => l.y === "c" ? 1.3 : 0.7);
+const node = gN.selectAll("circle").data(nodes).join("circle").attr("r", (d) => 4.5 + d.s / 14).attr("fill", (d) => nshade(d.s)).attr("stroke", (d) => d.s >= 60 ? "#ffffff" : "#ffffff55").attr("stroke-width", (d) => d.s >= 60 ? 1.4 : 0.8)
+  .attr("filter", (d) => d.s >= 60 ? "url(#glow)" : null)
   .style("cursor", "pointer").on("click", (e, d) => { e.stopPropagation(); showAccount(d); });
 const nlab = gN.selectAll("text.nl").data(nodes.filter((d) => d.s >= 60)).join("text").attr("class", "nl").attr("text-anchor", "middle")
-  .attr("font-size", 9).attr("font-weight", 800).attr("font-family", "Inter").attr("fill", "#7f1d1d").attr("paint-order", "stroke").attr("stroke", "#f3f6fb").attr("stroke-width", 3)
+  .attr("font-size", 9).attr("font-weight", 800).attr("font-family", "Inter").attr("fill", "#ffffff").attr("paint-order", "stroke").attr("stroke", "#03306a").attr("stroke-width", 3)
   .style("pointer-events", "none").text((d) => Math.round(d.s) + "%");
-d3.forceSimulation(nodes).force("link", d3.forceLink(links).distance(14).strength((l) => l.source.k === l.target.k ? 0.15 : 0))
+d3.forceSimulation(nodes).force("link", d3.forceLink(links).distance((l) => l.y === "c" ? 12 : 22).strength((l) => l.source.k !== l.target.k ? 0 : l.y === "c" ? 0.2 : 0.02))
   .force("charge", d3.forceManyBody().strength(-10)).force("x", d3.forceX((d) => cx(d.k)).strength(0.2)).force("y", d3.forceY((d) => cy(d.k)).strength(0.2))
   .force("collide", d3.forceCollide((d) => 5.5 + d.s / 14)).on("tick", tick).on("end", fit);
 
@@ -401,17 +420,17 @@ const ICO = {
   nostate: '<svg viewBox="0 0 24 24" width="100%" height="100%"><rect x="4" y="5" width="16" height="13" rx="2" fill="#04408b"/><path d="M9 9h6v5H9z" fill="#d2ab67"/><path d="M3 21 21 3" stroke="#dc2626" stroke-width="2.6" stroke-linecap="round"/></svg>',
   scale: '<svg viewBox="0 0 24 24" width="100%" height="100%"><rect x="11" y="4" width="2" height="15" fill="#374151"/><rect x="7" y="19" width="10" height="2" rx="1" fill="#374151"/><path d="M4 7h16" stroke="#374151" stroke-width="2"/><path d="M4 7 1.5 13h5Z M20 7l-2.5 6h5Z" fill="#9ca3af"/></svg>'};
 const FLAG = (cc) => `<img src="https://flagcdn.com/h40/${cc}.png" style="width:100%;height:100%;object-fit:cover;display:block">`;
-const EMBLEM = (size) => `<span title="Republika e Kosovës" style="width:${Math.round(size * 0.86)}px;height:${size}px;display:inline-block;flex:none;background:url(mod-logo.png) 0 50% / auto ${Math.round(size * 1.08)}px no-repeat"></span>`;
+const EMBLEM = (size) => `<img src="kosovo-emblem.png" alt="Republika e Kosovës" title="Republika e Kosovës" style="height:${size}px;width:auto;display:block;flex:none;filter:drop-shadow(0 3px 8px rgba(0,0,0,.35))">`;
 const badge = (name, size = 30) => name === "Kosovo independence denial" ? EMBLEM(size) : "";
 function tick() {
   link.attr("x1", (l) => l.source.x).attr("y1", (l) => l.source.y).attr("x2", (l) => l.target.x).attr("y2", (l) => l.target.y);
   node.attr("cx", (d) => d.x).attr("cy", (d) => d.y);
   nlab.attr("x", (d) => d.x).attr("y", (d) => d.y - (4.5 + d.s / 14) - 3);
   const g = d3.group(nodes, (d) => d.k);
-  gH.selectAll("path").data(D.pushes).join("path").attr("fill", "#dc262606").attr("stroke", "#dc262633").attr("stroke-width", 1.2)
+  gH.selectAll("path").data(D.pushes).join("path").attr("fill", "#ffffff08").attr("stroke", "#d2ab6766").attr("stroke-width", 1.2)
     .attr("d", (p, k) => { const ps = (g.get(k) || []).flatMap((d) => [[d.x - 12, d.y - 12], [d.x + 12, d.y - 12], [d.x - 12, d.y + 12], [d.x + 12, d.y + 12]]); const h = ps.length > 2 && d3.polygonHull(ps); return h ? "M" + h.join("L") + "Z" : null; });
   gT.selectAll("g").data(D.pushes).join((en) => { const t = en.append("g");
-      t.filter((p) => badge(p.name)).append("foreignObject").attr("x", -18).attr("y", -58).attr("width", 36).attr("height", 40).html((p) => `<div xmlns="http://www.w3.org/1999/xhtml" style="width:36px;height:40px;display:grid;place-items:center">${badge(p.name, 36)}</div>`);
+      t.filter((p) => badge(p.name)).append("foreignObject").attr("x", -34).attr("y", -96).attr("width", 68).attr("height", 76).html((p) => `<div xmlns="http://www.w3.org/1999/xhtml" style="width:68px;height:76px;display:grid;place-items:center">${badge(p.name, 64)}</div>`);
       t.append("text").attr("class", "hlabel"); t.append("text").attr("class", "hsub").attr("dy", 15); return t; })
     .attr("transform", (p, k) => { const ps = g.get(k) || []; return ps.length ? `translate(${d3.mean(ps, (d) => d.x)},${d3.min(ps, (d) => d.y) - 24})` : "translate(-999,-999)"; })
     .call((t) => { t.select(".hlabel").attr("text-anchor", "middle").text((p, k) => `#${k + 1} ${p.name}`);
@@ -421,7 +440,7 @@ function fit() { const b = root.node().getBBox(); const k = Math.min(W() / (b.wi
   svg.transition().duration(700).call(zoom.transform, d3.zoomIdentity.translate(W() / 2 - k * (b.x + b.width / 2), H() / 2 - k * (b.y + b.height / 2)).scale(k)); }
 const pct = (x) => Math.round(100 * x) + "%";
 document.getElementById("side").innerHTML = `<div class="note"><b style="color:#111827">How to read this.</b> Each card is a narrative pushed in comments under Kosovo/Serbia videos, ranked by how many accounts push it. <b>Copy-paste</b> = accounts that posted the identical text as other accounts. <b>Bursts</b> = same text from different accounts within 10 minutes. These are coordination signals for an analyst; the page does not attribute them to any state, and it does not show a bot % because the bot model is validated on the benchmark, not yet on YouTube.</div>` +
-  D.pushes.map((p, k) => `<div class="card" data-k="${k}"><div style="display:flex;align-items:center;gap:10px">${badge(p.name, 34)}<span class="rank">${k + 1}</span><span class="nm" style="font-size:15px">${p.name}</span></div>
+  D.pushes.map((p, k) => `<div class="card" data-k="${k}"><div style="display:flex;align-items:center;gap:10px">${badge(p.name, 46)}<span class="rank">${k + 1}</span><span class="nm" style="font-size:15px">${p.name}</span></div>
   <div class="stats">${[[p.accounts, "accounts", 0], [p.comments, "comments", 0], [p.copy_accounts, "copy-paste", 1], [p.burst_accounts, "in bursts", 1], [pct(p.new_share), "brand-new channels", 0], [p.videos, "videos", 0]]
     .map(([v, l, hot]) => `<div><b style="color:${hot && +String(v).replace(/\D/g, "") > 0 ? "#b91c1c" : "#04408b"}">${typeof v === "number" ? v.toLocaleString() : v}</b><span>${l}</span></div>`).join("")}</div>
   ${p.examples.map(([t, c]) => `<div class="q">${t.replace(/</g, "&lt;")}<span>${c} account${c > 1 ? "s" : ""}</span></div>`).join("")}
@@ -505,12 +524,12 @@ const sideHome = document.getElementById("side").innerHTML;
 function bindCards() {
   document.querySelectorAll(".card").forEach((el) => el.onclick = () => { const k = +el.dataset.k, open = !el.classList.contains("on");
     document.querySelectorAll(".card").forEach((c) => c.classList.toggle("on", open && c === el));
-    if (!open) { node.attr("opacity", 1); link.attr("stroke-opacity", 0.18); return; }
+    if (!open) { node.attr("opacity", 1); link.attr("stroke-opacity", LOP); return; }
     node.attr("opacity", (d) => d.k === k ? 1 : 0.12); link.attr("stroke-opacity", (l) => l.source.k === k ? 0.5 : 0.03); });
 }
 function showAccount(d) {
   const nb = new Set([d]); links.forEach((l) => { if (l.source === d) nb.add(l.target); if (l.target === d) nb.add(l.source); });
-  node.attr("opacity", (n) => nb.has(n) ? 1 : 0.12).attr("stroke", (n) => n === d ? "#04408b" : "#fff").attr("stroke-width", (n) => n === d ? 3 : 1.2);
+  node.attr("opacity", (n) => nb.has(n) ? 1 : 0.15).attr("stroke", (n) => n === d ? "#d2ab67" : "#ffffff").attr("stroke-width", (n) => n === d ? 3 : 1);
   link.attr("stroke-opacity", (l) => l.source === d || l.target === d ? 0.7 : 0.03);
   const COL = { "Word-for-word copies": "#991b1b", "Burst with other accounts": "#dc2626", "Fresh channel": "#d2ab67", "No audience": "#9ca3af", "Repeated across videos": "#04408b", "Several narratives": "#6b21a8" };
   const level = d.s >= 70 ? ["HIGH coordination", "#991b1b", "#fee2e2"] : d.s >= 40 ? ["MEDIUM coordination", "#92400e", "#fef3c7"] : d.s > 0 ? ["LOW coordination", "#065f46", "#d1fae5"] : ["NO coordination signal", "#374151", "#f3f4f6"];
@@ -537,7 +556,7 @@ function showAccount(d) {
    <p style="font-size:11.5px;color:#6b7280;margin-top:14px">Weights: copies up to 40 (grows with the number of copying accounts), burst 25, fresh channel up to 15, repeated across videos up to 10, no audience 5, several narratives 5. Coordination is a lead for an analyst, not proof that the account is a bot: the bot model is validated on the benchmark, not yet on YouTube.</p>`;
   document.getElementById("home").onclick = (e) => { e.preventDefault(); goHome(); };
 }
-function goHome() { document.getElementById("side").innerHTML = sideHome; bindCards(); node.attr("opacity", 1).attr("stroke", "#fff").attr("stroke-width", 1.2); link.attr("stroke-opacity", 0.18); }
+function goHome() { document.getElementById("side").innerHTML = sideHome; bindCards(); node.attr("opacity", 1).attr("stroke", (d) => d.s >= 60 ? "#ffffff" : "#ffffff55").attr("stroke-width", (d) => d.s >= 60 ? 1.4 : 0.8); link.attr("stroke-opacity", LOP); }
 bindCards();
 
 (() => {  // highlight the section in view; show "top" once past the map
