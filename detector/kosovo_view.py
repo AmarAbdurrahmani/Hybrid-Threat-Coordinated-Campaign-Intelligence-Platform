@@ -52,8 +52,6 @@ MOTIVES = {
                                 r"nije\s+zemlja|not\s+recogni[sz]", "#b45309"),
     "Islamist / Sharia advocacy": (r"\b(?:sharia\w*|sheriat\w*|[šs]erijat\w*|khilaf\w*|hilafet\w*|caliphat\w*|kalifat\w*|halifat\w*|"
                                    r"jihad\w*|d[žz]ihad\w*|xhihad\w*|ummah)\b", "#065f46"),
-    "Greater Albania / irredentism": (r"kosov[oa]\s*(?:is|është|eshte|=)\s*(?:albania|shqip\w*)|shqip[eë]ri\w*\s+(?:e|etnike)\s+madhe|"
-                                      r"greater\s+albania|bashkim\w*\s+kombëtar|natural\s+albania", "#be185d"),
     "Pro-Kosovo independence": (r"kosov[oa]\s+(?:is|është|eshte)\s+(?:a\s+)?(?:country|independent|shtet|e\s+pavarur)|independent\s+kosov|"
                                 r"kosova\s+e\s+lir|republi\w+\s+e\s+kosov|i'?m\s+from\s+kosov|unë\s+jam\s+nga\s+kosov", "#0f766e"),
 }
@@ -308,9 +306,9 @@ aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;pad
 .ramp{width:240px;height:10px;border-radius:6px;margin:7px 0 4px;background:linear-gradient(90deg,#e5e7eb,#fca5a5 35%,#dc2626 62%,#7f1d1d 84%,#120202)}
 .note{font-size:12px;color:var(--mut);background:#f9fafb;border:1px solid var(--line);border-radius:10px;padding:10px 12px;margin-bottom:14px}
 </style></head><body>
-<header><div style="display:flex;align-items:center;gap:11px"><svg class="kodlogo" viewBox="0 0 40 44" width="34" height="37" aria-label="KOD logo" role="img"><path d="M20 2 L36 8 V21 C36 31 29 38.5 20 42 C11 38.5 4 31 4 21 V8 Z" fill="#244aa5"/><path d="M20 5.5 L33 10.4 V21 C33 29.3 27.4 35.6 20 38.7 C12.6 35.6 7 29.3 7 21 V10.4 Z" fill="none" stroke="#ffffff" stroke-opacity=".16"/><line x1="13" y1="17" x2="27" y2="15" stroke="#cbd5e1" stroke-width="1.6"/><line x1="13" y1="17" x2="20" y2="29" stroke="#cbd5e1" stroke-width="1.6"/><line x1="27" y1="15" x2="20" y2="29" stroke="#ef4444" stroke-width="1.8"/><circle cx="13" cy="17" r="3.6" fill="#e5e7eb"/><circle cx="27" cy="15" r="3.6" fill="#e5e7eb"/><circle cx="20" cy="29" r="4.8" fill="#dc2626"/><circle cx="20" cy="29" r="7.6" fill="none" stroke="#dc2626" stroke-opacity=".45" stroke-width="1.4"/></svg><div><h1 style="font:800 20px/1 Inter;letter-spacing:.02em;margin:0">KOD</h1><div style="font:600 11px/1.3 Inter;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap">Kosova OSINT Defender</div></div></div><div style="margin-left:4px;border-left:1px solid #e5e7eb;padding-left:16px;min-width:0"><div style="font:700 12px Inter;color:var(--kblue);letter-spacing:.02em;white-space:nowrap">Prototype for Ministria e Mbrojtjes · Republika e Kosovës</div><div class="sub" id="sub"></div></div>
+<header><div style="display:flex;align-items:center;gap:11px"><svg class="kodlogo" viewBox="0 0 40 44" width="34" height="37" aria-label="KOD logo" role="img"><path d="M20 2 L36 8 V21 C36 31 29 38.5 20 42 C11 38.5 4 31 4 21 V8 Z" fill="#244aa5"/><path d="M20 5.5 L33 10.4 V21 C33 29.3 27.4 35.6 20 38.7 C12.6 35.6 7 29.3 7 21 V10.4 Z" fill="none" stroke="#ffffff" stroke-opacity=".16"/><line x1="13" y1="17" x2="27" y2="15" stroke="#cbd5e1" stroke-width="1.6"/><line x1="13" y1="17" x2="20" y2="29" stroke="#cbd5e1" stroke-width="1.6"/><line x1="27" y1="15" x2="20" y2="29" stroke="#ef4444" stroke-width="1.8"/><circle cx="13" cy="17" r="3.6" fill="#e5e7eb"/><circle cx="27" cy="15" r="3.6" fill="#e5e7eb"/><circle cx="20" cy="29" r="4.8" fill="#dc2626"/><circle cx="20" cy="29" r="7.6" fill="none" stroke="#dc2626" stroke-opacity=".45" stroke-width="1.4"/></svg><div><h1 style="font:800 20px/1 Inter;letter-spacing:.02em;margin:0">KOD</h1><div style="font:600 11px/1.3 Inter;color:#6b7280;letter-spacing:.04em;text-transform:uppercase;white-space:nowrap">Kosova OSINT Defender</div></div></div><div style="margin-left:4px;border-left:1px solid #e5e7eb;padding-left:16px;min-width:0"><div style="font:700 12px Inter;color:var(--kblue);letter-spacing:.02em;white-space:nowrap">Prototype for Ministria e Mbrojtjes · Republika e Kosovës</div></div>
 
-<div class="kpis" id="kpis"></div></header>
+</header>
 <main><div id="stage"><svg id="g"></svg><a class="scrollcue" href="#numbers">Scroll for motives, bot farms &amp; accuracy ↓</a><div class="zoomhint">Ctrl + scroll to zoom · drag to pan</div>
 <div class="legend"><b style="color:#0b0f19">Coordination score</b> — shade &amp; size<div class="ramp"></div>
 <div style="display:flex;justify-content:space-between;font:500 11px 'JetBrains Mono'"><span>0</span><span>50</span><span>100</span></div>
@@ -339,36 +337,21 @@ aside{background:var(--card);border-left:1px solid var(--line);overflow:auto;pad
 <section class="s" id="farms"><h2>Bot farms</h2><p class="lead">Where the truth is known we confirm. Where it is not yet known we detect, and we say which is which.</p><div class="grid" id="farmTiles"></div></section>
 <section class="s"><h2>How sure are we? In plain words</h2><p class="lead">Tested on accounts the model had never seen, against labels checked by humans.</p><div class="plain" id="plain"></div></section>
 <section class="s sec"><h2>How secure is it?</h2><div class="plain" id="secure"></div></section>
-<section class="s" id="roadmap"><h2>Where KOD goes next</h2><p class="lead">Built for Ministria e Mbrojtjes. The same detector transfers to any theatre where coordinated accounts fight for opinion.</p>
-<div class="plain" style="grid-template-columns:repeat(auto-fit,minmax(460px,1fr))">
-<div class="tile"><b class="k">Milestones</b><ol style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.7">
- <li><b style="color:#065f46">Done</b>: bot detector trained and blind-tested (F1 0.996, 97–99.7% on unseen bot types).</li>
- <li><b style="color:#065f46">Done</b>: Kosovo collection, pro-Serbian pushes and motive clades on 10,275 real comments.</li>
- <li><b style="color:#92400e">Next</b>: two analysts label a blind Kosovo sample, which gives a Kosovo accuracy with its margin.</li>
- <li><b style="color:#92400e">Next</b>: retrain on Kosovo labels, with an Albanian/Serbian language model in the loop.</li>
- <li>Telegram connector live, then TikTok / Meta through research access.</li>
- <li>On-premise deployment inside the Ministry: no data leaves Kosovo.</li></ol></div>
-<div class="tile"><b class="k">What it is for</b><ul style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.7">
- <li>Early warning when a coordinated push starts, for example around incidents in the north, elections or KFOR decisions.</li>
- <li>Strategic communication: know which narrative is pushed, where, and how hard, before answering it.</li>
- <li>Evidence packs for platform takedown requests: accounts, texts, timing, copy groups.</li>
- <li>Training and exercises for analysts on real, pseudonymised patterns.</li></ul></div>
-<div class="tile"><b class="k">Same method, other theatres</b><ul style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.7">
- <li><b>Ukraine – Russia</b>: cloned-media and bot-amplification networks of the “Doppelganger” type.</li>
- <li><b>Taiwan – China</b>: “Spamouflage”-style mass accounts pushing the same lines across platforms.</li>
- <li><b>Moldova, Romania</b>: paid and coordinated accounts around referendums and elections.</li>
- <li><b>Western Balkans</b>: Bosnia and Herzegovina, Montenegro, North Macedonia, Serbia.</li></ul></div>
-<div class="tile"><b class="k">Who gains</b><ul style="margin:0;padding-left:18px;font-size:13.5px;line-height:1.7">
- <li><b>Ministria e Mbrojtjes / FSK</b>: its own measured picture of the information space, on its own infrastructure, with a human always deciding.</li>
- <li><b>NATO / KFOR</b>: shared, explainable indicators of coordinated activity for situational awareness and StratCom.</li>
- <li><b>Partners</b>: a method that is published, measured and transferable, not a black box.</li></ul></div>
-</div></section>
+<section class="s" id="theatres" style="max-width:1320px">
+<h2 style="font-size:34px">Same method, other theatres</h2>
+<p class="lead" style="font-size:16px">Built and proven on Kosovo. The same trained detector, account graph and motive clades apply wherever coordinated accounts fight for opinion.</p>
+<div id="thCards" style="display:grid;grid-template-columns:repeat(auto-fit,minmax(290px,1fr));gap:14px"></div>
+<div class="tile" style="margin-top:16px;padding:22px 24px">
+ <div style="display:flex;align-items:baseline;gap:12px;flex-wrap:wrap"><b style="font-size:16px">How each theatre shows up in KOD’s signals</b>
+ <span class="d" style="margin:0">Lines = the signal that reveals that theatre’s campaigns · hover a theatre · <b style="color:#065f46">live</b> = working today · <b style="color:#92400e">next</b> = on the roadmap</span></div>
+ <svg id="thGraph" width="100%" height="460" style="display:block;margin-top:10px"></svg></div>
+</section>
 <footer>KOD · Kosova OSINT Defender · a hackathon prototype prepared for Ministria e Mbrojtjes, not an official Ministry product · one question per account: is it a bot? · trained model: LightGBM + relational graph network · benchmark: Cresci-2017 (human-labelled) · Kosovo data: public YouTube comments via the official API, authors pseudonymised. It measures automation and coordination; it never attributes activity to a state, group or person.</footer>
 <script>
 const D = __DATA__, S = D.stats;
 const shade = d3.scaleLinear().domain([0, 30, 55, 80, 100]).range(["#e5e7eb", "#fca5a5", "#dc2626", "#7f1d1d", "#120202"]).clamp(true);
-document.getElementById("sub").textContent = `${S.comments.toLocaleString()} real comments · ${S.accounts.toLocaleString()} accounts · ${S.videos} Kosovo/Serbia videos · authors pseudonymised`;
-document.getElementById("kpis").innerHTML = [[S.in_pushes.toLocaleString(), "accounts pushing"], [S.copy.toLocaleString(), "copy-paste accounts"], [D.pushes.length, "pushes found"]]
+(document.getElementById("sub") || {}).textContent = `${S.comments.toLocaleString()} real comments · ${S.accounts.toLocaleString()} accounts · ${S.videos} Kosovo/Serbia videos · authors pseudonymised`;
+(document.getElementById("kpis") || {}).innerHTML = [[S.in_pushes.toLocaleString(), "accounts pushing"], [S.copy.toLocaleString(), "copy-paste accounts"], [D.pushes.length, "pushes found"]]
   .map(([v, l]) => `<div class="kpi"><b>${v}</b><span>${l}</span></div>`).join("");
 const svg = d3.select("#g"), root = svg.append("g"), W = () => svg.node().clientWidth, H = () => svg.node().clientHeight;
 const zoom = d3.zoom().scaleExtent([0.3, 5]).filter((e) => e.type !== "wheel" || e.ctrlKey || e.metaKey)
@@ -508,6 +491,47 @@ function showAccount(d) {
 function goHome() { document.getElementById("side").innerHTML = sideHome; bindCards(); node.attr("opacity", 1).attr("stroke", "#fff").attr("stroke-width", 1.2); link.attr("stroke-opacity", 0.18); }
 bindCards();
 const B = D.bench, K = D.kosovo, P = (x, d = 1) => (100 * x).toFixed(d) + "%";
+(() => {
+  const F = (cc, h = 26) => `<img src="https://flagcdn.com/h40/${cc}.png" alt="${cc.toUpperCase()}" style="height:${h}px;border-radius:4px;box-shadow:0 0 0 1px #0b0f1922">`;
+  const TH = [
+    { id: "xk", name: "Kosovo – Serbia", sub: "proven here", flags: ["xk", "rs"], col: "#244aa5",
+      text: `${D.kosovo.groups} coordinated pro-Serbian copy groups and ${D.pushes.length} narrative pushes found in ${D.stats.comments.toLocaleString()} real comments.`, sig: ["copy", "sync", "fresh", "motive"] },
+    { id: "ua", name: "Ukraine – Russia", sub: "“Doppelganger” type", flags: ["ua", "ru"], col: "#0057b7",
+      text: "Cloned-media and bot-amplification networks.", sig: ["links", "copy", "paid", "cross"] },
+    { id: "tw", name: "Taiwan – China", sub: "“Spamouflage” style", flags: ["tw", "cn"], col: "#c81d25",
+      text: "Mass accounts pushing the same lines across platforms.", sig: ["fresh", "copy", "cross", "sync"] },
+    { id: "md", name: "Moldova, Romania", sub: "referendums & elections", flags: ["md", "ro"], col: "#d9a400",
+      text: "Paid and coordinated accounts around referendums and elections.", sig: ["paid", "sync", "fresh", "cross"] },
+    { id: "wb", name: "Western Balkans", sub: "BiH · ME · MK · RS", flags: ["ba", "me", "mk", "rs"], col: "#6b21a8",
+      text: "Bosnia and Herzegovina, Montenegro, North Macedonia, Serbia.", sig: ["copy", "motive", "fresh", "sync"] }];
+  const SG = [{ id: "copy", name: "Copy-paste groups", live: 1 }, { id: "sync", name: "Synchronised bursts", live: 1 }, { id: "fresh", name: "Fresh-account waves", live: 1 },
+    { id: "motive", name: "Motive clades", live: 1 }, { id: "links", name: "Shared / cloned links", live: 1 }, { id: "paid", name: "Paid amplification", live: 0 }, { id: "cross", name: "Cross-platform reposting", live: 0 }];
+  document.getElementById("thCards").innerHTML = TH.map((t) => `<div class="tile" data-th="${t.id}" style="padding:20px 22px;border-top:4px solid ${t.col};cursor:default">
+    <div style="display:flex;gap:6px;align-items:center;margin-bottom:12px">${t.flags.map((f, i) => F(f) + (i === 0 && t.flags.length === 2 ? '<span style="font:700 14px Inter;color:#9ca3af;margin:0 4px">vs</span>' : "")).join("")}</div>
+    <div style="font:800 19px Inter;letter-spacing:-.015em">${t.name}</div><div style="font:600 12px Inter;color:${t.col};margin:2px 0 8px;text-transform:uppercase;letter-spacing:.05em">${t.sub}</div>
+    <div class="d" style="font-size:13.5px;color:#374151">${t.text}</div>
+    <div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:12px">${t.sig.map((k) => `<span class="chipx" style="font-size:11.5px">${SG.find((x) => x.id === k).name}</span>`).join("")}</div></div>`).join("");
+  const svg = d3.select("#thGraph"), W = svg.node().clientWidth || 1100, H = 460, lx = 250, rx = W - 270;
+  const ty = (i) => 46 + i * ((H - 92) / (TH.length - 1)), sy = (i) => 30 + i * ((H - 60) / (SG.length - 1));
+  const edges = TH.flatMap((t, i) => t.sig.map((k) => ({ t, i, j: SG.findIndex((x) => x.id === k) })));
+  const path = (e) => `M${lx} ${ty(e.i)} C ${(lx + rx) / 2} ${ty(e.i)}, ${(lx + rx) / 2} ${sy(e.j)}, ${rx} ${sy(e.j)}`;
+  const ed = svg.append("g").selectAll("path").data(edges).join("path").attr("d", path).attr("fill", "none").attr("stroke", (e) => e.t.col)
+    .attr("stroke-width", (e) => e.t.id === "xk" ? 3.2 : 2).attr("stroke-opacity", 0.5).attr("stroke-dasharray", (e) => SG[e.j].live ? null : "5 5");
+  const tg = svg.append("g").selectAll("g").data(TH).join("g").attr("transform", (t, i) => `translate(0,${ty(i)})`).style("cursor", "pointer");
+  tg.append("foreignObject").attr("x", 0).attr("y", -15).attr("width", 92).attr("height", 30)
+    .html((t) => `<div style="display:flex;gap:3px">${t.flags.map((f) => F(f, 22)).join("")}</div>`);
+  tg.append("text").attr("x", lx - 14).attr("y", 5).attr("text-anchor", "end").attr("font-size", 14).attr("font-weight", 700).attr("fill", "#111827").text((t) => t.name);
+  tg.append("circle").attr("cx", lx).attr("r", (t) => t.id === "xk" ? 9 : 7).attr("fill", (t) => t.col).attr("stroke", "#fff").attr("stroke-width", 2.5);
+  const sgG = svg.append("g").selectAll("g").data(SG).join("g").attr("transform", (s, j) => `translate(${rx},${sy(j)})`);
+  sgG.append("circle").attr("r", 8).attr("fill", (s) => s.live ? "#0b0f19" : "#fff").attr("stroke", "#0b0f19").attr("stroke-width", 2);
+  sgG.append("text").attr("x", 18).attr("y", 5).attr("font-size", 14).attr("font-weight", 650).attr("fill", "#111827").text((s) => s.name);
+  sgG.append("text").attr("x", 18).attr("y", 21).attr("font-size", 11).attr("font-weight", 700).attr("fill", (s) => s.live ? "#065f46" : "#92400e").text((s) => s.live ? "LIVE" : "NEXT");
+  const hi = (id) => { ed.attr("stroke-opacity", (e) => !id || e.t.id === id ? 0.75 : 0.06);
+    document.querySelectorAll("[data-th]").forEach((c) => c.style.boxShadow = id && c.dataset.th === id ? "0 6px 20px #0b0f191f" : ""); };
+  tg.on("mouseenter", (e, t) => hi(t.id)).on("mouseleave", () => hi(null));
+  document.querySelectorAll("[data-th]").forEach((c) => { c.onmouseenter = () => hi(c.dataset.th); c.onmouseleave = () => hi(null); });
+})();
+
 document.getElementById("farmTiles").innerHTML = (B.farms != null ? `
  <div class="tile dark"><span class="tag ok">Confirmed · ground truth</span><div class="n">${B.farms}</div><div class="l">bot farms confirmed</div>
   <div class="d">Groups of 5+ accounts that copy-paste or post in sync, at least 90% of them truly bots by human labels. Sizes: ${B.farm_sizes.join(", ")} accounts.</div></div>
