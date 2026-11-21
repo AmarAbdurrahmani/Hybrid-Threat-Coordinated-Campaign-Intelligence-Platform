@@ -68,7 +68,11 @@ def main() -> int:
     check(S, "No server secrets published", leaked == 0, f"{len(secrets)} secret values from .env compared against all site files")
     texts = [t for (t,) in db.execute("SELECT text FROM comments") if t and len(t.strip()) >= 30]
     hits = sum(1 for t in texts if t.strip()[:30] in blob)
-    check(S, "No comment text published", hits == 0, f"{len(texts):,} comments of 30+ characters checked; {hits} found in site files")
+    check(S, "No bulk comment text published", hits == 0, f"{len(texts):,} comments of 30+ characters checked against graph/code files; {hits} found")
+    show = summary.get("showcase", [])
+    check(S, "Only 10 example comments shown, shortened, no names or IDs",
+          len(show) <= 10 and all(len(s["comment"]) <= 161 and not PSEUDO.search(json.dumps(s)) and not re.search(r"yt_[0-9a-f]{12}", json.dumps(s)) for s in show),
+          f"{len(show)} examples, each ≤160 characters, labelled Account A–J")
     cols = [r[1] for r in db.execute("PRAGMA table_info(comments)")]
     check(S, "No author names stored", not any(c in cols for c in ("author", "display_name", "name")), "comments table has no name column; display names are dropped on ingest")
     raw = db.execute("SELECT COUNT(*) FROM comments WHERE account LIKE '%UC%' AND account GLOB '*UC[0-9A-Za-z_-]*'").fetchone()[0]

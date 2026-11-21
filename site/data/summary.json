@@ -1,5 +1,5 @@
 {
- "built": "2026-11-21 20:27 UTC",
+ "built": "2026-11-21 20:42 UTC",
  "kpis": [
   {
    "value": 10275,
@@ -254,7 +254,7 @@
    },
    {
     "relation": "LINK",
-    "weight": 0.6931471824645996,
+    "weight": 0.0,
     "trained": false
    },
    {
@@ -264,7 +264,7 @@
    },
    {
     "relation": "CO_THREAD",
-    "weight": 0.6931471824645996,
+    "weight": 0.0,
     "trained": false
    }
   ],
@@ -333,8 +333,180 @@
   "videos": 69,
   "accounts": 7188,
   "nodes": 2571,
-  "rels": 11577
+  "rels": 11672
  },
+ "showcase": [
+  {
+   "label": "Account A",
+   "risk": 58,
+   "group": 9,
+   "group_name": "War + EU/US",
+   "theme": "Other talk",
+   "icon": "💬",
+   "comment": "Fantastic speech with clear facts! Bravo 👏",
+   "video": "FULL SPEECH: Serbian President Vučić Accuses West of Double Standards Over Kosovo at UN | AC1G",
+   "video_id": "BNwurRKBgs4",
+   "date": "24 Sep 2026, 13:00 UTC",
+   "why": [
+    "Posted in a burst: 9 comments in 15 minutes, 9× normal",
+    "4 comments within 2 minutes",
+    "Same text as 1 other comment"
+   ]
+  },
+  {
+   "label": "Account B",
+   "risk": 57,
+   "group": 3,
+   "group_name": "No clear theme",
+   "theme": "Other talk",
+   "icon": "💬",
+   "comment": "I live in kosovo",
+   "video": "What If Kosovo Suddenly Disappeared? 🤔",
+   "video_id": "g9F3sgZ0M3Y",
+   "date": "15 Nov 2026, 14:10 UTC",
+   "why": [
+    "Posted in a burst: 7 comments in 15 minutes, 7× normal",
+    "5 comments within 2 minutes",
+    "Same text as 12 other comments"
+   ]
+  },
+  {
+   "label": "Account C",
+   "risk": 57,
+   "group": 3,
+   "group_name": "No clear theme",
+   "theme": "Other talk",
+   "icon": "💬",
+   "comment": "I live in Kosovo",
+   "video": "Is Kosovo a country or not?",
+   "video_id": "xfhM49CN7Oc",
+   "date": "12 Nov 2026, 10:57 UTC",
+   "why": [
+    "Posted in a burst: 4 comments in 15 minutes, 4× normal",
+    "3 comments within 2 minutes",
+    "Same text as 24 other comments"
+   ]
+  },
+  {
+   "label": "Account D",
+   "risk": 57,
+   "group": 1,
+   "group_name": "Kosovo is Serbia",
+   "theme": "Kosovo is Serbia",
+   "icon": "🗺️",
+   "comment": "You are a part of serbia",
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "date": "20 Nov 2026, 14:10 UTC",
+   "why": [
+    "Posted in a burst: 15 comments in 15 minutes, 6× normal",
+    "8 comments within 2 minutes",
+    "Same text as 20 other comments"
+   ]
+  },
+  {
+   "label": "Account E",
+   "risk": 57,
+   "group": 1,
+   "group_name": "Kosovo is Serbia",
+   "theme": "Kosova independent",
+   "icon": "🏛️",
+   "comment": "Kosovo is Kosovo",
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "date": "20 Nov 2026, 14:11 UTC",
+   "why": [
+    "Posted in a burst: 16 comments in 15 minutes, 7× normal",
+    "7 comments within 2 minutes",
+    "Same text as 33 other comments"
+   ]
+  },
+  {
+   "label": "Account F",
+   "risk": 57,
+   "group": 1,
+   "group_name": "Kosovo is Serbia",
+   "theme": "Kosovo is Serbia",
+   "icon": "🗺️",
+   "comment": "Part of Serbia",
+   "video": "What If Kosovo Suddenly Disappeared? 🤔",
+   "video_id": "g9F3sgZ0M3Y",
+   "date": "21 Oct 2026, 19:52 UTC",
+   "why": [
+    "Posted in a burst: 8 comments in 15 minutes, 8× normal",
+    "3 comments within 2 minutes",
+    "Same text as 34 other comments"
+   ]
+  },
+  {
+   "label": "Account G",
+   "risk": 57,
+   "group": 1,
+   "group_name": "Kosovo is Serbia",
+   "theme": "Kosovo is Serbia",
+   "icon": "🗺️",
+   "comment": "A piece of serbia",
+   "video": "What If Kosovo Suddenly Disappeared? 🤔",
+   "video_id": "g9F3sgZ0M3Y",
+   "date": "22 Oct 2026, 06:55 UTC",
+   "why": [
+    "Posted in a burst: 4 comments in 15 minutes, 4× normal",
+    "3 comments within 2 minutes",
+    "Same text as 8 other comments"
+   ]
+  },
+  {
+   "label": "Account H",
+   "risk": 55,
+   "group": 13,
+   "group_name": "Kosova independent",
+   "theme": "Kosova independent",
+   "icon": "🏛️",
+   "comment": "Kosovo is it’s own country",
+   "video": "America NATO vs Serbia Russia: Dispute of Kosovo",
+   "video_id": "YlaLz0Fk5MM",
+   "date": "20 Nov 2026, 06:03 UTC",
+   "why": [
+    "Posted in a burst: 8 comments in 15 minutes, 3× normal",
+    "3 comments within 2 minutes",
+    "Same text as 11 other comments"
+   ]
+  },
+  {
+   "label": "Account I",
+   "risk": 55,
+   "group": 42,
+   "group_name": "Kosovo is Serbia + EU/US",
+   "theme": "Kosovo is Serbia",
+   "icon": "🗺️",
+   "comment": "Kosovo i Metohija je Srbija",
+   "video": "FULL SPEECH: Serbian President Vučić Accuses West of Double Standards Over Kosovo at UN | AC1G",
+   "video_id": "BNwurRKBgs4",
+   "date": "24 Sep 2026, 04:04 UTC",
+   "why": [
+    "Posted in a burst: 21 comments in 15 minutes, 21× normal",
+    "8 comments within 2 minutes",
+    "Same text as 2 other comments"
+   ]
+  },
+  {
+   "label": "Account J",
+   "risk": 54,
+   "group": 0,
+   "group_name": "Not linked to a group",
+   "theme": "Kosovo is Serbia",
+   "icon": "🗺️",
+   "comment": "So from serbia 😅",
+   "video": "What If Kosovo Suddenly Disappeared? 🤔",
+   "video_id": "g9F3sgZ0M3Y",
+   "date": "22 Oct 2026, 16:24 UTC",
+   "why": [
+    "Posted in a burst: 9 comments in 15 minutes, 9× normal",
+    "5 comments within 2 minutes",
+    "Same text as 10 other comments"
+   ]
+  }
+ ],
  "stats": {
   "collect": {
    "series": [
@@ -564,7 +736,7 @@
   }
  },
  "checks": {
-  "generated": "2026-11-21 20:33 UTC",
+  "generated": "2026-11-21 20:45 UTC",
   "groups": [
    {
     "name": "Security",
@@ -595,9 +767,14 @@
       "detail": "2 secret values from .env compared against all site files"
      },
      {
-      "name": "No comment text published",
+      "name": "No bulk comment text published",
       "status": "PASS",
-      "detail": "6,380 comments of 30+ characters checked; 0 found in site files"
+      "detail": "6,380 comments of 30+ characters checked against graph/code files; 0 found"
+     },
+     {
+      "name": "Only 10 example comments shown, shortened, no names or IDs",
+      "status": "PASS",
+      "detail": "10 examples, each ≤160 characters, labelled Account A–J"
      },
      {
       "name": "No author names stored",
@@ -672,7 +849,7 @@
      {
       "name": "Graph is consistent",
       "status": "PASS",
-      "detail": "11,577 relationships; 0 dangling, 0 self-loops"
+      "detail": "11,672 relationships; 0 dangling, 0 self-loops"
      },
      {
       "name": "Page counts match the database",
@@ -697,12 +874,12 @@
      {
       "name": "Detector test suite",
       "status": "PASS",
-      "detail": "43 passed, 1 warning in 11.74s"
+      "detail": "43 passed, 1 warning in 8.62s"
      },
      {
       "name": "Backend test suite",
       "status": "PASS",
-      "detail": "32 passed, 1 warning in 4.98s"
+      "detail": "32 passed, 1 warning in 4.99s"
      }
     ]
    }

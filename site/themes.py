@@ -11,10 +11,10 @@ THEMES: dict[str, dict] = {
     "contests_independence": {"label": "Contests Kosovo's independence", "short": "Kosovo is Serbia", "patterns": [
         r"kosovo\s*(?:je|is|=)\s*(?:srbija|serbia|србија)", r"косово\s*(?:је|=)\s*србија", r"\bkis\b", r"kosovo\s*i\s*metohija", r"косово\s*и\s*метохија",
         r"\bkim\b", r"(?:fake|not a|nije)\s*(?:country|state|država|drzava)", r"lažna\s*država", r"srpska\s*(?:zemlja|svetinja)", r"never\s*recogni[sz]e",
-        r"kosovo\s*(?:belongs|is part of)\s*(?:to\s*)?serbia", r"srce\s*srbije", r"срце\s*србије", r"no\s*surrender"]},
+        r"kosovo\s*(?:belongs|is part of)\s*(?:to\s*)?serbia", r"(?:part|piece)\s*of\s*serbia", r"(?:is|=)\s*serbia", r"deo\s*srbije", r"део\s*србије", r"srce\s*srbije", r"срце\s*србије", r"no\s*surrender"]},
     "supports_independence": {"label": "Supports Kosovo's independence", "short": "Kosova independent", "patterns": [
         r"kosova\s*(?:republik|e\s*pavarur|shtet)", r"republic\s*of\s*kosovo", r"kosovo\s*is\s*(?:a\s*)?(?:country|independent|kosovo)", r"kosova\s*është\s*e\s*jona",
-        r"pavarësi", r"pavaresi", r"independen(?:t|ce)\s*kosovo", r"kosovo\s*independen", r"recogni[sz]e\s*kosovo"]},
+        r"pavarësi", r"pavaresi", r"independen(?:t|ce)\s*kosovo", r"kosovo\s*independen", r"recogni[sz]e\s*kosovo", r"kosovo\s*(?:is|=)\s*kosovo", r"(?:its|it'?s|it’s)\s*own\s*country", r"kosovo\s*is\s*not\s*serbia"]},
     "religion": {"label": "Religion", "short": "Religion", "patterns": [
         r"\bgod\b", r"\bbog\b", r"\bбог\b", r"\bzot\b", r"\ballah", r"orthodox", r"pravoslav", r"православ", r"\bchurch", r"crkv", r"цркв", r"monaster", r"manastir",
         r"манастир", r"islam", r"muslim", r"musliman", r"christian", r"hrišć", r"hrisc", r"хришћ", r"katolik", r"catholic", r"\bxhami", r"džamij", r"dzamij", r"\bsveti\b", r"\bmosque"]},

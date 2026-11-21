@@ -41,6 +41,56 @@ def report_weights(path: Path, top: int = 100) -> list[dict]:
     return sorted(rows, key=lambda r: -r["pct"])[:top]
 
 
+ICON = {"contests_independence": "🗺️", "supports_independence": "🏛️", "religion": "⛪", "nato": "🛡️", "russia": "🇷🇺",
+        "war": "⚔️", "albania": "🇦🇱", "eu_us": "🇪🇺", "politicians": "👤"}
+
+
+def plain(reason: str) -> str | None:
+    m = re.search(r"(\d+) comments in its 15-min window vs ([\d.]+) expected \(×([\d.]+)", reason)
+    if m:
+        return f"Posted in a burst: {m.group(1)} comments in 15 minutes, {round(float(m.group(3)))}× normal"
+    m = re.search(r"Near-duplicate of (\d+) comment", reason)
+    if m:
+        return f"Same text as {m.group(1)} other comment{'s' if m.group(1) != '1' else ''}"
+    m = re.search(r"(\d+) comments within ±2 min", reason)
+    if m:
+        return f"{m.group(1)} comments within 2 minutes"
+    m = re.search(r"Low follower count \((\d+)\)", reason)
+    if m:
+        return f"Channel has only {m.group(1)} subscribers"
+    return None
+
+
+def showcase(best, risk, cluster_of, group_name, user_themes, threads, per_user_n, n=10) -> list[dict]:
+    """The 10 most notable accounts: highest coordination risk, with at most 4 from any one group so the picture shows
+    several groups. Published with a letter label only (no name, no ID); the comment is shortened to 160 characters."""
+    picked, per_group = [], Counter()
+    for u in sorted(risk, key=lambda x: (-risk[x], -per_user_n[x])):
+        g = cluster_of.get(u, 0)
+        it = best[u]
+        if not it.get("c", {}).get("text") or (g and per_group[g] >= 4):
+            continue
+        per_group[g] += 1
+        picked.append(u)
+        if len(picked) == n:
+            break
+    out = []
+    for i, u in enumerate(picked):
+        it, c = best[u], best[u]["c"]
+        th = [t for t, _ in user_themes[u].most_common()]
+        reasons = [p for p in (plain(x) for k in ("tReasons", "nReasons", "gReasons", "lReasons") for x in it.get(k, [])) if p][:3]
+        text = re.sub(r"\s+", " ", c["text"]).strip()
+        g = cluster_of.get(u, 0)
+        out.append({"label": f"Account {chr(65 + i)}", "risk": round(risk[u]), "group": g,
+                    "group_name": group_name.get(g, "Not linked to a group").split(" · ")[0] if g else "Not linked to a group",
+                    "theme": THEMES[th[0]]["short"] if th else "Other talk", "icon": ICON.get(th[0], "💬") if th else "💬",
+                    "comment": text[:160] + ("…" if len(text) > 160 else ""),
+                    "video": (threads.get(c["thread_id"], {}) or {}).get("title") or "", "video_id": (threads.get(c["thread_id"], {}) or {}).get("external_id"),
+                    "date": datetime.fromtimestamp(c["ts"] / 1000, timezone.utc).strftime("%d %b %Y, %H:%M UTC") if c.get("ts") else "",
+                    "why": reasons or ["Several weak signals together"]})
+    return out
+
+
 def confidence_table(path: Path) -> dict:
     """What a stated BOT % actually meant on held-out labelled accounts."""
     import pandas as pd
@@ -311,6 +361,7 @@ def main() -> None:
                         "accounts are ranked by the coordination engine, and a Kosovo-labelled sample is the next step.",
         },
         "counts": {"comments": len(comments), "videos": len(threads), "accounts": len(users), "nodes": len(nodes), "rels": len(rels)},
+        "showcase": showcase(best, risk, cluster_of, group_name, user_themes, threads, per_user_n),
         "stats": stage_stats(col, threads, tmeta, per_thread_n, per_user_n, best, risk, relc, levels, weights, meta),
     }
     review = sum(levels.get(k, 0) for k in (1, 2, 3))

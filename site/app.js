@@ -7,6 +7,56 @@
   const $ = id => document.getElementById(id);
 
   /* ---------- summary sections ---------- */
+  /* ---------- Top 10: bubbles (size = bot-likeness, clustered by group) ---------- */
+  $("h-comments").textContent = fmt(S.counts.comments);
+  const T = S.showcase || [];
+  const GCOL = ["#F16667", "#4C8EDA", "#F79767", "#569480", "#C990C0", "#FFC454", "#57C7E3", "#8DCC93"];
+  const groupsIn = [...new Set(T.map(t => t.group))];
+  const gcol = g => g ? GCOL[groupsIn.indexOf(g) % GCOL.length] : "#a5abb6";
+  const rmin = Math.min(...T.map(t => t.risk)), rmax = Math.max(...T.map(t => t.risk));
+  const rad = t => 24 + 56 * Math.pow((t.risk - rmin) / Math.max(1, rmax - rmin), 1.3);
+  const BW = 720, BH = 480;
+  const bsvg = d3.select("#bubbles").attr("viewBox", `0 0 ${BW} ${BH}`);
+  // circle packing: each group is a circle, its accounts sit inside it, nothing overlaps
+  const tree = d3.hierarchy({ children: groupsIn.map(g => ({ g, name: (T.find(t => t.group === g) || {}).group_name, children: T.filter(t => t.group === g).map(t => ({ ...t })) })) })
+    .sum(d => d.risk ? Math.pow(rad(d), 2) : 0);
+  d3.pack().size([BW, BH - 10]).padding(d => d.depth === 0 ? 22 : 5)(tree);
+  bsvg.attr("viewBox", `${tree.x - tree.r - 4} ${tree.y - tree.r - 14} ${2 * tree.r + 8} ${2 * tree.r + 30}`);
+  const grp = bsvg.append("g").selectAll("g").data(tree.children || []).join("g");
+  grp.append("circle").attr("cx", d => d.x).attr("cy", d => d.y + 10).attr("r", d => d.r).attr("fill", d => gcol(d.data.g)).attr("fill-opacity", 0.1)
+    .attr("stroke", d => gcol(d.data.g)).attr("stroke-dasharray", "5 4");
+  grp.filter(d => d.children.length > 1).append("text").attr("class", "halo-label").attr("x", d => d.x).attr("y", d => d.y + 10 - d.r - 6).attr("text-anchor", "middle").text(d => d.data.name);
+  const bnodes = tree.leaves().map(l => ({ ...l.data, x: l.x, y: l.y + 10, r: l.r }));
+  const bub = bsvg.append("g").selectAll("g").data(bnodes).join("g").attr("class", "bub").attr("tabindex", 0).attr("role", "button")
+    .attr("aria-label", d => `${d.label}, ${d.theme}, score ${d.risk}`).attr("transform", d => `translate(${d.x},${d.y})`)
+    .on("click", (e, d) => pick(d)).on("keydown", (e, d) => { if (e.key === "Enter" || e.key === " ") { e.preventDefault(); pick(d); } });
+  bub.append("circle").attr("class", "ring").attr("r", d => d.r + 4).attr("fill", "none");
+  bub.append("circle").attr("r", d => d.r - 2).attr("fill", d => gcol(d.group)).attr("stroke", "#fff").attr("stroke-width", 3);
+  bub.append("text").attr("text-anchor", "middle").attr("dy", "0.1em").style("font-size", d => `${Math.round(d.r * 0.7)}px`).text(d => d.icon);
+  bub.append("text").attr("text-anchor", "middle").attr("y", d => d.r * 0.6).attr("fill", "#fff").style("font-size", "13px").style("font-weight", 700).text(d => d.label.replace("Account ", ""));
+  function pick(d) {
+    bub.classed("sel", n => n === d);
+    $("pick").innerHTML = `<div class="pick-head"><span class="pick-icon" style="background:${gcol(d.group)}">${d.icon}</span>
+        <div><h3>${esc(d.label)}</h3><p>${esc(d.theme)} · ${esc(d.group_name)}</p></div></div>
+      <div class="meter"><div style="width:${Math.min(100, d.risk)}%;background:${d.risk >= 60 ? "#d43f3a" : d.risk >= 35 ? "#e8a33b" : "#4C8EDA"}"></div></div>
+      <p class="score"><b>${d.risk}/100</b> coordination score</p>
+      <blockquote>“${esc(d.comment)}”</blockquote>
+      <p class="where">▶️ <a href="https://www.youtube.com/watch?v=${encodeURIComponent(d.video_id || "")}" target="_blank" rel="noopener noreferrer">${esc(d.video)}</a><br>🕒 ${esc(d.date)}</p>
+      <h4>Why it stands out</h4><ul>${d.why.map(w => `<li>${esc(w)}</li>`).join("")}</ul>
+      <p class="fine">A sign of coordination, not proof. A human checks before anyone acts.</p>`;
+  }
+  if (bnodes.length) pick([...bnodes].sort((a, b) => b.risk - a.risk)[0]);
+
+  /* ---------- trust row ---------- */
+  const allChecks = (S.checks?.groups || []).flatMap(g => g.items);
+  const CFt = S.model.confidence || {};
+  $("trustrow").innerHTML = [
+    ["✅", `${allChecks.filter(i => i.status === "PASS").length}/${allChecks.length}`, "safety and sanity checks pass"],
+    ["🎯", `${CFt.accuracy ?? "–"}%`, `right on ${fmt(CFt.n || 0)} test accounts with known answers`],
+    ["🧪", fmt((S.model.tested || []).reduce((s, r) => s + r[1], 0)), "test runs on labelled accounts"],
+    ["🔒", "0", "names or channel IDs stored"],
+  ].map(([i, v, l]) => `<div class="tile"><span class="ti">${i}</span><b>${v}</b><span>${l}</span></div>`).join("");
+
   /* KPI cards: each opens the evidence behind it */
   const KPI_GO = [["stage", 2], ["query", 10], ["stage", 1], ["query", 0], ["query", 9], ["query", 10]];
   $("kpis").innerHTML = S.kpis.map((k, i) => `<button class="kpi" data-i="${i}" type="button"><b>${fmt(k.value)}</b><span>${esc(k.label)}</span>
@@ -14,7 +64,7 @@
   $("kpis").addEventListener("click", e => {
     const b = e.target.closest(".kpi"); if (!b) return;
     const [kind, arg] = KPI_GO[+b.dataset.i];
-    if (kind === "query") { runQuery(arg); $("graph").scrollIntoView({ behavior: "smooth" }); }
+    if (kind === "query") { openFull(); runQuery(arg); $("graph").scrollIntoView({ behavior: "smooth" }); }
     else { selectStage(arg); $("pipeline").scrollIntoView({ behavior: "smooth" }); }
   });
 
@@ -418,7 +468,9 @@
     $("tableview").hidden = v !== "table"; $("jsonview").hidden = v !== "json";
   });
 
+  let lastQ = 0;
   function run(i) {
+    lastQ = i;
     const q = QUERIES[i], t0 = performance.now();
     const res = q.run();
     current = { ...res, q: { name: q.name, notes: [["nodes", fmt(res.nodes.length)], ["relationships", fmt(res.rels.length)]] } };
@@ -431,6 +483,8 @@
   $("qlist").innerHTML = QUERIES.map((q, i) => `<button class="qbtn" data-i="${i}">${esc(q.name)}<small>${esc(q.cypher)}</small></button>`).join("");
   $("qlist").querySelectorAll(".qbtn").forEach(b => b.onclick = () => run(+b.dataset.i));
   runQuery = run;
+  $("full").addEventListener("toggle", () => { if ($("full").open) run(lastQ); });
+  const openFull = () => { if (!$("full").open) $("full").open = true; };
 
   /* ---------- browser self-test: every saved query, rendered for real ---------- */
   async function selfTest() {
@@ -457,7 +511,7 @@
     return out;
   }
   $("selftest-run").onclick = () => selfTest();
-  if (/[?&]selftest=1/.test(location.search)) selfTest();
+  if (/[?&]selftest=1/.test(location.search)) { $("full").open = true; selfTest(); }
   run(0);
   selectStage(0);
 })();

@@ -13,16 +13,33 @@
 <nav class="top">
   <a class="brand" href="#top">HTCCIP</a>
   <div class="links">
-    <a href="#pipeline">Pipeline</a><a href="#graph">Graph</a><a href="#model">Model</a><a href="#checks">Checks</a>
+    <a href="#top10">Top 10</a><a href="#trust">Can we trust it?</a><a href="#full">Full analysis</a>
   </div>
 </nav>
 
 <header id="top" class="hero wrap">
   <p class="eyebrow">Challenge 01 · AI-powered OSINT &amp; hybrid threat intelligence</p>
-  <h1>Which voices in Kosovo's comment sections are acting together?</h1>
-  <p class="lede">Real public YouTube comments on Kosovo–Serbia videos, collected through the official API, pseudonymised on arrival, scored by our coordination engine and explored as a graph. Every number on this page comes from that data.</p>
-  <div class="kpis" id="kpis"></div>
+  <h1>Who is acting together in Kosovo's comment sections?</h1>
+  <p class="lede">We read <b id="h-comments"></b> real YouTube comments on Kosovo–Serbia videos and looked for accounts that post the same words at the same moments.</p>
 </header>
+
+<section id="top10" class="wrap">
+  <h2>The 10 most bot-like accounts</h2>
+  <div class="legend10"><span><i class="big"></i> bigger = more bot-like</span><span><i class="near"></i><i class="near"></i> close together = same group</span><span>icon = what it talks about</span><span>👆 tap a bubble</span></div>
+  <div class="ten">
+    <div class="bubbles"><svg id="bubbles" role="img" aria-label="Top 10 accounts as bubbles"></svg></div>
+    <article class="pick" id="pick" aria-live="polite"></article>
+  </div>
+</section>
+
+<section id="trust" class="wrap">
+  <h2>Can we trust it?</h2>
+  <div class="trust" id="trustrow"></div>
+</section>
+
+<details id="full" class="wrap full">
+<summary>Show the full analysis: pipeline, graph browser, model, all checks</summary>
+<div class="kpis" id="kpis"></div>
 
 <section id="pipeline" class="wrap">
   <h2>The pipeline, with real counts</h2>
@@ -108,8 +125,10 @@
   </div>
 </section>
 
+</details>
+
 <footer class="wrap foot">
-  <p>Scores are indicators of coordination for a human analyst. They are never attribution: the platform measures behaviour, not identity or sponsor. Account IDs are keyed hashes; comment text, names and channel IDs are not published on this site.</p>
+  <p>Scores are indicators of coordination for a human analyst. They are never attribution: the platform measures behaviour, not identity or sponsor. Accounts appear only as letters or keyed hashes; no names or channel IDs are stored. Only the 10 example comments above are shown, shortened.</p>
 </footer>
 
 <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
